@@ -89,8 +89,6 @@ class ExcelService {
           cell.value?.toString().contains('УСЛОВИЯ') == true) {
         cell.cellStyle = CellStyle(
           bold: true,
-          fontColor: ExcelColor.fromHexString('#FFFFFF'),
-          backgroundColor: ExcelColor.fromHexString('#4472C4'),
         );
       }
     }
@@ -124,8 +122,6 @@ class ExcelService {
       final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: col, rowIndex: 0));
       cell.cellStyle = CellStyle(
         bold: true,
-        fontColor: ExcelColor.fromHexString('#FFFFFF'),
-        backgroundColor: ExcelColor.fromHexString('#4472C4'),
       );
     }
     
@@ -135,7 +131,6 @@ class ExcelService {
       final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: col, rowIndex: totalRow));
       cell.cellStyle = CellStyle(
         bold: true,
-        backgroundColor: ExcelColor.fromHexString('#E2EFDA'),
       );
     }
     
