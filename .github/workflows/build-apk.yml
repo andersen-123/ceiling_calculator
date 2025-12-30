@@ -39,7 +39,7 @@ jobs:
         echo "storePassword=password123" > android/key.properties
         echo "keyPassword=password123" >> android/key.properties
         echo "keyAlias=upload" >> android/key.properties
-        echo "storeFile=~/upload-keystore.jks" >> android/key.properties
+        echo "storeFile=upload-keystore.jks" >> android/key.properties
         
         # Собираем APK
         flutter build apk --release
