@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:share_plus/share_plus.dart';
 import '../models/quote.dart';
 import '../models/line_item.dart';
 import '../models/company.dart';
@@ -37,10 +38,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
         widget.company,
       );
       
-      await Printing.sharePdf(
-        bytes: await file.readAsBytes(),
-        filename: 'Коммерческое предложение_${widget.quote.customerName}.pdf',
-      );
+      // Используем SharePlus вместо Printing.sharePdf
+      await Share.shareXFiles([XFile(file.path)], 
+        text: 'Коммерческое предложение для ${widget.quote.customerName}');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
