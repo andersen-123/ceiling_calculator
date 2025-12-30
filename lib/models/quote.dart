@@ -177,6 +177,8 @@ extension QuoteStatusExtension on QuoteStatus {
         return 'Согласовано';
       case QuoteStatus.completed:
         return 'Выполнено';
+      case QuoteStatus.cancelled:
+        return 'Отменено';
     }
   }
 
@@ -190,6 +192,8 @@ extension QuoteStatusExtension on QuoteStatus {
         return Colors.orange;
       case QuoteStatus.completed:
         return Colors.green;
+      case QuoteStatus.cancelled:
+        return Colors.red;
     }
   }
 }
