@@ -34,6 +34,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   List<LineItem> _lineItems = [];
   bool _isLoading = false;
   Company? _company;
+  int? quoteId;
 
   final List<String> _ceilingSystems = [
     'Гарпун',

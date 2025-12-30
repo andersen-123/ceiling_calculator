@@ -190,5 +190,3 @@ extension QuoteStatusExtension on QuoteStatus {
     }
   }
 }
-
-import 'package:flutter/material.dart';

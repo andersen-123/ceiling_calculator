@@ -148,8 +148,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final settings = AppSettings(
         currencyCode: _selectedCurrency,
         defaultCompanyId: _settings?.defaultCompanyId,
-        language: _settings?.language,
-        requireAuth: _settings?.requireAuth,
+        language: _settings?.language ?? 'ru',
+        requireAuth: _settings?.requireAuth ?? false,
         pinCode: _settings?.pinCode,
       );
 
