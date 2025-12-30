@@ -82,6 +82,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       // Загрузка данных предложения
       if (widget.quote != null) {
         final quote = widget.quote!;
+        quoteId = quote.id;
         _customerNameController.text = quote.customerName;
         _customerPhoneController.text = quote.customerPhone ?? '';
         _customerEmailController.text = quote.customerEmail ?? '';

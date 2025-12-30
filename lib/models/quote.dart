@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Quote {
   final int? id;
   final int companyId;
@@ -161,6 +163,7 @@ enum QuoteStatus {
   sent,
   approved,
   completed,
+  cancelled,
 }
 
 extension QuoteStatusExtension on QuoteStatus {
