@@ -33,7 +33,7 @@ jobs:
     - name: Build APK
       run: |
         # Создаем keystore для подписи
-        keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload -storepass password123 -keypass password123 -dname "CN=Calculator, OU=Dev, O=Company, L=City, ST=State, C=RU"
+        keytool -genkey -v -keystore android/app/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload -storepass password123 -keypass password123 -dname "CN=Calculator, OU=Dev, O=Company, L=City, ST=State, C=RU"
         
         # Создаем файл настроек
         echo "storePassword=password123" > android/key.properties
