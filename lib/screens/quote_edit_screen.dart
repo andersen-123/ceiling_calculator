@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/quote.dart';
 import '../models/line_item.dart';
 import '../models/company.dart';
 import '../database/database_helper.dart';
 import '../widgets/line_item_widget.dart';
+import '../widgets/animated_button.dart';
+import '../services/excel_service.dart';
 
 class QuoteEditScreen extends StatefulWidget {
   final Quote? quote;
@@ -35,6 +38,9 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   bool _isLoading = false;
   Company? _company;
   int? quoteId;
+  bool _isExportingExcel = false;
+
+  final ExcelService _excelService = ExcelService();
 
   final List<String> _ceilingSystems = [
     'Гарпун',
@@ -164,6 +170,72 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     });
   }
 
+  Future<void> _exportToExcel() async {
+    if (_company == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Сначала настройте информацию о компании')),
+      );
+      return;
+    }
+
+    setState(() => _isExportingExcel = true);
+    
+    try {
+      // Создаем текущее предложение для экспорта
+      final quote = _createQuoteFromForm();
+      
+      final file = await _excelService.generateQuoteExcel(
+        quote,
+        _lineItems,
+        _company!,
+      );
+      
+      await Share.shareXFiles([XFile(file.path)], 
+        text: 'Коммерческое предложение для ${quote.customerName}');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка экспорта в Excel: $e')),
+        );
+      }
+    }
+    
+    setState(() => _isExportingExcel = false);
+  }
+
+  Quote _createQuoteFromForm() {
+    final subtotalWork = _lineItems
+        .where((item) => item.section == LineItemSection.work)
+        .fold(0.0, (sum, item) => sum + item.amount);
+    final subtotalEquipment = _lineItems
+        .where((item) => item.section == LineItemSection.equipment)
+        .fold(0.0, (sum, item) => sum + item.amount);
+    final totalAmount = subtotalWork + subtotalEquipment;
+
+    return Quote(
+      id: widget.quote?.id ?? 0,
+      customerName: _customerNameController.text,
+      customerPhone: _customerPhoneController.text.isEmpty ? null : _customerPhoneController.text,
+      customerEmail: _customerEmailController.text.isEmpty ? null : _customerEmailController.text,
+      objectName: _objectNameController.text.isEmpty ? null : _objectNameController.text,
+      address: _addressController.text.isEmpty ? null : _addressController.text,
+      areaS: _areaSController.text.isEmpty ? null : double.tryParse(_areaSController.text),
+      perimeterP: _perimeterPController.text.isEmpty ? null : double.tryParse(_perimeterPController.text),
+      heightH: _heightHController.text.isEmpty ? null : double.tryParse(_heightHController.text),
+      ceilingSystem: _selectedCeilingSystem,
+      status: _selectedStatus,
+      paymentTerms: _paymentTermsController.text.isEmpty ? null : _paymentTermsController.text,
+      installationTerms: _installationTermsController.text.isEmpty ? null : _installationTermsController.text,
+      notes: _notesController.text.isEmpty ? null : _notesController.text,
+      subtotalWork: subtotalWork,
+      subtotalEquipment: subtotalEquipment,
+      totalAmount: totalAmount,
+      currencyCode: 'RUB',
+      createdAt: widget.quote?.createdAt ?? DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+
   Future<void> _saveQuote() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -265,11 +337,18 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         title: Text(widget.quote == null ? 'Новое предложение' : 'Редактирование'),
         actions: [
           if (widget.quote != null)
-            IconButton(
-              icon: const Icon(Icons.picture_as_pdf),
+            AnimatedIconButton(
+              icon: Icons.table_chart,
+              onPressed: _exportToExcel,
+              tooltip: 'Экспорт в Excel',
+            ),
+          if (widget.quote != null)
+            AnimatedIconButton(
+              icon: Icons.picture_as_pdf,
               onPressed: () {
                 // TODO: Реализовать предпросмотр PDF
               },
+              tooltip: 'Предпросмотр PDF',
             ),
         ],
       ),
@@ -292,7 +371,27 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                     const SizedBox(height: 24),
                     _buildStatusSection(),
                     const SizedBox(height: 32),
-                    _buildSaveButton(),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AnimatedButton(
+                            text: 'Сохранить предложение',
+                            onPressed: _saveQuote,
+                            isLoading: _isLoading,
+                            icon: Icons.save,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        AnimatedButton(
+                          text: 'Excel',
+                          onPressed: _isExportingExcel ? null : _exportToExcel,
+                          isLoading: _isExportingExcel,
+                          icon: Icons.table_chart,
+                          color: Colors.green,
+                          width: 100,
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -593,22 +692,6 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildSaveButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _saveQuote,
-        child: _isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : const Text('Сохранить предложение'),
       ),
     );
   }
