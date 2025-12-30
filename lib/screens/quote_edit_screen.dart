@@ -34,7 +34,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   List<LineItem> _lineItems = [];
   bool _isLoading = false;
   Company? _company;
-  late int? quoteId;
+  int? quoteId;
 
   final List<String> _ceilingSystems = [
     'Гарпун',
@@ -217,13 +217,12 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       );
 
       // Сохранение предложения
-      final quoteId = widget.quote?.id;
-      if (quoteId != null) {
+      if (widget.quote?.id != null) {
         await DatabaseHelper.instance.update(
           'quotes',
           quoteWithTotals.toMap(),
           where: 'quote_id = ?',
-          whereArgs: [quoteId],
+          whereArgs: [widget.quote!.id],
         );
       } else {
         final newId = await DatabaseHelper.instance.insert('quotes', quoteWithTotals.toMap());
