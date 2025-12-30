@@ -214,6 +214,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
 
     return Quote(
       id: widget.quote?.id ?? 0,
+      companyId: _company?.id ?? 1,
       customerName: _customerNameController.text,
       customerPhone: _customerPhoneController.text.isEmpty ? null : _customerPhoneController.text,
       customerEmail: _customerEmailController.text.isEmpty ? null : _customerEmailController.text,
@@ -384,7 +385,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                         const SizedBox(width: 12),
                         AnimatedButton(
                           text: 'Excel',
-                          onPressed: _isExportingExcel ? null : _exportToExcel,
+                          onPressed: _isExportingExcel ? () {} : _exportToExcel,
                           isLoading: _isExportingExcel,
                           icon: Icons.table_chart,
                           color: Colors.green,

@@ -89,7 +89,7 @@ class ExcelService {
           cell.value?.toString().contains('УСЛОВИЯ') == true) {
         cell.cellStyle = CellStyle(
           bold: true,
-          fontColor: ExcelColor.white,
+          fontColor: ExcelColor.fromHexString('#FFFFFF'),
           backgroundColor: ExcelColor.fromHexString('#4472C4'),
         );
       }
@@ -124,7 +124,7 @@ class ExcelService {
       final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: col, rowIndex: 0));
       cell.cellStyle = CellStyle(
         bold: true,
-        fontColor: ExcelColor.white,
+        fontColor: ExcelColor.fromHexString('#FFFFFF'),
         backgroundColor: ExcelColor.fromHexString('#4472C4'),
       );
     }
@@ -139,10 +139,10 @@ class ExcelService {
       );
     }
     
-    // Автоширина колонок
-    for (int col = 0; col <= 6; col++) {
-      sheet.setColWidth(col, 20);
-    }
+    // Автоширина колонок (удалено - метод не поддерживается)
+    // for (int col = 0; col <= 6; col++) {
+    //   sheet.setColWidth(col, 20);
+    // }
   }
   
   void _appendRow(Sheet sheet, List<dynamic> values) {
