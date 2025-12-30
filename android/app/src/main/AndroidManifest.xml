@@ -6,8 +6,8 @@
 
     <application
         android:label="Калькулятор потолков"
-        android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:roundIcon="@drawable/ic_launcher_foreground"
         android:allowBackup="true"
         android:fullBackupContent="false"
         android:supportsRtl="true"
