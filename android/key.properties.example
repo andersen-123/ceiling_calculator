@@ -1,0 +1,7 @@
+# Пример файла ключей для подписи APK
+# Скопируйте этот файл в key.properties и заполните реальные значения
+
+storePassword=your_store_password_here
+keyPassword=your_key_password_here
+keyAlias=upload
+storeFile=/home/your_username/upload-keystore.jks

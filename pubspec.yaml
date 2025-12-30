@@ -1,0 +1,53 @@
+name: ceiling_calculator
+description: Коммерческие предложения по натяжным потолкам
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # База данных
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  path_provider: ^2.1.1
+
+  # UI компоненты
+  cupertino_icons: ^1.0.2
+  flutter_slidable: ^3.0.1
+  intl: ^0.20.2
+
+  # Экспорт
+  pdf: ^3.10.4
+  excel: ^4.0.1
+  printing: ^5.12.0
+
+  # Файловая система и шаринг
+  share_plus: ^7.2.1
+  image_picker: ^1.0.4
+  file_picker: ^5.5.0
+
+  # Утилиты
+  uuid: ^4.2.1
+  currency_picker: ^2.0.20
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/
+    - assets/templates/
