@@ -174,16 +174,16 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     });
   }
 
-  Future<void> _showQuickAddDialog(LineItemSection section) async {
+  Future<void> _showQuickAddDialog() async {
     final result = await showDialog<LineItem>(
       context: context,
-      builder: (context) => QuickAddItemDialog(section: section),
+      builder: (context) => const QuickAddItemDialog(),
     );
 
     if (result != null) {
       setState(() {
         // Устанавливаем правильную позицию
-        final itemsInSection = _lineItems.where((item) => item.section == section).toList();
+        final itemsInSection = _lineItems.where((item) => item.section == result.section).toList();
         final newPosition = itemsInSection.isEmpty ? 1 : itemsInSection.last.position + 1;
         
         final itemWithPosition = result.copyWith(position: newPosition);
@@ -572,19 +572,40 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   }
 
   Widget _buildCustomerInfo() {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE5E5E7)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Клиент', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
+            Text(
+              'Информация о клиенте',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF1D1D1F),
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 20),
             TextFormField(
               controller: _customerNameController,
               decoration: const InputDecoration(
                 labelText: 'Имя клиента *',
                 border: OutlineInputBorder(),
+                floatingLabelStyle: TextStyle(color: Color(0xFF007AFF)),
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
@@ -593,23 +614,25 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _customerPhoneController,
               decoration: const InputDecoration(
                 labelText: 'Телефон',
                 border: OutlineInputBorder(),
                 prefixText: '+7 ',
+                floatingLabelStyle: TextStyle(color: Color(0xFF007AFF)),
               ),
               keyboardType: TextInputType.phone,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _customerEmailController,
               decoration: const InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
+                floatingLabelStyle: TextStyle(color: Color(0xFF007AFF)),
               ),
               keyboardType: TextInputType.emailAddress,
             ),
@@ -720,80 +743,74 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     final workItems = _lineItems.where((item) => item.section == LineItemSection.work).toList();
     final equipmentItems = _lineItems.where((item) => item.section == LineItemSection.equipment).toList();
 
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE5E5E7)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Позиции', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(
+                  'Позиции',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF1D1D1F),
+                    letterSpacing: -0.5,
+                  ),
+                ),
                 Row(
                   children: [
-                    // Быстрые кнопки в стиле Apple
+                    // Одна кнопка быстрого добавления в стиле Apple
                     Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        gradient: LinearGradient(
-                          colors: [Colors.blue.shade400, Colors.blue.shade600],
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF007AFF), Color(0xFF0056CC)],
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.blue.withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
+                            color: const Color(0xFF007AFF).withOpacity(0.3),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
                           ),
                         ],
                       ),
                       child: Material(
                         color: Colors.transparent,
                         child: InkWell(
-                          onTap: () => _showQuickAddDialog(LineItemSection.work),
-                          borderRadius: BorderRadius.circular(12),
+                          onTap: _showQuickAddDialog,
+                          borderRadius: BorderRadius.circular(16),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.flash_on, color: Colors.white, size: 18),
-                                SizedBox(width: 8),
-                                Text('Быстрые работы', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        gradient: LinearGradient(
-                          colors: [Colors.orange.shade400, Colors.orange.shade600],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.orange.withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => _showQuickAddDialog(LineItemSection.equipment),
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.flash_on, color: Colors.white, size: 18),
-                                SizedBox(width: 8),
-                                Text('Быстрое оборудование', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                                Icon(Icons.flash_on, color: Colors.white, size: 20),
+                                SizedBox(width: 10),
+                                Text(
+                                  'Быстрое добавление',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    letterSpacing: -0.3,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -804,15 +821,29 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             
             if (workItems.isNotEmpty) ...[
-              Text('Работы', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue[700])),
-              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF007AFF).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'Работы',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF007AFF),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
               ...workItems.asMap().entries.map((entry) {
                 final index = _lineItems.indexOf(entry.value);
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.only(bottom: 12),
                   child: LineItemWidget(
                     item: entry.value,
                     onChanged: (item) => _updateLineItem(index, item),
@@ -820,16 +851,30 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                   ),
                 );
               }).toList(),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
             ],
             
             if (equipmentItems.isNotEmpty) ...[
-              Text('Оборудование', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green[700])),
-              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF9500).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'Оборудование',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFFFF9500),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
               ...equipmentItems.asMap().entries.map((entry) {
                 final index = _lineItems.indexOf(entry.value);
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.only(bottom: 12),
                   child: LineItemWidget(
                     item: entry.value,
                     onChanged: (item) => _updateLineItem(index, item),
@@ -839,11 +884,35 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
               }).toList(),
             ],
             
-            if (_lineItems.isEmpty) ...[
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(32),
-                  child: Text('Добавьте позиции для расчёта стоимости'),
+            if (_lineItems.isEmpty)
+              Container(
+                padding: const EdgeInsets.all(40),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.inventory_2_outlined,
+                        size: 48,
+                        color: const Color(0xFF86868B),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Нет позиций',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: const Color(0xFF86868B),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Нажмите "Быстрое добавление" для начала',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: const Color(0xFF86868B),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
