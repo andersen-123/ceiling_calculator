@@ -7,10 +7,10 @@ import 'database/database_helper.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Отложенная инициализация базы данных
-  Future.microtask(() async {
+  // Инициализируем базу данных в фоне с обработкой ошибок
+  Future.delayed(const Duration(milliseconds: 500), () async {
     try {
-      developer.log('Initializing database...', name: 'main');
+      developer.log('Starting database initialization...', name: 'main');
       await DatabaseHelper.instance.database;
       developer.log('Database initialized successfully', name: 'main');
     } catch (e, stackTrace) {
