@@ -40,7 +40,7 @@ class PdfService {
           pw.SizedBox(height: 20),
           _buildTitle(font, boldFont),
           pw.SizedBox(height: 20),
-          ..._buildLineItemsTable(lineItems, font, boldFont),
+          ..._buildLineItemsTable(lineItems, font, boldFont, quote),
           pw.SizedBox(height: 20),
           _buildTotals(quote, font, boldFont),
           if (quote.paymentTerms != null || quote.installationTerms != null || quote.notes != null) ...[
@@ -206,25 +206,25 @@ class PdfService {
     );
   }
 
-  List<pw.Widget> _buildLineItemsTable(List<LineItem> lineItems, pw.Font font, pw.Font boldFont) {
+  List<pw.Widget> _buildLineItemsTable(List<LineItem> lineItems, pw.Font font, pw.Font boldFont, Quote quote) {
     final workItems = lineItems.where((item) => item.section == LineItemSection.work).toList();
     final equipmentItems = lineItems.where((item) => item.section == LineItemSection.equipment).toList();
 
     final result = <pw.Widget>[];
 
     if (workItems.isNotEmpty) {
-      result.add(_buildSectionTable('Работы', workItems, font, boldFont));
+      result.add(_buildSectionTable('Работы', workItems, font, boldFont, quote.currencyCode));
       result.add(pw.SizedBox(height: 20));
     }
 
     if (equipmentItems.isNotEmpty) {
-      result.add(_buildSectionTable('Оборудование', equipmentItems, font, boldFont));
+      result.add(_buildSectionTable('Оборудование', equipmentItems, font, boldFont, quote.currencyCode));
     }
 
     return result;
   }
 
-  pw.Widget _buildSectionTable(String title, List<LineItem> items, pw.Font font, pw.Font boldFont) {
+  pw.Widget _buildSectionTable(String title, List<LineItem> items, pw.Font font, pw.Font boldFont, String currencyCode) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -245,7 +245,7 @@ class PdfService {
           },
           children: [
             _buildTableHeader(font, boldFont),
-            ...items.map((item) => _buildTableRow(item, font)),
+            ...items.map((item) => _buildTableRow(item, font, currencyCode)),
           ],
         ),
       ],
@@ -266,15 +266,15 @@ class PdfService {
     );
   }
 
-  pw.TableRow _buildTableRow(LineItem item, pw.Font font) {
+  pw.TableRow _buildTableRow(LineItem item, pw.Font font, String currencyCode) {
     return pw.TableRow(
       children: [
         _buildTableCell(item.position.toString(), font),
         _buildTableCell(item.description, font),
         _buildTableCell(item.unit, font),
         _buildTableCell(item.quantity.toStringAsFixed(2), font, align: pw.Alignment.centerRight),
-        _buildTableCell('${item.price.toStringAsFixed(2)} ${item.currencyCode}', font, align: pw.Alignment.centerRight),
-        _buildTableCell('${item.amount.toStringAsFixed(2)} ${item.currencyCode}', font, align: pw.Alignment.centerRight),
+        _buildTableCell('${item.price.toStringAsFixed(2)} $currencyCode', font, align: pw.Alignment.centerRight),
+        _buildTableCell('${item.amount.toStringAsFixed(2)} $currencyCode', font, align: pw.Alignment.centerRight),
       ],
     );
   }
