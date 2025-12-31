@@ -4,6 +4,7 @@ import '../database/database_helper.dart';
 import '../widgets/quote_card.dart';
 import 'quote_edit_screen.dart';
 import 'import_screen.dart';
+import 'project_list_screen.dart';
 
 class QuoteListScreen extends StatefulWidget {
   const QuoteListScreen({super.key});
@@ -152,6 +153,16 @@ class _QuoteListScreenState extends State<QuoteListScreen> {
         ),
         iconTheme: const IconThemeData(color: Color(0xFF007AFF)),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.business_outlined, color: Color(0xFF007AFF)),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProjectListScreen()),
+              );
+            },
+            tooltip: 'Учет объектов',
+          ),
           IconButton(
             icon: const Icon(Icons.cloud_upload_outlined, color: Color(0xFF007AFF)),
             onPressed: _navigateToImport,

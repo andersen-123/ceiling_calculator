@@ -4,6 +4,7 @@ import '../models/company.dart';
 import '../models/quote.dart';
 import '../models/line_item.dart';
 import '../models/settings.dart';
+import 'project_schema.dart';
 
 class DatabaseHelper {
   static const String _databaseName = 'ceiling_calculator.db';
@@ -35,6 +36,7 @@ class DatabaseHelper {
     await _createQuotesTable(db);
     await _createLineItemsTable(db);
     await _createUnitsTable(db);
+    await ProjectSchema.createTables(this);
     await _insertDefaultData(db);
   }
 
