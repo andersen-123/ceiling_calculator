@@ -8,6 +8,7 @@ import '../database/database_helper.dart';
 import '../widgets/line_item_widget.dart';
 import '../widgets/animated_button.dart';
 import '../services/excel_service.dart';
+import '../services/pdf_service.dart';
 
 class QuoteEditScreen extends StatefulWidget {
   final Quote? quote;
@@ -39,8 +40,10 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   Company? _company;
   int? quoteId;
   bool _isExportingExcel = false;
+  bool _isExportingPdf = false;
 
   final ExcelService _excelService = ExcelService();
+  final PdfService _pdfService = PdfService();
 
   final List<String> _ceilingSystems = [
     'Гарпун',
@@ -168,6 +171,39 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     setState(() {
       _lineItems[index] = item;
     });
+  }
+
+  Future<void> _exportToPdf() async {
+    if (_company == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Сначала настройте информацию о компании')),
+      );
+      return;
+    }
+
+    setState(() => _isExportingPdf = true);
+    
+    try {
+      // Создаем текущее предложение для экспорта
+      final quote = _createQuoteFromForm();
+      
+      final file = await _pdfService.generateQuotePdf(
+        quote,
+        _lineItems,
+        _company!,
+      );
+      
+      await Share.shareXFiles([XFile(file.path)], 
+        text: 'Коммерческое предложение для ${quote.customerName}');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка экспорта в PDF: $e')),
+        );
+      }
+    }
+    
+    setState(() => _isExportingPdf = false);
   }
 
   Future<void> _exportToExcel() async {
@@ -337,20 +373,16 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       appBar: AppBar(
         title: Text(widget.quote == null ? 'Новое предложение' : 'Редактирование'),
         actions: [
-          if (widget.quote != null)
-            AnimatedIconButton(
-              icon: Icons.table_chart,
-              onPressed: _exportToExcel,
-              tooltip: 'Экспорт в Excel',
-            ),
-          if (widget.quote != null)
-            AnimatedIconButton(
-              icon: Icons.picture_as_pdf,
-              onPressed: () {
-                // TODO: Реализовать предпросмотр PDF
-              },
-              tooltip: 'Предпросмотр PDF',
-            ),
+          AnimatedIconButton(
+            icon: Icons.table_chart,
+            onPressed: _exportToExcel,
+            tooltip: 'Экспорт в Excel',
+          ),
+          AnimatedIconButton(
+            icon: Icons.picture_as_pdf,
+            onPressed: _exportToPdf,
+            tooltip: 'Экспорт в PDF',
+          ),
         ],
       ),
       body: _isLoading
@@ -382,14 +414,23 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                             icon: Icons.save,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 8),
+                        AnimatedButton(
+                          text: 'PDF',
+                          onPressed: _isExportingPdf ? () {} : _exportToPdf,
+                          isLoading: _isExportingPdf,
+                          icon: Icons.picture_as_pdf,
+                          color: Colors.red,
+                          width: 80,
+                        ),
+                        const SizedBox(width: 8),
                         AnimatedButton(
                           text: 'Excel',
                           onPressed: _isExportingExcel ? () {} : _exportToExcel,
                           isLoading: _isExportingExcel,
                           icon: Icons.table_chart,
                           color: Colors.green,
-                          width: 100,
+                          width: 80,
                         ),
                       ],
                     ),
