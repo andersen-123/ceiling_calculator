@@ -81,17 +81,6 @@ class _QuoteListScreenState extends State<QuoteListScreen> {
     });
   }
 
-  Future<void> _navigateToImport() async {
-    final result = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(builder: (context) => const ImportScreen()),
-    );
-    
-    if (result == true) {
-      _loadQuotes(); // Обновляем список после импорта
-    }
-  }
-
   Future<void> _deleteQuote(Quote quote) async {
     final confirmed = await showDialog<bool>(
       context: context,
