@@ -112,12 +112,12 @@ class ImportService {
     }
   }
   
-  static String? _getCellValue(Cell? cell) {
+  static String? _getCellValue(dynamic cell) {
     if (cell == null) return null;
     return cell.value?.toString();
   }
   
-  static double? _getNumericValue(Cell? cell) {
+  static double? _getNumericValue(dynamic cell) {
     if (cell == null) return null;
     final value = cell.value;
     if (value == null) return null;
