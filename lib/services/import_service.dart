@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import '../models/quote.dart';
 import '../models/line_item.dart';
 import '../models/company.dart';
+import 'package:sqflite/sqflite.dart';
 
 class ImportService {
   static Future<List<Map<String, dynamic>>> importExcelFile(File file) async {

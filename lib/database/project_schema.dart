@@ -1,7 +1,10 @@
+import 'package:sqflite/sqflite.dart';
 import '../database/database_helper.dart';
 
 class ProjectSchema {
-  static Future<void> createTables(DatabaseHelper db) async {
+  static Future<void> createTables(DatabaseHelper dbHelper) async {
+    final db = await dbHelper.database;
+    
     await db.execute('''
       CREATE TABLE IF NOT EXISTS projects (
         project_id INTEGER PRIMARY KEY AUTOINCREMENT,
