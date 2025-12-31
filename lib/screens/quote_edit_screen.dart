@@ -7,6 +7,7 @@ import '../models/company.dart';
 import '../database/database_helper.dart';
 import '../widgets/line_item_widget.dart';
 import '../widgets/animated_button.dart';
+import '../widgets/quick_add_item_dialog.dart';
 import '../services/excel_service.dart';
 import '../services/pdf_service.dart';
 
@@ -173,6 +174,24 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     });
   }
 
+  Future<void> _showQuickAddDialog(LineItemSection section) async {
+    final result = await showDialog<LineItem>(
+      context: context,
+      builder: (context) => QuickAddItemDialog(section: section),
+    );
+
+    if (result != null) {
+      setState(() {
+        // Устанавливаем правильную позицию
+        final itemsInSection = _lineItems.where((item) => item.section == section).toList();
+        final newPosition = itemsInSection.isEmpty ? 1 : itemsInSection.last.position + 1;
+        
+        final itemWithPosition = result.copyWith(position: newPosition);
+        _lineItems.add(itemWithPosition);
+      });
+    }
+  }
+
   Future<void> _exportToPdf() async {
     if (_company == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -326,6 +345,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       );
 
       // Сохранение предложения
+      int? savedQuoteId;
       if (widget.quote?.id != null) {
         await DatabaseHelper.instance.update(
           'quotes',
@@ -333,8 +353,10 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
           where: 'quote_id = ?',
           whereArgs: [widget.quote!.id],
         );
+        savedQuoteId = widget.quote!.id;
       } else {
         final newId = await DatabaseHelper.instance.insert('quotes', quoteWithTotals.toMap());
+        savedQuoteId = newId;
         quoteId = newId;
       }
 
@@ -342,11 +364,11 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       await DatabaseHelper.instance.delete(
         'line_items',
         where: 'quote_id = ?',
-        whereArgs: [quoteId],
+        whereArgs: [savedQuoteId],
       );
 
       for (final item in _lineItems) {
-        final itemWithQuoteId = item.copyWith(quoteId: quoteId);
+        final itemWithQuoteId = item.copyWith(quoteId: savedQuoteId);
         await DatabaseHelper.instance.insert('line_items', itemWithQuoteId.toMap());
       }
 
@@ -602,11 +624,28 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                 const Text('Позиции', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 Row(
                   children: [
+                    AnimatedButton(
+                      text: 'Быстрая работа',
+                      onPressed: () => _showQuickAddDialog(LineItemSection.work),
+                      icon: Icons.flash_on,
+                      color: Colors.blue,
+                      width: 140,
+                    ),
+                    const SizedBox(width: 8),
                     TextButton.icon(
                       onPressed: () => _addLineItem(LineItemSection.work),
                       icon: const Icon(Icons.add),
                       label: const Text('Работу'),
                     ),
+                    const SizedBox(width: 8),
+                    AnimatedButton(
+                      text: 'Быстрое оборудование',
+                      onPressed: () => _showQuickAddDialog(LineItemSection.equipment),
+                      icon: Icons.flash_on,
+                      color: Colors.orange,
+                      width: 160,
+                    ),
+                    const SizedBox(width: 8),
                     TextButton.icon(
                       onPressed: () => _addLineItem(LineItemSection.equipment),
                       icon: const Icon(Icons.add),

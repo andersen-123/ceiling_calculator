@@ -35,10 +35,19 @@ class ExcelService {
     
     // Сохраняем файл
     final output = await getTemporaryDirectory();
-    final file = File('${output.path}/Коммерческое предложение_${quote.customerName}.xlsx');
+    final fileName = 'Коммерческое предложение_${quote.customerName.replaceAll(RegExp(r'[^\w\s-]'), '_')}.xlsx';
+    final file = File('${output.path}/$fileName');
     
-    final bytes = excel.save();
-    await file.writeAsBytes(bytes!);
+    try {
+      final bytes = excel.save();
+      if (bytes != null) {
+        await file.writeAsBytes(bytes);
+      } else {
+        throw Exception('Не удалось создать Excel файл');
+      }
+    } catch (e) {
+      throw Exception('Ошибка сохранения Excel: $e');
+    }
     
     return file;
   }
