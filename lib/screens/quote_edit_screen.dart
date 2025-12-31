@@ -374,9 +374,17 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Предложение сохранено')),
+          const SnackBar(
+            content: Text('Предложение сохранено'),
+            backgroundColor: Colors.green,
+          ),
         );
-        Navigator.pop(context);
+        // Небольшая задержка перед закрытием для показа снэкбара
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            Navigator.of(context).pop(true); // Возвращаем true чтобы обновить список
+          }
+        });
       }
     } catch (e) {
       if (mounted) {
@@ -426,33 +434,133 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                     const SizedBox(height: 24),
                     _buildStatusSection(),
                     const SizedBox(height: 32),
+                    // Кнопки в стиле Apple
                     Row(
                       children: [
                         Expanded(
-                          child: AnimatedButton(
-                            text: 'Сохранить предложение',
-                            onPressed: _saveQuote,
-                            isLoading: _isLoading,
-                            icon: Icons.save,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              gradient: LinearGradient(
+                                colors: [Colors.blue.shade500, Colors.blue.shade700],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.blue.withOpacity(0.3),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: _isLoading ? null : _saveQuote,
+                                borderRadius: BorderRadius.circular(16),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  child: Center(
+                                    child: _isLoading
+                                        ? const SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                            ),
+                                          )
+                                        : const Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.save, color: Colors.white, size: 20),
+                                              SizedBox(width: 8),
+                                              Text(
+                                                'Сохранить предложение',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        AnimatedButton(
-                          text: 'PDF',
-                          onPressed: _isExportingPdf ? () {} : _exportToPdf,
-                          isLoading: _isExportingPdf,
-                          icon: Icons.picture_as_pdf,
-                          color: Colors.red,
-                          width: 80,
+                        const SizedBox(width: 12),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: LinearGradient(
+                              colors: [Colors.red.shade500, Colors.red.shade700],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.red.withOpacity(0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: _isExportingPdf ? () {} : _exportToPdf,
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                child: _isExportingPdf
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      )
+                                    : const Icon(Icons.picture_as_pdf, color: Colors.white, size: 20),
+                              ),
+                            ),
+                          ),
                         ),
-                        const SizedBox(width: 8),
-                        AnimatedButton(
-                          text: 'Excel',
-                          onPressed: _isExportingExcel ? () {} : _exportToExcel,
-                          isLoading: _isExportingExcel,
-                          icon: Icons.table_chart,
-                          color: Colors.green,
-                          width: 80,
+                        const SizedBox(width: 12),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: LinearGradient(
+                              colors: [Colors.green.shade500, Colors.green.shade700],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.green.withOpacity(0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: _isExportingExcel ? () {} : _exportToExcel,
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                child: _isExportingExcel
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      )
+                                    : const Icon(Icons.table_chart, color: Colors.white, size: 20),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -624,32 +732,73 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                 const Text('Позиции', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 Row(
                   children: [
-                    AnimatedButton(
-                      text: 'Быстрая работа',
-                      onPressed: () => _showQuickAddDialog(LineItemSection.work),
-                      icon: Icons.flash_on,
-                      color: Colors.blue,
-                      width: 140,
+                    // Быстрые кнопки в стиле Apple
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        gradient: LinearGradient(
+                          colors: [Colors.blue.shade400, Colors.blue.shade600],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.blue.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => _showQuickAddDialog(LineItemSection.work),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.flash_on, color: Colors.white, size: 18),
+                                SizedBox(width: 8),
+                                Text('Быстрые работы', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                    const SizedBox(width: 8),
-                    TextButton.icon(
-                      onPressed: () => _addLineItem(LineItemSection.work),
-                      icon: const Icon(Icons.add),
-                      label: const Text('Работу'),
-                    ),
-                    const SizedBox(width: 8),
-                    AnimatedButton(
-                      text: 'Быстрое оборудование',
-                      onPressed: () => _showQuickAddDialog(LineItemSection.equipment),
-                      icon: Icons.flash_on,
-                      color: Colors.orange,
-                      width: 160,
-                    ),
-                    const SizedBox(width: 8),
-                    TextButton.icon(
-                      onPressed: () => _addLineItem(LineItemSection.equipment),
-                      icon: const Icon(Icons.add),
-                      label: const Text('Оборудование'),
+                    const SizedBox(width: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        gradient: LinearGradient(
+                          colors: [Colors.orange.shade400, Colors.orange.shade600],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.orange.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => _showQuickAddDialog(LineItemSection.equipment),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.flash_on, color: Colors.white, size: 18),
+                                SizedBox(width: 8),
+                                Text('Быстрое оборудование', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),

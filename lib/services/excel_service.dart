@@ -7,49 +7,48 @@ import '../models/company.dart';
 
 class ExcelService {
   Future<File> generateQuoteExcel(Quote quote, List<LineItem> lineItems, Company company) async {
-    final excel = Excel.createExcel();
-    
-    // Удаляем стандартный лист
-    excel.delete('Sheet1');
-    
-    // Создаём листы
-    final summarySheet = excel['Сводка'];
-    final workSheet = excel['Работы'];
-    final equipmentSheet = excel['Оборудование'];
-    
-    // Заполняем сводку
-    _fillSummarySheet(summarySheet, quote, company);
-    
-    // Разделяем позиции по разделам
-    final workItems = lineItems.where((item) => item.section == LineItemSection.work).toList();
-    final equipmentItems = lineItems.where((item) => item.section == LineItemSection.equipment).toList();
-    
-    // Заполняем листы
-    if (workItems.isNotEmpty) {
-      _fillItemsSheet(workSheet, workItems, quote.currencyCode);
-    }
-    
-    if (equipmentItems.isNotEmpty) {
-      _fillItemsSheet(equipmentSheet, equipmentItems, quote.currencyCode);
-    }
-    
-    // Сохраняем файл
-    final output = await getTemporaryDirectory();
-    final fileName = 'Коммерческое предложение_${quote.customerName.replaceAll(RegExp(r'[^\w\s-]'), '_')}.xlsx';
-    final file = File('${output.path}/$fileName');
-    
     try {
+      final excel = Excel.createExcel();
+      
+      // Удаляем стандартный лист
+      excel.delete('Sheet1');
+      
+      // Создаём листы
+      final summarySheet = excel['Сводка'];
+      final workSheet = excel['Работы'];
+      final equipmentSheet = excel['Оборудование'];
+      
+      // Заполняем сводку
+      _fillSummarySheet(summarySheet, quote, company);
+      
+      // Разделяем позиции по разделам
+      final workItems = lineItems.where((item) => item.section == LineItemSection.work).toList();
+      final equipmentItems = lineItems.where((item) => item.section == LineItemSection.equipment).toList();
+      
+      // Заполняем листы
+      if (workItems.isNotEmpty) {
+        _fillItemsSheet(workSheet, workItems, quote.currencyCode);
+      }
+      
+      if (equipmentItems.isNotEmpty) {
+        _fillItemsSheet(equipmentSheet, equipmentItems, quote.currencyCode);
+      }
+      
+      // Сохраняем файл
+      final output = await getTemporaryDirectory();
+      final fileName = 'Коммерческое_предложение_${quote.customerName.replaceAll(RegExp(r'[^\w\s-]'), '_')}.xlsx';
+      final file = File('${output.path}/$fileName');
+      
       final bytes = excel.save();
-      if (bytes != null) {
+      if (bytes != null && bytes.isNotEmpty) {
         await file.writeAsBytes(bytes);
+        return file;
       } else {
-        throw Exception('Не удалось создать Excel файл');
+        throw Exception('Не удалось создать Excel файл - пустые данные');
       }
     } catch (e) {
-      throw Exception('Ошибка сохранения Excel: $e');
+      throw Exception('Ошибка создания Excel файла: $e');
     }
-    
-    return file;
   }
   
   void _fillSummarySheet(Sheet sheet, Quote quote, Company company) {

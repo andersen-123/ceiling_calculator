@@ -14,157 +14,142 @@ class QuickAddItemDialog extends StatefulWidget {
 }
 
 class _QuickAddItemDialogState extends State<QuickAddItemDialog> {
-  final _descriptionController = TextEditingController();
-  final _quantityController = TextEditingController(text: '1');
-  final _priceController = TextEditingController();
-  final _unitController = TextEditingController(text: 'м²');
-  final _noteController = TextEditingController();
-
-  final List<String> _commonDescriptions = [
-    'Монтаж натяжного потолка',
-    'Полотно ПВХ белое',
-    'Полотно сатиновое',
-    'Полотно матовое',
-    'Багет пластиковый',
-    'Багет алюминиевый',
-    'Профиль стартовый',
-    'Профиль направляющий',
-    'Подвес прямой',
-    'Точечный светильник',
-    'Светодиодная лента',
-    'Диммер',
-    'Трансформатор',
+  final List<Map<String, dynamic>> _commonItems = [
+    // Работы
+    {'description': 'Монтаж натяжного потолка', 'unit': 'м²', 'price': 350.0, 'section': LineItemSection.work},
+    {'description': 'Монтаж многоуровневого потолка', 'unit': 'м²', 'price': 550.0, 'section': LineItemSection.work},
+    {'description': 'Монтаж натяжного потолка с фотопечатью', 'unit': 'м²', 'price': 450.0, 'section': LineItemSection.work},
+    {'description': 'Установка светильников', 'unit': 'шт.', 'price': 150.0, 'section': LineItemSection.work},
+    {'description': 'Монтаж светодиодной ленты', 'unit': 'м.п.', 'price': 200.0, 'section': LineItemSection.work},
+    {'description': 'Установка диммера', 'unit': 'шт.', 'price': 250.0, 'section': LineItemSection.work},
+    {'description': 'Демонтаж старого потолка', 'unit': 'м²', 'price': 100.0, 'section': LineItemSection.work},
+    {'description': 'Выравнивание потолка', 'unit': 'м²', 'price': 150.0, 'section': LineItemSection.work},
+    
+    // Оборудование
+    {'description': 'Полотно ПВХ белое матовое', 'unit': 'м²', 'price': 120.0, 'section': LineItemSection.equipment},
+    {'description': 'Полотно ПВХ белое сатиновое', 'unit': 'м²', 'price': 140.0, 'section': LineItemSection.equipment},
+    {'description': 'Полотно с фотопечатью', 'unit': 'м²', 'price': 350.0, 'section': LineItemSection.equipment},
+    {'description': 'Багет пластиковый белый', 'unit': 'м.п.', 'price': 80.0, 'section': LineItemSection.equipment},
+    {'description': 'Багет алюминиевый', 'unit': 'м.п.', 'price': 120.0, 'section': LineItemSection.equipment},
+    {'description': 'Профиль стартовый', 'unit': 'м.п.', 'price': 60.0, 'section': LineItemSection.equipment},
+    {'description': 'Профиль направляющий', 'unit': 'м.п.', 'price': 70.0, 'section': LineItemSection.equipment},
+    {'description': 'Подвес прямой', 'unit': 'шт.', 'price': 15.0, 'section': LineItemSection.equipment},
+    {'description': 'Точечный светильник', 'unit': 'шт.', 'price': 250.0, 'section': LineItemSection.equipment},
+    {'description': 'Светодиодная лента', 'unit': 'м.п.', 'price': 80.0, 'section': LineItemSection.equipment},
+    {'description': 'Диммер', 'unit': 'шт.', 'price': 350.0, 'section': LineItemSection.equipment},
+    {'description': 'Трансформатор', 'unit': 'шт.', 'price': 280.0, 'section': LineItemSection.equipment},
   ];
-
-  final List<String> _commonUnits = ['м²', 'м.п.', 'шт.', 'компл.'];
 
   @override
   Widget build(BuildContext context) {
+    final filteredItems = _commonItems.where((item) => item['section'] == widget.section).toList();
+    
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      elevation: 8,
       child: Container(
-        padding: const EdgeInsets.all(20),
-        width: MediaQuery.of(context).size.width * 0.9,
-        constraints: const BoxConstraints(maxWidth: 500),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+          maxWidth: MediaQuery.of(context).size.width * 0.9,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Быстрое добавление - ${widget.section == LineItemSection.work ? 'Работы' : 'Оборудование'}',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            // Header
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: widget.section == LineItemSection.work ? Colors.blue.shade50 : Colors.orange.shade50,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            
-            // Быстрые описания
-            const Text('Быстрые описания:', style: TextStyle(fontWeight: FontWeight.w500)),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _commonDescriptions.map((desc) {
-                return ActionChip(
-                  label: Text(desc, style: const TextStyle(fontSize: 12)),
-                  onPressed: () {
-                    _descriptionController.text = desc;
-                  },
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16),
-            
-            // Описание
-            TextFormField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Описание *',
-                border: OutlineInputBorder(),
-                hintText: 'Введите описание позиции',
               ),
-              maxLines: 2,
-            ),
-            const SizedBox(height: 12),
-            
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _quantityController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(
-                      labelText: 'Количество *',
-                      border: OutlineInputBorder(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Быстрое добавление - ${widget.section == LineItemSection.work ? 'Работы' : 'Оборудование'}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: widget.section == LineItemSection.work ? Colors.blue.shade800 : Colors.orange.shade800,
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                SizedBox(
-                  width: 100,
-                  child: DropdownButtonFormField<String>(
-                    value: _unitController.text,
-                    decoration: const InputDecoration(
-                      labelText: 'Ед.изм.',
-                      border: OutlineInputBorder(),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.grey.shade600,
                     ),
-                    items: _commonUnits.map((unit) {
-                      return DropdownMenuItem(
-                        value: unit,
-                        child: Text(unit),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      _unitController.text = value ?? 'м²';
-                    },
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            
-            TextFormField(
-              controller: _priceController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'Цена за единицу *',
-                border: OutlineInputBorder(),
-                prefixText: '₽ ',
+                ],
               ),
             ),
-            const SizedBox(height: 12),
             
-            TextFormField(
-              controller: _noteController,
-              decoration: const InputDecoration(
-                labelText: 'Примечание',
-                border: OutlineInputBorder(),
-                hintText: 'Дополнительная информация',
+            // Items list
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: filteredItems.length,
+                itemBuilder: (context, index) {
+                  final item = filteredItems[index];
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    child: InkWell(
+                      onTap: () => _addItem(item),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item['description'],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade100,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    item['unit'],
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade600,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '${item['price'].toStringAsFixed(0)} ₽/${item['unit']}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: widget.section == LineItemSection.work ? Colors.blue.shade600 : Colors.orange.shade600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
-              maxLines: 2,
-            ),
-            const SizedBox(height: 20),
-            
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Отмена'),
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton(
-                  onPressed: _addItem,
-                  child: const Text('Добавить'),
-                ),
-              ],
             ),
           ],
         ),
@@ -172,45 +157,22 @@ class _QuickAddItemDialogState extends State<QuickAddItemDialog> {
     );
   }
 
-  void _addItem() {
-    final description = _descriptionController.text.trim();
-    final quantity = double.tryParse(_quantityController.text);
-    final price = double.tryParse(_priceController.text);
-
-    if (description.isEmpty || quantity == null || price == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Заполните все обязательные поля')),
-      );
-      return;
-    }
-
-    final amount = quantity * price;
-    
+  void _addItem(Map<String, dynamic> itemData) {
     final item = LineItem(
       id: null,
       quoteId: 0, // Будет установлен позже
       position: 1, // Будет установлен позже
       section: widget.section,
-      description: description,
-      unit: _unitController.text,
-      quantity: quantity,
-      price: price,
-      amount: amount,
-      note: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
+      description: itemData['description'],
+      unit: itemData['unit'],
+      quantity: 1.0,
+      price: itemData['price'],
+      amount: itemData['price'],
+      note: null,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
 
     Navigator.pop(context, item);
-  }
-
-  @override
-  void dispose() {
-    _descriptionController.dispose();
-    _quantityController.dispose();
-    _priceController.dispose();
-    _unitController.dispose();
-    _noteController.dispose();
-    super.dispose();
   }
 }
