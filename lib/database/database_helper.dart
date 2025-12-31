@@ -31,13 +31,18 @@ class DatabaseHelper {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    await _createCompaniesTable(db);
-    await _createSettingsTable(db);
-    await _createQuotesTable(db);
-    await _createLineItemsTable(db);
-    await _createUnitsTable(db);
-    await ProjectSchema.createTables(this);
-    await _insertDefaultData(db);
+    try {
+      await _createCompaniesTable(db);
+      await _createSettingsTable(db);
+      await _createQuotesTable(db);
+      await _createLineItemsTable(db);
+      await _createUnitsTable(db);
+      await ProjectSchema.createTables(this);
+      await _insertDefaultData(db);
+    } catch (e) {
+      print('Error creating database tables: $e');
+      rethrow;
+    }
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {

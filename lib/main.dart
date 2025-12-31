@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'dart:developer' as developer;
 import 'screens/home_screen.dart';
 import 'database/database_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  await DatabaseHelper.instance.database;
+  try {
+    developer.log('Initializing database...', name: 'main');
+    await DatabaseHelper.instance.database;
+    developer.log('Database initialized successfully', name: 'main');
+  } catch (e, stackTrace) {
+    developer.log('Database initialization failed: $e', name: 'main', error: e, stackTrace: stackTrace);
+    // Продолжаем работу даже если база данных не инициализировалась
+  }
   
   runApp(const CeilingCalculatorApp());
 }
