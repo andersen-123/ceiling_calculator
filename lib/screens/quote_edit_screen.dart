@@ -915,7 +915,6 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                   ),
                 ),
               ),
-            ],
           ],
         ),
       ),
