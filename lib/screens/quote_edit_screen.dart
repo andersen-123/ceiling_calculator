@@ -525,8 +525,20 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       }
 
       if (mounted) {
-        // Мгновенный переход без SnackBar
-        Navigator.of(context).pop(true);
+        // Показываем SnackBar и переходим назад через WidgetsBinding
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Предложение сохранено'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        
+        // Переходим назад в следующем фрейме
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            Navigator.of(context).pop(true);
+          }
+        });
         return;
       }
     } catch (e) {
