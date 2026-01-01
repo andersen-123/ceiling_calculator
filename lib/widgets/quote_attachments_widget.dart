@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/quote_attachment.dart';
 
 class QuoteAttachmentsWidget extends StatefulWidget {
@@ -93,6 +95,40 @@ class _QuoteAttachmentsWidgetState extends State<QuoteAttachmentsWidget> {
     }
   }
 
+  Future<void> _openAttachment(QuoteAttachment attachment) async {
+    try {
+      final file = File(attachment.filePath);
+      if (await file.exists()) {
+        // Для Android используем url_launcher
+        final uri = Uri.file(file.path);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri);
+        } else {
+          // Если не удалось открыть через url_launcher, пробуем через share_plus
+          await Share.shareXFiles([XFile(file.path)], text: 'Файл: ${attachment.fileName}');
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Файл не найден'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Ошибка открытия файла: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   void _removeAttachment(QuoteAttachment attachment) {
     setState(() {
       widget.attachments.remove(attachment);
@@ -142,16 +178,18 @@ class _QuoteAttachmentsWidgetState extends State<QuoteAttachmentsWidget> {
           children: [
             Row(
               children: [
-                Text(
-                  'Прикрепленные файлы',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF1D1D1F),
-                    letterSpacing: -0.5,
+                Expanded(
+                  child: Text(
+                    'Прикрепленные файлы',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF1D1D1F),
+                      letterSpacing: -0.5,
+                    ),
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 ElevatedButton.icon(
                   onPressed: _isAddingFile ? null : _addAttachment,
                   icon: _isAddingFile
@@ -163,12 +201,14 @@ class _QuoteAttachmentsWidgetState extends State<QuoteAttachmentsWidget> {
                             color: Colors.white,
                           ),
                         )
-                      : const Icon(Icons.attach_file, size: 16),
-                  label: Text(_isAddingFile ? 'Загрузка...' : 'Добавить файл'),
+                      : const Icon(Icons.attach_file, size: 14),
+                  label: Text(_isAddingFile ? 'Загрузка...' : 'Добавить'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    minimumSize: Size(0, 32),
+                    textStyle: const TextStyle(fontSize: 12),
                   ),
                 ),
               ],
@@ -221,6 +261,7 @@ class _QuoteAttachmentsWidgetState extends State<QuoteAttachmentsWidget> {
                 ),
                 child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  onTap: () => _openAttachment(attachment),
                   leading: Container(
                     width: 40,
                     height: 40,

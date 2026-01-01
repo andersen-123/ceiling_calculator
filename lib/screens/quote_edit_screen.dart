@@ -535,9 +535,9 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
           SnackBar(content: Text('Ошибка сохранения: $e')),
         );
       }
+    } finally {
+      setState(() => _isLoading = false);
     }
-
-    // setState убираем, так как мы уходим с экрана
   }
 
   @override
