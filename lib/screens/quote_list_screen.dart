@@ -162,22 +162,28 @@ class _QuoteListScreenState extends State<QuoteListScreen> {
                           return QuoteCard(
                             quote: quote,
                             onTap: () async {
-                              await Navigator.push(
+                              final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => QuoteEditScreen(quote: quote),
                                 ),
                               );
-                              _loadQuotes();
+                              // Обновляем список только если вернулись с сохранением
+                              if (result == true && mounted) {
+                                _loadQuotes();
+                              }
                             },
                             onEdit: () async {
-                              await Navigator.push(
+                              final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => QuoteEditScreen(quote: quote),
                                 ),
                               );
-                              _loadQuotes();
+                              // Обновляем список только если вернулись с сохранением
+                              if (result == true && mounted) {
+                                _loadQuotes();
+                              }
                             },
                             onDelete: () => _deleteQuote(quote),
                           );
