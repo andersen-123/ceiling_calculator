@@ -337,18 +337,26 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       _lineItems.add(newItem);
     });
     
-    // Прокрутка к новой позиции после полного рендеринга
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted && _scrollController.hasClients) {
-          _scrollController.animateTo(
-            _scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
-      });
+    // Более надежная прокрутка
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        _scrollToNewItem();
+      }
     });
+  }
+
+  void _scrollToNewItem() {
+    // Найдем индекс последнего элемента
+    final lastIndex = _lineItems.length - 1;
+    if (lastIndex >= 0 && _scrollController.hasClients) {
+      // Прокрутим к последнему элементу с небольшим отступом
+      final targetPosition = (lastIndex * 200.0); // Примерная высота одного элемента
+      _scrollController.animateTo(
+        targetPosition,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   void _scrollToBottom() {
@@ -957,6 +965,7 @@ Widget _buildLineItems() {
     final equipmentItems = _lineItems.where((item) => item.section == LineItemSection.equipment).toList();
 
     return Container(
+      key: ValueKey(_lineItems.length), // Ключ для обновления при изменении количества
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
