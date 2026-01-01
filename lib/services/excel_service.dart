@@ -152,7 +152,20 @@ class ExcelService {
     final rowIndex = sheet.maxRows;
     for (int col = 0; col < values.length; col++) {
       final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: col, rowIndex: rowIndex));
-      cell.value = values[col];
+      final value = values[col];
+      
+      // Правильное присвоение значения в зависимости от типа
+      if (value == null) {
+        cell.value = TextCellValue('');
+      } else if (value is String) {
+        cell.value = TextCellValue(value);
+      } else if (value is int) {
+        cell.value = IntCellValue(value);
+      } else if (value is double) {
+        cell.value = DoubleCellValue(value);
+      } else {
+        cell.value = TextCellValue(value.toString());
+      }
     }
   }
 }
