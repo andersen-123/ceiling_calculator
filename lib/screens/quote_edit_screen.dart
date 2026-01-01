@@ -506,8 +506,9 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        // Переходим назад немедленно
+        // Переходим назад немедленно, без setState
         Navigator.of(context).pop(true);
+        return; // Выходим из функции
       }
     } catch (e) {
       if (mounted) {
