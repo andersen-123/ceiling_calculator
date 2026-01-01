@@ -434,12 +434,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        // Небольшая задержка перед закрытием для показа снэкбара
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            Navigator.of(context).pop(true); // Возвращаем true чтобы обновить список
-          }
-        });
+        // Сразу переходим назад без задержки
+        Navigator.of(context).pop(true);
       }
     } catch (e) {
       if (mounted) {
