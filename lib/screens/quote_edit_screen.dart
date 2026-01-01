@@ -475,7 +475,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                                               Icon(Icons.save, color: Colors.white, size: 20),
                                               SizedBox(width: 8),
                                               Text(
-                                                'Сохранить предложение',
+                                                'Сохранить',
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.w600,

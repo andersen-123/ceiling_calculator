@@ -10,30 +10,35 @@ class QuickAddItemDialog extends StatefulWidget {
 
 class _QuickAddItemDialogState extends State<QuickAddItemDialog> {
   final List<Map<String, dynamic>> _allItems = [
-    {'description': 'Полотно MSD Premium белое матовое с установкой по цене 650 за кв.м.', 'unit': 'м²', 'price': 650.0, 'section': LineItemSection.equipment, 'category': 'Полотна'},
-    {'description': 'Полотно MSD Premium белое сатиновое с установкой по цене 680 за кв.м.', 'unit': 'м²', 'price': 680.0, 'section': LineItemSection.equipment, 'category': 'Полотна'},
-    {'description': 'Полотно MSD Premium цветное с установкой по цене 750 за кв.м.', 'unit': 'м²', 'price': 750.0, 'section': LineItemSection.equipment, 'category': 'Полотна'},
-    {'description': 'Полотно MSD Premium с фотопечатью с установкой по цене 850 за кв.м.', 'unit': 'м²', 'price': 850.0, 'section': LineItemSection.equipment, 'category': 'Полотна'},
-    {'description': 'Багет пластиковый белый с установкой по цене 120 за м.п.', 'unit': 'м.п.', 'price': 120.0, 'section': LineItemSection.equipment, 'category': 'Багеты'},
-    {'description': 'Багет пластиковый цветной с установкой по цене 140 за м.п.', 'unit': 'м.п.', 'price': 140.0, 'section': LineItemSection.equipment, 'category': 'Багеты'},
-    {'description': 'Багет алюминиевый с установкой по цене 180 за м.п.', 'unit': 'м.п.', 'price': 180.0, 'section': LineItemSection.equipment, 'category': 'Багеты'},
-    {'description': 'Профиль стартовый с установкой по цене 90 за м.п.', 'unit': 'м.п.', 'price': 90.0, 'section': LineItemSection.equipment, 'category': 'Профили'},
-    {'description': 'Профиль направляющий с установкой по цене 100 за м.п.', 'unit': 'м.п.', 'price': 100.0, 'section': LineItemSection.equipment, 'category': 'Профили'},
-    {'description': 'Подвес прямой с установкой по цене 25 за шт.', 'unit': 'шт.', 'price': 25.0, 'section': LineItemSection.equipment, 'category': 'Крепеж'},
-    {'description': 'Точечный светильник с установкой по цене 350 за шт.', 'unit': 'шт.', 'price': 350.0, 'section': LineItemSection.equipment, 'category': 'Освещение'},
-    {'description': 'Точечный светильник поворотный с установкой по цене 420 за шт.', 'unit': 'шт.', 'price': 420.0, 'section': LineItemSection.equipment, 'category': 'Освещение'},
-    {'description': 'Светодиодная лента с установкой по цене 150 за м.п.', 'unit': 'м.п.', 'price': 150.0, 'section': LineItemSection.equipment, 'category': 'Освещение'},
-    {'description': 'Диммер с установкой по цене 450 за шт.', 'unit': 'шт.', 'price': 450.0, 'section': LineItemSection.equipment, 'category': 'Освещение'},
-    {'description': 'Трансформатор с установкой по цене 380 за шт.', 'unit': 'шт.', 'price': 380.0, 'section': LineItemSection.equipment, 'category': 'Освещение'},
-    {'description': 'Монтаж натяжного потолка по цене 350 за кв.м.', 'unit': 'м²', 'price': 350.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
-    {'description': 'Монтаж многоуровневого потолка по цене 550 за кв.м.', 'unit': 'м²', 'price': 550.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
-    {'description': 'Монтаж натяжного потолка с фотопечатью по цене 450 за кв.м.', 'unit': 'м²', 'price': 450.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
-    {'description': 'Установка светильников по цене 150 за шт.', 'unit': 'шт.', 'price': 150.0, 'section': LineItemSection.work, 'category': 'Электромонтаж'},
-    {'description': 'Монтаж светодиодной ленты по цене 200 за м.п.', 'unit': 'м.п.', 'price': 200.0, 'section': LineItemSection.work, 'category': 'Электромонтаж'},
-    {'description': 'Установка диммера по цене 250 за шт.', 'unit': 'шт.', 'price': 250.0, 'section': LineItemSection.work, 'category': 'Электромонтаж'},
-    {'description': 'Демонтаж старого потолка по цене 100 за кв.м.', 'unit': 'м²', 'price': 100.0, 'section': LineItemSection.work, 'category': 'Подготовка'},
-    {'description': 'Выравнивание потолка по цене 150 за кв.м.', 'unit': 'м²', 'price': 150.0, 'section': LineItemSection.work, 'category': 'Подготовка'},
+    {'description': 'Гарпун', 'unit': 'м.п.', 'price': 0.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
+    {'description': 'Полотно MSD Premium белое матовое с установкой', 'unit': 'м²', 'price': 610.0, 'section': LineItemSection.equipment, 'category': 'Полотна'},
+    {'description': 'Профиль стеновой/потолочный гарпунный с установкой', 'unit': 'м.п.', 'price': 310.0, 'section': LineItemSection.equipment, 'category': 'Профили'},
+    {'description': 'Вставка по периметру гарпунная', 'unit': 'м.п.', 'price': 220.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
+    {'description': 'Монтаж закладных под световое оборудование, установка светильников', 'unit': 'шт.', 'price': 780.0, 'section': LineItemSection.work, 'category': 'Электромонтаж'},
+    {'description': 'Монтаж закладных под сдвоенное световое оборудование, установка светильников', 'unit': 'шт.', 'price': 1350.0, 'section': LineItemSection.work, 'category': 'Электромонтаж'},
+    {'description': 'Монтаж закладных под люстру', 'unit': 'шт.', 'price': 1100.0, 'section': LineItemSection.work, 'category': 'Электромонтаж'},
+    {'description': 'Монтаж закладной и установка вентелятора', 'unit': 'шт.', 'price': 1300.0, 'section': LineItemSection.work, 'category': 'Электромонтаж'},
+    {'description': 'Монтаж закладной под потолочный карниз', 'unit': 'м.п.', 'price': 650.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
+    {'description': 'Установка потолочного карниза', 'unit': 'м.п.', 'price': 270.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
+    {'description': 'Установка разделителей', 'unit': 'м.п.', 'price': 1700.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
+    {'description': 'Монтаж закладных под вcтраеваемые шкафы', 'unit': 'м.п.', 'price': 1100.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
+    {'description': 'Монтаж шторных карнизов (ПК-15) двухрядный', 'unit': 'м.п.', 'price': 4000.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
+    {'description': 'Монтаж шторных карнизов (ПК-5) трехрядный', 'unit': 'м.п.', 'price': 4500.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
+    {'description': 'Работы по керамической плитке/керамограниту', 'unit': 'м.п.', 'price': 400.0, 'section': LineItemSection.work, 'category': 'Отделка'},
+    {'description': 'Установка вентиляционной решетки', 'unit': 'шт.', 'price': 600.0, 'section': LineItemSection.work, 'category': 'Вентиляция'},
+    {'description': 'Монтаж "парящего" потолка, установка светодиодной ленты', 'unit': 'м.п.', 'price': 1600.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
+    {'description': 'Монтаж потолка системы "EuroKRAAB"', 'unit': 'м.п.', 'price': 1600.0, 'section': LineItemSection.equipment, 'category': 'Системы'},
+    {'description': 'Монтаж световых линий, установка светодиодной ленты', 'unit': 'м.п.', 'price': 3400.0, 'section': LineItemSection.work, 'category': 'Электромонтаж'},
+    {'description': 'Монтаж открытой ниши', 'unit': 'м.п.', 'price': 1200.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
+    {'description': 'Монтаж ниши с поворотом полотна', 'unit': 'м.п.', 'price': 3000.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
+    {'description': 'Монтаж перехода уровня', 'unit': 'м.п.', 'price': 3700.0, 'section': LineItemSection.work, 'category': 'Монтаж'},
+    {'description': 'Монтаж закладных под трековое освещение (встраиваемые) с установкой', 'unit': 'м.п.', 'price': 3400.0, 'section': LineItemSection.work, 'category': 'Электромонтаж'},
+    {'description': 'Монтаж закладных под трековое освещение (накладные) с установкой', 'unit': 'м.п.', 'price': 1100.0, 'section': LineItemSection.work, 'category': 'Электромонтаж'},
   ];
+
+  final TextEditingController _customDescriptionController = TextEditingController();
+  final TextEditingController _customPriceController = TextEditingController();
+  final TextEditingController _customUnitController = TextEditingController();
 
   String _searchQuery = '';
   List<Map<String, dynamic>> get _filteredItems {
@@ -84,37 +89,65 @@ class _QuickAddItemDialogState extends State<QuickAddItemDialog> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Быстрое добавление',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF1D1D1F),
                           letterSpacing: -0.5,
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: _showAddCustomItemDialog,
+                            child: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF007AFF),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF007AFF).withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                            ],
+                              child: const Icon(
+                                Icons.add,
+                                size: 18,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
-                          child: const Icon(
-                            Icons.close,
-                            size: 18,
-                            color: Color(0xFF86868B),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                size: 18,
+                                color: Color(0xFF86868B),
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),
@@ -267,6 +300,111 @@ class _QuickAddItemDialogState extends State<QuickAddItemDialog> {
       updatedAt: DateTime.now(),
     );
 
+    Navigator.pop(context, item);
+  }
+
+  void _showAddCustomItemDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          width: 400,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Добавить свою позицию',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1D1D1F),
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _customDescriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Наименование',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _customPriceController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Цена',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: TextField(
+                      controller: _customUnitController,
+                      decoration: const InputDecoration(
+                        labelText: 'Ед. изм.',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Отмена'),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    onPressed: _addCustomItem,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF007AFF),
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Добавить'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _addCustomItem() {
+    if (_customDescriptionController.text.trim().isEmpty ||
+        _customPriceController.text.trim().isEmpty ||
+        _customUnitController.text.trim().isEmpty) {
+      return;
+    }
+
+    final item = LineItem(
+      id: null,
+      quoteId: 0,
+      position: 1,
+      section: LineItemSection.equipment,
+      description: _customDescriptionController.text.trim(),
+      unit: _customUnitController.text.trim(),
+      quantity: 1.0,
+      price: double.tryParse(_customPriceController.text) ?? 0.0,
+      amount: double.tryParse(_customPriceController.text) ?? 0.0,
+      note: null,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    Navigator.pop(context);
     Navigator.pop(context, item);
   }
 }
