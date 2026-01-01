@@ -483,6 +483,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                     const SizedBox(height: 24),
                     _buildObjectInfo(),
                     const SizedBox(height: 24),
+                    _buildActionButtons(),
+                    const SizedBox(height: 24),
                     _buildLineItems(),
                     const SizedBox(height: 24),
                     _buildTermsAndNotes(),
@@ -794,7 +796,98 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     );
   }
 
-  Widget _buildLineItems() {
+  Widget _buildActionButtons() {
+  return Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: const Color(0xFFE5E5E7)),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.03),
+          blurRadius: 10,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Действия',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF1D1D1F),
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Тестовая кнопка для проверки
+              ElevatedButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Кнопки работают!')),
+                  );
+                },
+                child: const Text('ТЕСТ'),
+              ),
+              const SizedBox(height: 8),
+              // Ряд с основными кнопками
+              Row(
+                children: [
+                  // Простая кнопка быстрого добавления
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _showQuickAddDialog,
+                      icon: const Icon(Icons.flash_on, size: 16),
+                      label: const Text('Быстрое добавление', style: TextStyle(fontSize: 12)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // Простая кнопка импорта Excel
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _isImporting ? null : _importFromExcel,
+                      icon: _isImporting 
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.file_upload, size: 16),
+                      label: Text(_isImporting ? 'Загрузка...' : 'Импорт Excel', style: const TextStyle(fontSize: 12)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildLineItems() {
     final workItems = _lineItems.where((item) => item.section == LineItemSection.work).toList();
     final equipmentItems = _lineItems.where((item) => item.section == LineItemSection.equipment).toList();
 
@@ -816,75 +909,14 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Позиции',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF1D1D1F),
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Тестовая кнопка для проверки
-                    ElevatedButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Кнопки работают!')),
-                        );
-                      },
-                      child: const Text('ТЕСТ'),
-                    ),
-                    const SizedBox(height: 8),
-                    // Ряд с основными кнопками
-                    Row(
-                      children: [
-                        // Простая кнопка быстрого добавления
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: _showQuickAddDialog,
-                            icon: const Icon(Icons.flash_on, size: 16),
-                            label: const Text('Быстрое добавление', style: TextStyle(fontSize: 12)),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        // Простая кнопка импорта Excel
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: _isImporting ? null : _importFromExcel,
-                            icon: _isImporting 
-                                ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : const Icon(Icons.file_upload, size: 16),
-                            label: Text(_isImporting ? 'Загрузка...' : 'Импорт Excel', style: const TextStyle(fontSize: 12)),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+            Text(
+              'Позиции',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF1D1D1F),
+                letterSpacing: -0.5,
+              ),
             ),
             const SizedBox(height: 20),
             
