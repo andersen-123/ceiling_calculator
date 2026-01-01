@@ -137,15 +137,6 @@ class ExcelService {
         }
       }
     }
-    
-    // Устанавливаем ширину колонок (если метод поддерживается)
-    try {
-      sheet.setColWidth(1, 50); // Наименование работ
-      sheet.setColWidth(4, 15); // Цена за ед.
-      sheet.setColWidth(5, 15); // Стоимость
-    } catch (e) {
-      // Если метод не поддерживается, пропускаем
-    }
   }
   
   void _appendRow(Sheet sheet, List<dynamic> values) {
