@@ -22,18 +22,22 @@ class QuoteEditScreen extends StatefulWidget {
 
 class _QuoteEditScreenState extends State<QuoteEditScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _customerNameController = TextEditingController();
-  final _customerPhoneController = TextEditingController();
-  final _customerEmailController = TextEditingController();
-  final _objectNameController = TextEditingController();
-  final _addressController = TextEditingController();
-  final _areaSController = TextEditingController();
-  final _perimeterPController = TextEditingController();
-  final _heightHController = TextEditingController();
-  final _paymentTermsController = TextEditingController();
-  final _installationTermsController = TextEditingController();
-  final _notesController = TextEditingController();
-
+  final ScrollController _scrollController = ScrollController();
+  
+  // Controllers
+  final TextEditingController _customerNameController = TextEditingController();
+  final TextEditingController _customerPhoneController = TextEditingController();
+  final TextEditingController _customerEmailController = TextEditingController();
+  final TextEditingController _objectNameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _areaSController = TextEditingController();
+  final TextEditingController _perimeterPController = TextEditingController();
+  final TextEditingController _heightHController = TextEditingController();
+  final TextEditingController _paymentTermsController = TextEditingController();
+  final TextEditingController _installationTermsController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
+  
+  // State variables
   String? _selectedCeilingSystem;
   QuoteStatus _selectedStatus = QuoteStatus.draft;
   List<LineItem> _lineItems = [];
@@ -43,8 +47,9 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   bool _isExportingExcel = false;
   bool _isExportingPdf = false;
   bool _isImporting = false;
-
-  final ScrollController _scrollController = ScrollController();
+  
+  // Key для принудительного обновления
+  final GlobalKey _lineItemsKey = GlobalKey();
   final ExcelService _excelService = ExcelService();
   final PdfService _pdfService = PdfService();
 
@@ -280,9 +285,17 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         _updatePositions();
       });
 
-      // Прокрутка к новым позициям
+      // Прокрутка к новым позициям после полного рендеринга
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollToBottom();
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted && _scrollController.hasClients) {
+            _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+            );
+          }
+        });
       });
 
       if (mounted) {
@@ -324,11 +337,17 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       _lineItems.add(newItem);
     });
     
-    // Прокрутка к новой позиции после рендеринга
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (mounted) {
-        _scrollToBottom();
-      }
+    // Прокрутка к новой позиции после полного рендеринга
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted && _scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
     });
   }
 
@@ -479,12 +498,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        // Переходим назад сразу после снэкбара
-        Future.delayed(const Duration(milliseconds: 100), () {
-          if (mounted) {
-            Navigator.of(context).pop(true);
-          }
-        });
+        // Переходим назад немедленно
+        Navigator.of(context).pop(true);
       }
     } catch (e) {
       if (mounted) {
