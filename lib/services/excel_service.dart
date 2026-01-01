@@ -26,26 +26,14 @@ class ExcelService {
       // Удаляем стандартный лист
       excel.delete('Sheet1');
       
-      // Создаём листы
-      final summarySheet = excel['Сводка'];
-      final workSheet = excel['Работы'];
-      final equipmentSheet = excel['Оборудование'];
+      // Создаём один лист как в примере
+      final sheet = excel['Коммерческое предложение'];
       
-      // Заполняем сводку
-      _fillSummarySheet(summarySheet, quote, company);
+      // Заполняем шапку как в примере
+      _fillHeader(sheet, quote, company);
       
-      // Разделяем позиции по разделам
-      final workItems = lineItems.where((item) => item.section == LineItemSection.work).toList();
-      final equipmentItems = lineItems.where((item) => item.section == LineItemSection.equipment).toList();
-      
-      // Заполняем листы
-      if (workItems.isNotEmpty) {
-        _fillItemsSheet(workSheet, workItems, quote.currencyCode);
-      }
-      
-      if (equipmentItems.isNotEmpty) {
-        _fillItemsSheet(equipmentSheet, equipmentItems, quote.currencyCode);
-      }
+      // Заполняем все позиции в одной таблице
+      _fillAllItems(sheet, lineItems);
       
       // Сохраняем файл
       final output = await getTemporaryDirectory();
@@ -64,101 +52,97 @@ class ExcelService {
     }
   }
   
-  void _fillSummarySheet(Sheet sheet, Quote quote, Company company) {
-    // Информация о компании
-    _appendRow(sheet, ['ИНФОРМАЦИЯ О КОМПАНИИ']);
-    _appendRow(sheet, ['Название:', company.name]);
-    if (company.phone != null) _appendRow(sheet, ['Телефон:', company.phone!]);
-    if (company.email != null) _appendRow(sheet, ['Email:', company.email!]);
-    if (company.website != null) _appendRow(sheet, ['Сайт:', company.website!]);
-    if (company.address != null) _appendRow(sheet, ['Адрес:', company.address!]);
-    _appendRow(sheet, []);
+  void _fillHeader(Sheet sheet, Quote quote, Company company) {
+    // Шапка как в примере
+    _appendRow(sheet, ['ООО "ВЕКТОР"']);
+    _appendRow(sheet, ['ИНН 1650326450 КПП 165001001']);
+    _appendRow(sheet, ['ОГРН 1181690098364']);
+    _appendRow(sheet, ['Юридический адрес: 424000, г. Йошкар-Ола, ул. Якимова, д. 1']);
+    _appendRow(sheet, ['Тел.: +7 (927) 880-11-22']);
+    _appendRow(sheet, ['E-mail: mail@mail.ru']);
+    _appendRow(sheet, ['']);
     
-    // Информация о клиенте и объекте
-    _appendRow(sheet, ['ИНФОРМАЦИЯ О КЛИЕНТЕ И ОБЪЕКТЕ']);
-    _appendRow(sheet, ['Клиент:', quote.customerName]);
-    if (quote.customerPhone != null) _appendRow(sheet, ['Телефон:', quote.customerPhone!]);
-    if (quote.customerEmail != null) _appendRow(sheet, ['Email:', quote.customerEmail!]);
-    if (quote.objectName != null) _appendRow(sheet, ['Объект:', quote.objectName!]);
-    if (quote.address != null) _appendRow(sheet, ['Адрес:', quote.address!]);
-    if (quote.areaS != null) _appendRow(sheet, ['Площадь:', '${quote.areaS} м²']);
-    if (quote.perimeterP != null) _appendRow(sheet, ['Периметр:', '${quote.perimeterP} м.п.']);
-    if (quote.heightH != null) _appendRow(sheet, ['Высота:', '${quote.heightH} м']);
-    if (quote.ceilingSystem != null) _appendRow(sheet, ['Система:', quote.ceilingSystem!]);
-    _appendRow(sheet, []);
+    // Информация о предложении
+    _appendRow(sheet, ['Коммерческое предложение']);
+    _appendRow(sheet, ['от ${DateTime.now().day.toString().padLeft(2, '0')}.${DateTime.now().month.toString().padLeft(2, '0')}.${DateTime.now().year} г.']);
+    _appendRow(sheet, ['']);
     
-    // Итоги
-    _appendRow(sheet, ['ИТОГИ']);
-    _appendRow(sheet, ['Итого по работам:', quote.subtotalWork, quote.currencyCode]);
-    _appendRow(sheet, ['Итого по оборудованию:', quote.subtotalEquipment, quote.currencyCode]);
-    _appendRow(sheet, ['ОБЩАЯ СУММА:', quote.totalAmount, quote.currencyCode]);
-    _appendRow(sheet, []);
-    
-    // Условия и примечания
-    if (quote.paymentTerms != null || quote.installationTerms != null || quote.notes != null) {
-      _appendRow(sheet, ['УСЛОВИЯ И ПРИМЕЧАНИЯ']);
-      if (quote.paymentTerms != null) _appendRow(sheet, ['Условия оплаты:', quote.paymentTerms!]);
-      if (quote.installationTerms != null) _appendRow(sheet, ['Условия монтажа:', quote.installationTerms!]);
-      if (quote.notes != null) _appendRow(sheet, ['Примечания:', quote.notes!]);
+    // Информация о клиенте
+    _appendRow(sheet, ['Заказчик: ${quote.customerName}']);
+    if (quote.objectName != null) {
+      _appendRow(sheet, ['Объект: ${quote.objectName}']);
     }
-    
-    // Форматирование заголовков
-    for (int row = 0; row < sheet.maxRows; row++) {
-      final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: row));
-      if (cell.value?.toString().contains('ИНФОРМАЦИЯ') == true ||
-          cell.value?.toString().contains('ИТОГИ') == true ||
-          cell.value?.toString().contains('УСЛОВИЯ') == true) {
-        cell.cellStyle = CellStyle(
-          bold: true,
-        );
-      }
+    if (quote.address != null) {
+      _appendRow(sheet, ['Адрес: ${quote.address}']);
     }
+    _appendRow(sheet, ['']);
   }
   
-  void _fillItemsSheet(Sheet sheet, List<LineItem> items, String currency) {
-    // Заголовки таблицы
-    _appendRow(sheet, ['№', 'Описание', 'Ед.изм.', 'Кол-во', 'Цена', 'Сумма', 'Примечание']);
+  void _fillAllItems(Sheet sheet, List<LineItem> lineItems) {
+    // Заголовки таблицы как в примере
+    _appendRow(sheet, ['№', 'Наименование работ', 'Ед. изм.', 'Кол-во', 'Цена за ед., руб.', 'Стоимость, руб.']);
     
-    // Данные
-    for (final item in items) {
+    // Сортируем позиции: сначала работы, потом оборудование
+    final workItems = lineItems.where((item) => item.section == LineItemSection.work).toList();
+    final equipmentItems = lineItems.where((item) => item.section == LineItemSection.equipment).toList();
+    
+    final allItems = [...workItems, ...equipmentItems];
+    
+    // Заполняем позиции
+    for (int i = 0; i < allItems.length; i++) {
+      final item = allItems[i];
       _appendRow(sheet, [
-        item.position,
+        i + 1,
         item.description,
         item.unit,
         item.quantity,
         item.price,
         item.amount,
-        item.note ?? '',
       ]);
     }
     
-    // Итого по разделу
-    final subtotal = items.fold(0.0, (sum, item) => sum + item.amount);
+    // Итого
+    final totalAmount = lineItems.fold(0.0, (sum, item) => sum + item.amount);
     _appendRow(sheet, []);
-    _appendRow(sheet, ['ИТОГО:', '', '', '', '', subtotal, currency]);
+    _appendRow(sheet, ['', '', '', '', 'Итого:', totalAmount]);
     
     // Форматирование
-    // Заголовки
-    for (int col = 0; col <= 6; col++) {
-      final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: col, rowIndex: 0));
-      cell.cellStyle = CellStyle(
-        bold: true,
-      );
+    _formatSheet(sheet);
+  }
+  
+  void _formatSheet(Sheet sheet) {
+    // Форматирование заголовков
+    for (int row = 0; row < sheet.maxRows; row++) {
+      for (int col = 0; col < sheet.maxCols; col++) {
+        final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: col, rowIndex: row));
+        
+        // Заголовки таблицы
+        if (row == 7) { // Строка с заголовками таблицы
+          cell.cellStyle = CellStyle(
+            bold: true,
+            horizontalAlign: HorizontalAlign.Center,
+            verticalAlign: VerticalAlign.Center,
+          );
+        }
+        
+        // Итоговая строка
+        if (row == sheet.maxRows - 1) {
+          cell.cellStyle = CellStyle(
+            bold: true,
+            horizontalAlign: HorizontalAlign.Right,
+          );
+        }
+        
+        // Широкие колонки
+        if (col == 1) { // Наименование работ
+          sheet.setColWidth(col, 50);
+        } else if (col == 4 || col == 5) { // Цена и стоимость
+          sheet.setColWidth(col, 15);
+        } else {
+          sheet.setColWidth(col, 10);
+        }
+      }
     }
-    
-    // Итоговая строка
-    final totalRow = sheet.maxRows - 1;
-    for (int col = 0; col <= 6; col++) {
-      final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: col, rowIndex: totalRow));
-      cell.cellStyle = CellStyle(
-        bold: true,
-      );
-    }
-    
-    // Автоширина колонок (удалено - метод не поддерживается)
-    // for (int col = 0; col <= 6; col++) {
-    //   sheet.setColWidth(col, 20);
-    // }
   }
   
   void _appendRow(Sheet sheet, List<dynamic> values) {
