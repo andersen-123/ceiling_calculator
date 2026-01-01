@@ -525,8 +525,12 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       }
 
       if (mounted) {
-        // Мгновенный переход без SnackBar и setState
-        Navigator.of(context).pop(true);
+        // Принудительный переход с задержкой для MIUI
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) {
+            Navigator.of(context).pop(true);
+          }
+        });
         return;
       }
     } catch (e) {

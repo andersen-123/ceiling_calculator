@@ -28,7 +28,9 @@
         android:fullBackupContent="false"
         android:supportsRtl="true"
         android:theme="@style/LaunchTheme"
-        android:requestLegacyExternalStorage="true">
+        android:requestLegacyExternalStorage="true"
+        android:forceDarkAllowed="false"
+        android:usesCleartextTraffic="true">
         
         <activity
             android:name=".MainActivity"
