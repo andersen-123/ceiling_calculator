@@ -500,15 +500,9 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Предложение сохранено'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        // Переходим назад немедленно, без setState
+        // Мгновенный переход без SnackBar
         Navigator.of(context).pop(true);
-        return; // Выходим из функции
+        return;
       }
     } catch (e) {
       if (mounted) {
