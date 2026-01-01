@@ -828,7 +828,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                     letterSpacing: -0.5,
                   ),
                 ),
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Тестовая кнопка для проверки
                     ElevatedButton(
@@ -839,42 +840,47 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                       },
                       child: const Text('ТЕСТ'),
                     ),
-                    const SizedBox(width: 8),
-                    // Простая кнопка быстрого добавления
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: _showQuickAddDialog,
-                        icon: const Icon(Icons.flash_on, size: 16),
-                        label: const Text('Быстрое добавление', style: TextStyle(fontSize: 12)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    const SizedBox(height: 8),
+                    // Ряд с основными кнопками
+                    Row(
+                      children: [
+                        // Простая кнопка быстрого добавления
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: _showQuickAddDialog,
+                            icon: const Icon(Icons.flash_on, size: 16),
+                            label: const Text('Быстрое добавление', style: TextStyle(fontSize: 12)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Простая кнопка импорта Excel
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: _isImporting ? null : _importFromExcel,
-                        icon: _isImporting 
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Icon(Icons.file_upload, size: 16),
-                        label: Text(_isImporting ? 'Загрузка...' : 'Импорт Excel', style: const TextStyle(fontSize: 12)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                        const SizedBox(width: 8),
+                        // Простая кнопка импорта Excel
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: _isImporting ? null : _importFromExcel,
+                            icon: _isImporting 
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(Icons.file_upload, size: 16),
+                            label: Text(_isImporting ? 'Загрузка...' : 'Импорт Excel', style: const TextStyle(fontSize: 12)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
