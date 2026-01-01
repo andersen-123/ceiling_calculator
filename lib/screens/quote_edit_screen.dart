@@ -42,6 +42,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   int? quoteId;
   bool _isExportingExcel = false;
   bool _isExportingPdf = false;
+  bool _isImporting = false;
 
   final ExcelService _excelService = ExcelService();
   final PdfService _pdfService = PdfService();
@@ -256,6 +257,60 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     }
     
     setState(() => _isExportingExcel = false);
+  }
+
+  Future<void> _importFromExcel() async {
+    setState(() => _isImporting = true);
+    
+    try {
+      final importData = await _excelService.importFromExcel();
+      
+      if (importData == null) {
+        return; // Пользователь отменил выбор файла
+      }
+
+      setState(() {
+        // Добавляем импортированные позиции к существующим
+        _lineItems.addAll(importData.workItems);
+        _lineItems.addAll(importData.equipmentItems);
+        
+        // Обновляем позиции
+        _updatePositions();
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Импортировано: ${importData.workItems.length} работ, ${importData.equipmentItems.length} оборудования'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка импорта: $e')),
+        );
+      }
+    }
+    
+    setState(() => _isImporting = false);
+  }
+
+  void _updatePositions() {
+    // Обновляем позиции для работ
+    final workItems = _lineItems.where((item) => item.section == LineItemSection.work).toList();
+    for (int i = 0; i < workItems.length; i++) {
+      final index = _lineItems.indexOf(workItems[i]);
+      _lineItems[index] = workItems[i].copyWith(position: i + 1);
+    }
+    
+    // Обновляем позиции для оборудования
+    final equipmentItems = _lineItems.where((item) => item.section == LineItemSection.equipment).toList();
+    for (int i = 0; i < equipmentItems.length; i++) {
+      final index = _lineItems.indexOf(equipmentItems[i]);
+      _lineItems[index] = equipmentItems[i].copyWith(position: i + 1);
+    }
   }
 
   Quote _createQuoteFromForm() {
@@ -813,6 +868,73 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                                 ),
                               ],
                             ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Кнопка импорта из Excel
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF34C759), Color(0xFF28A745)],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF34C759).withOpacity(0.3),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _isImporting ? null : _importFromExcel,
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                            child: _isImporting
+                                ? const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        'Загрузка...',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                          letterSpacing: -0.3,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.file_upload, color: Colors.white, size: 20),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        'Импорт Excel',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                          letterSpacing: -0.3,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                           ),
                         ),
                       ),
