@@ -28,14 +28,15 @@ dependencies:
   # Экспорт
   pdf: ^3.10.4
   excel: ^4.0.1
+  
+  # Файлы
+  file_picker: ^6.1.1
+  permission_handler: ^11.0.1
   printing: ^5.12.0
 
   # Файловая система и шаринг
   share_plus: ^7.2.1
   image_picker: ^1.0.4
-  file_picker: ^5.5.0
-
-  # Утилиты
   uuid: ^4.2.1
   currency_picker: ^2.0.20
 

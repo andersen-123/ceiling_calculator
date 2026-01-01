@@ -34,6 +34,7 @@ class DatabaseHelper {
     await _createSettingsTable(db);
     await _createQuotesTable(db);
     await _createLineItemsTable(db);
+    await _createQuoteAttachmentsTable(db);
     await _createUnitsTable(db);
     await _insertDefaultData(db);
   }
@@ -124,6 +125,23 @@ class DatabaseHelper {
 
     await db.execute('CREATE INDEX idx_line_items_quote_id ON line_items (quote_id)');
     await db.execute('CREATE INDEX idx_line_items_section ON line_items (section)');
+  }
+
+  Future<void> _createQuoteAttachmentsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE quote_attachments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        quote_id INTEGER NOT NULL,
+        file_name TEXT NOT NULL,
+        file_path TEXT NOT NULL,
+        mime_type TEXT NULL,
+        file_size INTEGER NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (quote_id) REFERENCES quotes (quote_id) ON DELETE CASCADE
+      )
+    ''');
+
+    await db.execute('CREATE INDEX idx_quote_attachments_quote_id ON quote_attachments (quote_id)');
   }
 
   Future<void> _createUnitsTable(Database db) async {

@@ -4,10 +4,12 @@ import 'package:share_plus/share_plus.dart';
 import '../models/quote.dart';
 import '../models/line_item.dart';
 import '../models/company.dart';
+import '../models/quote_attachment.dart';
 import '../database/database_helper.dart';
 import '../widgets/line_item_widget.dart';
 import '../widgets/animated_button.dart';
 import '../widgets/quick_add_item_dialog.dart';
+import '../widgets/quote_attachments_widget.dart';
 import '../services/excel_service.dart';
 import '../services/pdf_service.dart';
 
@@ -41,6 +43,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   String? _selectedCeilingSystem;
   QuoteStatus _selectedStatus = QuoteStatus.draft;
   List<LineItem> _lineItems = [];
+  List<QuoteAttachment> _attachments = [];
   bool _isLoading = false;
   Company? _company;
   int? quoteId;
@@ -123,6 +126,15 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
           orderBy: 'position',
         );
         _lineItems = itemsData.map((map) => LineItem.fromMap(map)).toList();
+
+        // Загрузка вложений
+        final attachmentsData = await DatabaseHelper.instance.query(
+          'quote_attachments',
+          where: 'quote_id = ?',
+          whereArgs: [quote.id],
+          orderBy: 'created_at DESC',
+        );
+        _attachments = attachmentsData.map((map) => QuoteAttachment.fromMap(map)).toList();
       } else {
         // Новое предложение - добавляем пустые позиции
         _lineItems = [
@@ -136,6 +148,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
             price: 0,
           ),
         ];
+        _attachments = [];
       }
     } catch (e) {
       if (mounted) {
@@ -499,6 +512,18 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         await DatabaseHelper.instance.insert('line_items', itemWithQuoteId.toMap());
       }
 
+      // Сохранение вложений
+      await DatabaseHelper.instance.delete(
+        'quote_attachments',
+        where: 'quote_id = ?',
+        whereArgs: [savedQuoteId],
+      );
+
+      for (final attachment in _attachments) {
+        final attachmentWithQuoteId = attachment.copyWith(quoteId: savedQuoteId);
+        await DatabaseHelper.instance.insert('quote_attachments', attachmentWithQuoteId.toMap());
+      }
+
       if (mounted) {
         // Мгновенный переход без SnackBar
         Navigator.of(context).pop(true);
@@ -554,6 +579,16 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                     _buildTermsAndNotes(),
                     const SizedBox(height: 24),
                     _buildStatusSection(),
+                    const SizedBox(height: 24),
+                    QuoteAttachmentsWidget(
+                      quoteId: widget.quote?.id ?? 0,
+                      attachments: _attachments,
+                      onChanged: (attachments) {
+                        setState(() {
+                          _attachments = attachments;
+                        });
+                      },
+                    ),
                     const SizedBox(height: 32),
                     // Кнопки в стиле Apple
                     Row(
