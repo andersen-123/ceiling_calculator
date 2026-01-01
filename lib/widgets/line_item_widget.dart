@@ -25,6 +25,7 @@ class _LineItemWidgetState extends State<LineItemWidget> {
   late TextEditingController _priceController;
   late TextEditingController _noteController;
   late String _selectedUnit;
+  late FocusNode _descriptionFocusNode;
 
   @override
   void initState() {
@@ -34,6 +35,14 @@ class _LineItemWidgetState extends State<LineItemWidget> {
     _priceController = TextEditingController(text: widget.item.price.toString());
     _noteController = TextEditingController(text: widget.item.note ?? '');
     _selectedUnit = widget.item.unit;
+    _descriptionFocusNode = FocusNode();
+    
+    // Если это новая пустая позиция, фокусируемся на описании
+    if (widget.item.description.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _descriptionFocusNode.requestFocus();
+      });
+    }
   }
 
   @override
@@ -42,6 +51,7 @@ class _LineItemWidgetState extends State<LineItemWidget> {
     _quantityController.dispose();
     _priceController.dispose();
     _noteController.dispose();
+    _descriptionFocusNode.dispose();
     super.dispose();
   }
 
@@ -116,6 +126,7 @@ class _LineItemWidgetState extends State<LineItemWidget> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _descriptionController,
+              focusNode: _descriptionFocusNode,
               decoration: const InputDecoration(
                 labelText: 'Описание *',
                 border: OutlineInputBorder(),

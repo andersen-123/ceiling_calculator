@@ -324,22 +324,22 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       _lineItems.add(newItem);
     });
     
-    // Прокрутка к новой позиции через короткую задержку
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToBottom();
+    // Прокрутка к новой позиции после рендеринга
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        _scrollToBottom();
+      }
     });
   }
 
   void _scrollToBottom() {
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   void _updatePositions() {
@@ -479,8 +479,12 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        // Сразу переходим назад без задержки
-        Navigator.of(context).pop(true);
+        // Переходим назад сразу после снэкбара
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) {
+            Navigator.of(context).pop(true);
+          }
+        });
       }
     } catch (e) {
       if (mounted) {
