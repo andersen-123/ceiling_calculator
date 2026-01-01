@@ -445,7 +445,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       }
     }
 
-    setState(() => _isLoading = false);
+    // setState убираем, так как мы уходим с экрана
   }
 
   @override
