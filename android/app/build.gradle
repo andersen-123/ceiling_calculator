@@ -31,7 +31,7 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     namespace "com.ceilingcalc.ceiling_calculator"
-    compileSdkVersion 34
+    compileSdkVersion 35
     buildToolsVersion "34.0.0"
     ndkVersion flutter.ndkVersion
 
@@ -58,7 +58,7 @@ android {
     defaultConfig {
         applicationId "com.ceilingcalc.ceiling_calculator"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
