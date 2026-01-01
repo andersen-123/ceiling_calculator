@@ -831,110 +831,126 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                 Row(
                   children: [
                     // Одна кнопка быстрого добавления в стиле Apple
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF007AFF), Color(0xFF0056CC)],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF007AFF).withOpacity(0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: _showQuickAddDialog,
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.flash_on, color: Colors.white, size: 20),
-                                SizedBox(width: 10),
-                                Text(
-                                  'Быстрое добавление',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                    letterSpacing: -0.3,
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF007AFF), Color(0xFF0056CC)],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF007AFF).withOpacity(0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: _showQuickAddDialog,
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.flash_on, color: Colors.white, size: 18),
+                                  SizedBox(width: 6),
+                                  Flexible(
+                                    child: Text(
+                                      'Быстрое добавление',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                        letterSpacing: -0.3,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                     // Кнопка импорта из Excel
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF34C759), Color(0xFF28A745)],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF34C759).withOpacity(0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: _isImporting ? null : _importFromExcel,
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                            child: _isImporting
-                                ? const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF34C759), Color(0xFF28A745)],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF34C759).withOpacity(0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: _isImporting ? null : _importFromExcel,
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              child: _isImporting
+                                  ? const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        'Загрузка...',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16,
-                                          letterSpacing: -0.3,
+                                        SizedBox(width: 6),
+                                        Flexible(
+                                          child: Text(
+                                            'Загрузка...',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                              letterSpacing: -0.3,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  )
-                                : const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.file_upload, color: Colors.white, size: 20),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        'Импорт Excel',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16,
-                                          letterSpacing: -0.3,
+                                      ],
+                                    )
+                                  : const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.file_upload, color: Colors.white, size: 18),
+                                        SizedBox(width: 6),
+                                        Flexible(
+                                          child: Text(
+                                            'Импорт Excel',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                              letterSpacing: -0.3,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
+                                      ],
+                                    ),
+                            ),
                           ),
                         ),
                       ),
