@@ -525,20 +525,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       }
 
       if (mounted) {
-        // Показываем SnackBar и переходим назад через WidgetsBinding
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Предложение сохранено'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        
-        // Переходим назад в следующем фрейме
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            Navigator.of(context).pop(true);
-          }
-        });
+        // Мгновенный переход без SnackBar и setState
+        Navigator.of(context).pop(true);
         return;
       }
     } catch (e) {
@@ -547,9 +535,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
           SnackBar(content: Text('Ошибка сохранения: $e')),
         );
       }
-    } finally {
-      setState(() => _isLoading = false);
     }
+    // setState убираем совсем, чтобы избежать конфликтов
   }
 
   @override
@@ -623,35 +610,19 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                             child: Material(
                               color: Colors.transparent,
                               child: InkWell(
-                                onTap: _isLoading ? null : _saveQuote,
+                                onTap: _saveQuote,
                                 borderRadius: BorderRadius.circular(16),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                   child: Center(
-                                    child: _isLoading
-                                        ? const SizedBox(
-                                            height: 20,
-                                            width: 20,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                            ),
-                                          )
-                                        : const Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Icon(Icons.save, color: Colors.white, size: 20),
-                                              SizedBox(width: 8),
-                                              Text(
-                                                'Сохранить',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                    child: Text(
+                                      'Сохранить',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
