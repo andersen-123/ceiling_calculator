@@ -830,6 +830,16 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                 ),
                 Row(
                   children: [
+                    // Тестовая кнопка для проверки
+                    ElevatedButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Кнопки работают!')),
+                        );
+                      },
+                      child: const Text('ТЕСТ'),
+                    ),
+                    const SizedBox(width: 8),
                     // Одна кнопка быстрого добавления в стиле Apple
                     Expanded(
                       child: Container(
