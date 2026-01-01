@@ -290,17 +290,17 @@ class ExcelService {
     return data;
   }
 
-  String _getCellValue(Cell cell) {
-    if (cell.value == null) return '';
+  String _getCellValue(dynamic cell) {
+    if (cell == null || cell.value == null) return '';
     
     if (cell.value is TextCellValue) {
-      return (cell.value as TextCellValue).value;
+      return (cell.value as TextCellValue).value ?? '';
     } else if (cell.value is IntCellValue) {
       return (cell.value as IntCellValue).value.toString();
     } else if (cell.value is DoubleCellValue) {
       return (cell.value as DoubleCellValue).value.toString();
     }
     
-    return cell.value.toString();
+    return cell.value?.toString() ?? '';
   }
 }
