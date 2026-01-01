@@ -54,9 +54,18 @@ class _QuoteAttachmentsWidgetState extends State<QuoteAttachmentsWidget> {
           await attachmentsDir.create(recursive: true);
         }
 
+        // Создаем уникальное имя файла
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final uniqueFileName = '${timestamp}_$fileName';
+        final savedFile = File('${attachmentsDir.path}/$uniqueFileName');
+        
+        print('Копируем файл из: ${file.path}');
+        print('Копируем файл в: ${savedFile.path}');
+        
         // Копируем файл в директорию приложения
-        final uniqueFileName = '${DateTime.now().millisecondsSinceEpoch}_$fileName';
-        final savedFile = await file.copy('${attachmentsDir.path}/$uniqueFileName');
+        await file.copy(savedFile.path);
+        
+        print('Файл скопирован, существует: ${await savedFile.exists()}');
 
         final attachment = QuoteAttachment(
           quoteId: widget.quoteId,
@@ -82,6 +91,7 @@ class _QuoteAttachmentsWidgetState extends State<QuoteAttachmentsWidget> {
         }
       }
     } catch (e) {
+      print('Ошибка добавления файла: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -98,26 +108,27 @@ class _QuoteAttachmentsWidgetState extends State<QuoteAttachmentsWidget> {
   Future<void> _openAttachment(QuoteAttachment attachment) async {
     try {
       final file = File(attachment.filePath);
+      print('Проверка файла: ${attachment.filePath}');
+      print('Файл существует: ${await file.exists()}');
+      
       if (await file.exists()) {
-        // Для Android используем url_launcher
-        final uri = Uri.file(file.path);
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri);
-        } else {
-          // Если не удалось открыть через url_launcher, пробуем через share_plus
-          await Share.shareXFiles([XFile(file.path)], text: 'Файл: ${attachment.fileName}');
-        }
+        // Для Android используем share_plus как основной метод
+        await Share.shareXFiles(
+          [XFile(file.path)], 
+          text: 'Файл из предложения: ${attachment.fileName}'
+        );
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Файл не найден'),
+              content: Text('Файл не найден на устройстве'),
               backgroundColor: Colors.red,
             ),
           );
         }
       }
     } catch (e) {
+      print('Ошибка открытия файла: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
