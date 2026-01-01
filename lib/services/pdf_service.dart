@@ -271,7 +271,7 @@ class PdfService {
       children: [
         _buildTableCell(item.position.toString(), font),
         _buildTableCell(item.description, font),
-        _buildTableCell(item.unit, font),
+        _buildTableCell(item.unit == 'м.п.' ? 'м.п.' : item.unit, font),
         _buildTableCell(item.quantity.toStringAsFixed(2), font, align: pw.Alignment.centerRight),
         _buildTableCell('${item.price.toStringAsFixed(2)} $currencyCode', font, align: pw.Alignment.centerRight),
         _buildTableCell('${item.amount.toStringAsFixed(2)} $currencyCode', font, align: pw.Alignment.centerRight),

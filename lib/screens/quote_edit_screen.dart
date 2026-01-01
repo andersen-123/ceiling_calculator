@@ -44,6 +44,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   bool _isExportingPdf = false;
   bool _isImporting = false;
 
+  final ScrollController _scrollController = ScrollController();
   final ExcelService _excelService = ExcelService();
   final PdfService _pdfService = PdfService();
 
@@ -74,6 +75,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     _paymentTermsController.dispose();
     _installationTermsController.dispose();
     _notesController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -278,6 +280,11 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         _updatePositions();
       });
 
+      // Прокрутка к новым позициям
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottom();
+      });
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -295,6 +302,44 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     }
     
     setState(() => _isImporting = false);
+  }
+
+  void _addNewLineItem() {
+    final newItem = LineItem(
+      id: null,
+      quoteId: widget.quote?.id ?? 0,
+      position: _lineItems.length + 1,
+      section: LineItemSection.work,
+      description: '',
+      unit: 'шт.',
+      quantity: 1.0,
+      price: 0.0,
+      amount: 0.0,
+      note: null,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+    
+    setState(() {
+      _lineItems.add(newItem);
+    });
+    
+    // Прокрутка к новой позиции через короткую задержку
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
+  }
+
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   void _updatePositions() {
@@ -471,6 +516,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
           : Form(
               key: _formKey,
               child: SingleChildScrollView(
+                controller: _scrollController,
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -824,19 +870,23 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Тестовая кнопка для проверки
-              ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Кнопки работают!')),
-                  );
-                },
-                child: const Text('ТЕСТ'),
-              ),
-              const SizedBox(height: 8),
               // Ряд с основными кнопками
               Row(
                 children: [
+                  // Кнопка добавления новой позиции
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _addNewLineItem,
+                      icon: const Icon(Icons.add, size: 16),
+                      label: const Text('Добавить позицию', style: TextStyle(fontSize: 12)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   // Простая кнопка быстрого добавления
                   Expanded(
                     child: ElevatedButton.icon(
