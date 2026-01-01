@@ -294,7 +294,7 @@ class ExcelService {
     if (cell == null || cell.value == null) return '';
     
     if (cell.value is TextCellValue) {
-      return (cell.value as TextCellValue).value ?? '';
+      return (cell.value as TextCellValue).value.toString();
     } else if (cell.value is IntCellValue) {
       return (cell.value as IntCellValue).value.toString();
     } else if (cell.value is DoubleCellValue) {
