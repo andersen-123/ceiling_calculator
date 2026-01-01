@@ -113,7 +113,10 @@ class ExcelService {
   void _formatSheet(Sheet sheet) {
     // Форматирование заголовков
     for (int row = 0; row < sheet.maxRows; row++) {
-      for (int col = 0; col < sheet.maxCols; col++) {
+      // Определяем количество колонок по данным
+      int maxCols = 6; // У нас 6 колонок в таблице
+      
+      for (int col = 0; col < maxCols; col++) {
         final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: col, rowIndex: row));
         
         // Заголовки таблицы
@@ -132,16 +135,16 @@ class ExcelService {
             horizontalAlign: HorizontalAlign.Right,
           );
         }
-        
-        // Широкие колонки
-        if (col == 1) { // Наименование работ
-          sheet.setColWidth(col, 50);
-        } else if (col == 4 || col == 5) { // Цена и стоимость
-          sheet.setColWidth(col, 15);
-        } else {
-          sheet.setColWidth(col, 10);
-        }
       }
+    }
+    
+    // Устанавливаем ширину колонок (если метод поддерживается)
+    try {
+      sheet.setColWidth(1, 50); // Наименование работ
+      sheet.setColWidth(4, 15); // Цена за ед.
+      sheet.setColWidth(5, 15); // Стоимость
+    } catch (e) {
+      // Если метод не поддерживается, пропускаем
     }
   }
   
