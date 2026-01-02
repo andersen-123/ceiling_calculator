@@ -1313,7 +1313,7 @@ class _AddSalaryDialogState extends State<_AddSalaryDialog> {
       employeeName: employeeName,
       amount: amount,
       date: _selectedDate,
-      description: _workDescriptionController.text.trim().isEmpty ? null : _workDescriptionController.text.trim(),
+      description: _workDescriptionController.text.trim().isEmpty ? 'Без описания' : _workDescriptionController.text.trim(),
       createdAt: DateTime.now(),
     );
 
