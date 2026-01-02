@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../models/project.dart';
+import '../models/expense.dart';
 import '../models/quote.dart';
-import '../models/expense.dart' as expense_model;
+
 import '../models/advance.dart';
 import '../database/database_helper.dart';
 import '../widgets/quote_selector_widget.dart';
@@ -44,7 +45,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
   List<String> _installers = [];
   List<Advance> _advances = [];
 
-  List<expense_model.Expense> _expenses = [];
+  List<Expense> _expenses = [];
   List<SalaryPayment> _salaryPayments = [];
 
   bool _isLoading = false;
@@ -117,7 +118,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
       );
       
       setState(() {
-        _expenses = expensesData.map((map) => expense_model.Expense.fromMap(map)).toList();
+        _expenses = expensesData.map((map) => Expense.fromMap(map)).toList();
         _salaryPayments = salaryData.map((map) => SalaryPayment.fromMap(map)).toList();
       });
     } catch (e) {
@@ -213,9 +214,9 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
         startDate: _startDate,
         endDate: _endDate,
         plannedBudget: plannedBudget,
-        actualExpenses: _expenses.fold(0.0, (sum, expense) => sum + (expense as expense_model.Expense).amount),
+        actualExpenses: _expenses.fold(0.0, (sum, expense) => sum + (expense as Expense).amount),
         totalSalary: _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount),
-        profit: plannedBudget - _expenses.fold(0.0, (sum, expense) => sum + (expense as expense_model.Expense).amount) - _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount),
+        profit: plannedBudget - _expenses.fold(0.0, (sum, expense) => sum + (expense as Expense).amount) - _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount),
         quoteId: _selectedQuoteId,
         driverName: _driverName?.trim().isEmpty ?? true ? null : _driverName?.trim(),
         installers: _installers,
@@ -314,7 +315,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final totalExpenses = _expenses.fold(0.0, (sum, expense) => sum + (expense as expense_model.Expense).amount);
+    final totalExpenses = _expenses.fold(0.0, (sum, expense) => sum + (expense as Expense).amount);
     final totalSalary = _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount);
     final plannedBudget = double.tryParse(_budgetController.text) ?? 0.0;
     final profit = plannedBudget - totalExpenses - totalSalary;
@@ -552,7 +553,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
               salaryDistribution: _calculateSalaryDistribution(
                 double.tryParse(_budgetController.text) ?? 0.0,
                 _installers,
-                _expenses.fold(0.0, (sum, expense) => sum + (expense as expense_model.Expense).amount),
+                _expenses.fold(0.0, (sum, expense) => sum + (expense as Expense).amount),
               ),
               onChanged: (driverName, installers) {
                 setState(() {
@@ -755,7 +756,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
     );
   }
 
-  Widget _buildExpenseItem(expense_model.Expense expense, int index) {
+  Widget _buildExpenseItem(Expense expense, int index) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -770,12 +771,12 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: expense.type.color.withOpacity(0.1),
+              color: Colors.blue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
-              _getExpenseIcon(expense.type),
-              color: expense.type.color,
+              Icons.receipt,
+              color: Colors.blue,
               size: 20,
             ),
           ),
@@ -792,7 +793,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
                   ),
                 ),
                 Text(
-                  expense.type.label,
+                  expense.description,
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF86868B),
@@ -1177,7 +1178,7 @@ class _AddExpenseDialogState extends State<_AddExpenseDialog> {
       return;
     }
 
-    final expense = expense_model.Expense(
+    final expense = Expense(
       projectId: 0, // Будет установлен позже
       description: description,
       amount: amount,

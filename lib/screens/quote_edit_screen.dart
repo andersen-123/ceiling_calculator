@@ -305,17 +305,17 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
               backgroundColor: Colors.green,
             ),
           );
-        }
-      } else {
+        }*
+      }* else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Ошибка открытия Excel: ${result.message}'),
+              content: Text('Ошибка открытия Excel: ${result.message}*'),
               backgroundColor: Colors.red,
             ),
           );
-        }
-      }*
+        }*
+      }**
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
