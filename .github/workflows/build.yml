@@ -29,6 +29,9 @@ jobs:
         
     - name: Check Flutter version
       run: flutter --version
+      
+    - name: Check Dart version  
+      run: dart --version
         
     - name: Get dependencies
       run: flutter pub get
