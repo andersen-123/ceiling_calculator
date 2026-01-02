@@ -135,7 +135,7 @@ class DatabaseHelper {
           }
           
           // Создаем резервную копию существующих данных
-          Map<String, List<Map<String, dynamic>>> backupData = {};
+          Map<String, List<Map<String, Object?>>> backupData = {};
           
           try {
             List<String> existingTables = ['companies', 'quotes'];
@@ -148,7 +148,7 @@ class DatabaseHelper {
                 
                 if (result.isNotEmpty) {
                   List<Map> tableData = await db.rawQuery('SELECT * FROM $table');
-                  backupData[table] = tableData;
+                  backupData[table] = tableData.cast<String, Object?>();
                   if (kDebugMode) {
                     print('Backed up ${tableData.length} records from $table');
                   }
@@ -228,13 +228,13 @@ class DatabaseHelper {
               
               if (backupData['companies'] != null) {
                 for (Map record in backupData['companies']!) {
-                  batch.insert('companies', record);
+                  batch.insert('companies', Map<String, Object?>.from(record));
                 }
               }
               
               if (backupData['quotes'] != null) {
                 for (Map record in backupData['quotes']!) {
-                  batch.insert('quotes', record);
+                  batch.insert('quotes', Map<String, Object?>.from(record));
                 }
               }
               
@@ -278,7 +278,7 @@ class DatabaseHelper {
       String path = join(await getDatabasesPath(), _databaseName);
       
       // Создаем полное резервное копирование всех данных
-      Map<String, List<Map<String, dynamic>>> backupData = {};
+      Map<String, List<Map<String, Object?>>> backupData = {};
       
       try {
         Database existingDb = await openDatabase(path);
@@ -298,7 +298,7 @@ class DatabaseHelper {
             
             if (result.isNotEmpty) {
               List<Map> tableData = await existingDb.rawQuery('SELECT * FROM $table');
-              backupData[table] = tableData;
+              backupData[table] = tableData.cast<String, Object?>();
               if (kDebugMode) {
                 print('Backed up ${tableData.length} records from $table');
               }
@@ -341,42 +341,42 @@ class DatabaseHelper {
           // Восстанавливаем компании
           if (backupData['companies'] != null) {
             for (Map record in backupData['companies']!) {
-              batch.insert('companies', record);
+              batch.insert('companies', Map<String, Object?>.from(record));
             }
           }
           
           // Восстанавливаем предложения
           if (backupData['quotes'] != null) {
             for (Map record in backupData['quotes']!) {
-              batch.insert('quotes', record);
+              batch.insert('quotes', Map<String, Object?>.from(record));
             }
           }
           
           // Восстанавливаем проекты
           if (backupData['projects'] != null) {
             for (Map record in backupData['projects']!) {
-              batch.insert('projects', record);
+              batch.insert('projects', Map<String, Object?>.from(record));
             }
           }
           
           // Восстанавливаем расходы
           if (backupData['expenses'] != null) {
             for (Map record in backupData['expenses']!) {
-              batch.insert('expenses', record);
+              batch.insert('expenses', Map<String, Object?>.from(record));
             }
           }
           
           // Восстанавливаем выплаты зарплат
           if (backupData['salary_payments'] != null) {
             for (Map record in backupData['salary_payments']!) {
-              batch.insert('salary_payments', record);
+              batch.insert('salary_payments', Map<String, Object?>.from(record));
             }
           }
           
           // Восстанавливаем позиции предложений
           if (backupData['quote_line_items'] != null) {
             for (Map record in backupData['quote_line_items']!) {
-              batch.insert('quote_line_items', record);
+              batch.insert('quote_line_items', Map<String, Object?>.from(record));
             }
           }
           
