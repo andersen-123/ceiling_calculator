@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:open_file/open_file.dart';
+// import 'package:open_file/open_file.dart';
 import 'dart:io';
 import '../models/quote.dart';
 import '../models/line_item.dart';
@@ -290,9 +290,14 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       final filePath = await _excelService.generateQuoteExcel(quote, _lineItems, await _getCompany());
       
       // Открываем файл напрямую в Excel
-      final result = await OpenFile.open(filePath.path);
+      // final result = await OpenFile.open(filePath.path);
       
-      if (result.type == ResultType.done) {
+      // Временно показываем сообщение вместо открытия
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Excel файл сохранен: ${filePath.path}')),
+      );
+      
+      /* if (result.type == ResultType.done) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -338,9 +343,14 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       final filePath = await _pdfService.generateQuotePdf(quote, _lineItems, await _getCompany());
       
       // Открываем файл напрямую в PDF просмотрщике
-      final result = await OpenFile.open(filePath.path);
+      // final result = await OpenFile.open(filePath.path);
       
-      if (result.type == ResultType.done) {
+      // Временно показываем сообщение вместо открытия
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('PDF файл сохранен: ${filePath.path}')),
+      );
+      
+      /* if (result.type == ResultType.done) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

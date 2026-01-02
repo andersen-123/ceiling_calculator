@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:open_file/open_file.dart';
+// import 'package:open_file/open_file.dart';
 import '../models/quote_attachment.dart';
 
 class QuoteAttachmentsWidget extends StatefulWidget {
@@ -112,11 +112,16 @@ class _QuoteAttachmentsWidgetState extends State<QuoteAttachmentsWidget> {
       
       if (await file.exists()) {
         // Используем OpenFile для прямого открытия в приложении
-        final result = await OpenFile.open(attachment.filePath);
-        print('Результат открытия: ${result.type}');
-        print('Сообщение: ${result.message}');
+        // final result = await OpenFile.open(attachment.filePath);
+        // print('Результат открытия: ${result.type}');
+        // print('Сообщение: ${result.message}');
         
-        if (result.type == ResultType.error) {
+        // Временно показываем сообщение
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Файл доступен: ${attachment.fileName}')),
+        );
+        
+        /* if (result.type == ResultType.error) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -125,7 +130,7 @@ class _QuoteAttachmentsWidgetState extends State<QuoteAttachmentsWidget> {
               ),
             );
           }
-        }
+        } */
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
