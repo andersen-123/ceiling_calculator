@@ -440,7 +440,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   try {
     final quote = Quote(
       id: widget.quote?.id,
-      customerId: 1,
+      companyId: 1,
       customerName: _customerNameController.text.trim(),
       customerPhone: _customerPhoneController.text.trim(),
       customerEmail: _customerEmailController.text.trim(),
@@ -460,6 +460,10 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       notes: _notesController.text.trim().isEmpty 
           ? null 
           : _notesController.text.trim(),
+      currencyCode: 'RUB',
+      subtotalWork: 0, // TODO: Calculate from line items
+      subtotalEquipment: 0, // TODO: Calculate from line items
+      totalAmount: 0, // TODO: Calculate from line items
       createdAt: widget.quote?.createdAt ?? DateTime.now(),
       updatedAt: DateTime.now(),
     );
