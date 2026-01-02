@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:open_file/open_file.dart';
 import '../models/quote_attachment.dart';
 
 class QuoteAttachmentsWidget extends StatefulWidget {
@@ -112,11 +111,21 @@ class _QuoteAttachmentsWidgetState extends State<QuoteAttachmentsWidget> {
       print('Файл существует: ${await file.exists()}');
       
       if (await file.exists()) {
-        // Для Android используем share_plus как основной метод
-        await Share.shareXFiles(
-          [XFile(file.path)], 
-          text: 'Файл из предложения: ${attachment.fileName}'
-        );
+        // Используем OpenFile для прямого открытия в приложении
+        final result = await OpenFile.open(attachment.filePath);
+        print('Результат открытия: ${result.type}');
+        print('Сообщение: ${result.message}');
+        
+        if (result.type == ResultType.error) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Не удалось открыть файл: ${result.message}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

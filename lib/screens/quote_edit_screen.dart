@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:open_file/open_file.dart';
 import 'dart:io';
 import '../models/quote.dart';
 import '../models/line_item.dart';
@@ -215,70 +216,99 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     }
   }
 
-  Future<void> _exportToPdf() async {
-    if (_company == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Сначала настройте информацию о компании')),
-      );
-      return;
-    }
-
-    setState(() => _isExportingPdf = true);
-    
-    try {
-      // Создаем текущее предложение для экспорта
-      final quote = _createQuoteFromForm();
-      
-      final file = await _pdfService.generateQuotePdf(
-        quote,
-        _lineItems,
-        _company!,
-      );
-      
-      await Share.shareXFiles([XFile(file.path)], 
-        text: 'Коммерческое предложение для ${quote.customerName}');
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка экспорта в PDF: $e')),
-        );
-      }
-    }
-    
-    setState(() => _isExportingPdf = false);
-  }
-
   Future<void> _exportToExcel() async {
-    if (_company == null) {
+    if (_lineItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Сначала настройте информацию о компании')),
+        const SnackBar(content: Text('Нет позиций для экспорта')),
       );
       return;
     }
 
     setState(() => _isExportingExcel = true);
-    
+
     try {
-      // Создаем текущее предложение для экспорта
-      final quote = _createQuoteFromForm();
+      final quote = _getCurrentQuote();
+      final filePath = await _excelService.exportToExcel(quote, _lineItems);
       
-      final file = await _excelService.generateQuoteExcel(
-        quote,
-        _lineItems,
-        _company!,
-      );
+      // Открываем файл напрямую в Excel
+      final result = await OpenFile.open(filePath);
       
-      await Share.shareXFiles([XFile(file.path)], 
-        text: 'Коммерческое предложение для ${quote.customerName}');
+      if (result.type == ResultType.done) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Excel файл открыт'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Ошибка открытия Excel: ${result.message}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка экспорта в Excel: $e')),
+          SnackBar(content: Text('Ошибка экспорта: $e')),
         );
       }
+    } finally {
+      setState(() => _isExportingExcel = false);
     }
-    
-    setState(() => _isExportingExcel = false);
+  }
+
+  Future<void> _exportToPdf() async {
+    if (_lineItems.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Нет позиций для экспорта')),
+      );
+      return;
+    }
+
+    setState(() => _isExportingPdf = true);
+
+    try {
+      final quote = _getCurrentQuote();
+      final company = await _getCompany();
+      final filePath = await _pdfService.generatePdf(quote, _lineItems, company);
+      
+      // Открываем файл напрямую в PDF просмотрщике
+      final result = await OpenFile.open(filePath);
+      
+      if (result.type == ResultType.done) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('PDF файл открыт'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Ошибка открытия PDF: ${result.message}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка экспорта: $e')),
+        );
+      }
+    } finally {
+      setState(() => _isExportingPdf = false);
+    }
   }
 
   Future<void> _importFromExcel() async {
