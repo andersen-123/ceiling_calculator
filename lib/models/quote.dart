@@ -22,6 +22,7 @@ class Quote {
   final double totalAmount;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final int? projectId; // Связь с проектом
   final DateTime? deletedAt;
 
   Quote({
@@ -36,19 +37,20 @@ class Quote {
     this.perimeterP,
     this.heightH,
     this.ceilingSystem,
-    this.status = QuoteStatus.draft,
+    required this.status,
     this.paymentTerms,
     this.installationTerms,
     this.notes,
-    this.currencyCode = 'RUB',
+    required this.currencyCode,
     this.subtotalWork = 0.0,
     this.subtotalEquipment = 0.0,
     this.totalAmount = 0.0,
-    DateTime? createdAt,
-    DateTime? updatedAt,
+    required this.createdAt,
+    required this.updatedAt,
+    this.projectId,
     this.deletedAt,
-  })  : createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
+  })  : assert(createdAt != null),
+        assert(updatedAt != null);
 
   Map<String, dynamic> toMap() {
     return {
@@ -74,6 +76,7 @@ class Quote {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'deleted_at': deletedAt?.toIso8601String(),
+      'project_id': projectId, // Связь с проектом
     };
   }
 
@@ -91,7 +94,7 @@ class Quote {
       heightH: map['height_h']?.toDouble(),
       ceilingSystem: map['ceiling_system'],
       status: QuoteStatus.values.firstWhere(
-        (s) => s.name == map['status'],
+        (e) => e.name == map['status'],
         orElse: () => QuoteStatus.draft,
       ),
       paymentTerms: map['payment_terms'],
@@ -104,6 +107,7 @@ class Quote {
       createdAt: DateTime.parse(map['created_at']),
       updatedAt: DateTime.parse(map['updated_at']),
       deletedAt: map['deleted_at'] != null ? DateTime.parse(map['deleted_at']) : null,
+      projectId: map['project_id'], // Связь с проектом
     );
   }
 

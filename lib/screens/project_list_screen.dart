@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/project.dart';
+import '../models/quote.dart';
 import '../database/database_helper.dart';
 import 'project_edit_screen.dart';
 
@@ -13,6 +15,7 @@ class ProjectListScreen extends StatefulWidget {
 class _ProjectListScreenState extends State<ProjectListScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<Project> _projects = [];
+  List<Quote> _quotes = []; // Загружаем предложения для отображения
   List<Project> _filteredProjects = [];
   bool _isLoading = true;
   ProjectStatus? _selectedStatus;
@@ -22,6 +25,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
   void initState() {
     super.initState();
     _loadProjects();
+    _loadQuotes();
     _searchController.addListener(_onSearchChanged);
   }
 
@@ -55,6 +59,24 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
           SnackBar(content: Text('Ошибка загрузки проектов: $e')),
         );
       }
+    }
+  }
+
+  Future<void> _loadQuotes() async {
+    try {
+      final data = await DatabaseHelper.instance.query(
+        'quotes',
+        where: 'deleted_at IS NULL',
+        orderBy: 'created_at DESC',
+      );
+      
+      final quotes = data.map((map) => Quote.fromMap(map)).toList();
+      
+      setState(() {
+        _quotes = quotes;
+      });
+    } catch (e) {
+      // Ошибка загрузки предложений
     }
   }
 
@@ -279,6 +301,10 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
         ? ((project.profit / project.plannedBudget) * 100).toStringAsFixed(1)
         : '0.0';
     
+    final relatedQuote = project.quoteId != null 
+        ? _quotes.firstWhere((q) => q.id == project.quoteId, orElse: () => Quote.fromMap({}))
+        : null;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -321,15 +347,15 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                     project.status.label,
                     style: TextStyle(
                       fontSize: 12,
-                      color: project.status.color,
                       fontWeight: FontWeight.w600,
+                      color: project.status.color,
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
             if (project.customerName != null) ...[
+              const SizedBox(height: 8),
               Text(
                 'Клиент: ${project.customerName}',
                 style: const TextStyle(
@@ -338,6 +364,46 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                 ),
               ),
               const SizedBox(height: 4),
+            ],
+            
+            // Связанное предложение
+            if (relatedQuote != null) ...[
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.description, color: Colors.blue[700], size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Предложение: ${relatedQuote!.objectName ?? 'Без названия'}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.blue[700],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Сумма: ${currencyFormat.format(relatedQuote!.totalAmount)}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.blue[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
             if (project.address != null) ...[
               Text(

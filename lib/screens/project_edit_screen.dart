@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/project.dart';
+import '../models/quote.dart';
 import '../database/database_helper.dart';
+import '../widgets/installers_widget.dart';
+import '../widgets/quote_selector_widget.dart';
 
 class ProjectEditScreen extends StatefulWidget {
   final Project? project;
@@ -23,6 +27,9 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
   ProjectStatus _selectedStatus = ProjectStatus.planning;
   DateTime? _startDate;
   DateTime? _endDate;
+  int? _selectedQuoteId;
+  String? _driverName;
+  List<String> _installers = [];
 
   List<Expense> _expenses = [];
   List<SalaryPayment> _salaryPayments = [];
@@ -48,7 +55,9 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
     _selectedStatus = project.status;
     _startDate = project.startDate;
     _endDate = project.endDate;
-    
+    _selectedQuoteId = project.quoteId;
+    _driverName = project.driverName;
+    _installers = List.from(project.installers);
     _loadExpensesAndSalary();
   }
 
@@ -59,6 +68,67 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
       // Загрузка расходов
       final expensesData = await DatabaseHelper.instance.query(
         'expenses',
+        where: 'project_id = ?',
+        whereArgs: [widget.project!.id],
+      );
+      
+      // Загрузка выплат зарплаты
+      final salaryData = await DatabaseHelper.instance.query(
+        'salary_payments',
+        where: 'project_id = ?',
+        whereArgs: [widget.project!.id],
+      );
+      
+      setState(() {
+        _expenses = expensesData.map((map) => Expense.fromMap(map)).toList();
+        _salaryPayments = salaryData.map((map) => SalaryPayment.fromMap(map)).toList();
+      });
+    } catch (e) {
+      // Обработка ошибки
+    }
+  }
+
+  Future<void> _loadQuoteData(int quoteId) async {
+    try {
+      final data = await DatabaseHelper.instance.query(
+        'quotes',
+        where: 'quote_id = ?',
+        whereArgs: [quoteId],
+      );
+      
+      if (data.isNotEmpty) {
+        final quote = Quote.fromMap(data.first);
+        
+        // Загрузка позиций предложения
+        final lineItemsData = await DatabaseHelper.instance.query(
+          'line_items',
+          where: 'quote_id = ?',
+          whereArgs: [quoteId],
+        );
+        
+        setState(() {
+          // Автоматически заполняем поля из предложения
+          _customerNameController.text = quote.customerName;
+          _customerPhoneController.text = quote.customerPhone ?? '';
+          _addressController.text = quote.address ?? '';
+          _budgetController.text = quote.totalAmount.toString();
+          
+          // Создаем расходы на основе позиций предложения
+          _expenses.clear();
+          _expenses.add(Expense(
+            projectId: widget.project?.id ?? 0,
+            type: ExpenseType.materials,
+            description: 'Материалы по смете',
+            amount: quote.totalAmount * 0.5, // 50% на материалы
+            date: DateTime.now(),
+            createdAt: DateTime.now(),
+          ));
+        });
+      }
+    } catch (e) {
+      // Обработка ошибки
+    }
+  }
         where: 'project_id = ?',
         whereArgs: [widget.project!.id],
         orderBy: 'date DESC',
@@ -84,12 +154,43 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
     }
   }
 
+  Map<String, double> _calculateSalaryDistribution(double plannedBudget, List<String> installers) {
+    if (plannedBudget <= 0 || installers.isEmpty) {
+      return {
+        'driver': 0.0,
+        'installer': 0.0,
+        'total': 0.0,
+      };
+    }
+
+    // 50% - затраты на материалы, бензин и прочее
+    final expensesAmount = plannedBudget * 0.5;
+    final remainingAmount = plannedBudget - expensesAmount;
+
+    // От остатка 5% начисляется тому кто на машине
+    final driverAmount = remainingAmount * 0.05;
+    final finalRemaining = remainingAmount - driverAmount;
+
+    // Остальное делится на количество монтажников
+    final installerAmount = finalRemaining / installers.length;
+
+    return {
+      'driver': driverAmount,
+      'installer': installerAmount,
+      'total': driverAmount + (installerAmount * installers.length),
+    };
+  }
+
   Future<void> _saveProject() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     try {
+      // Расчитываем зарплату по новой формуле
+      final plannedBudget = double.tryParse(_budgetController.text) ?? 0.0;
+      final salaryDistribution = _calculateSalaryDistribution(plannedBudget, _installers);
+      
       final project = Project(
         id: widget.project?.id,
         name: _nameController.text.trim(),
@@ -99,10 +200,13 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
         status: _selectedStatus,
         startDate: _startDate,
         endDate: _endDate,
-        plannedBudget: double.tryParse(_budgetController.text) ?? 0.0,
+        plannedBudget: plannedBudget,
         actualExpenses: _expenses.fold(0.0, (sum, expense) => sum + expense.amount),
-        totalSalary: _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount),
+        totalSalary: salaryDistribution['total'] ?? 0.0,
         profit: 0.0, // Будет рассчитано ниже
+        quoteId: _selectedQuoteId,
+        driverName: _driverName?.trim().isEmpty ?? true ? null : _driverName?.trim(),
+        installers: _installers,
         notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
         createdAt: widget.project?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
@@ -406,6 +510,34 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
               ],
             ),
             const SizedBox(height: 16),
+            
+            // Выбор предложения
+            QuoteSelectorWidget(
+              selectedQuoteId: _selectedQuoteId,
+              onChanged: (quoteId) {
+                setState(() {
+                  _selectedQuoteId = quoteId;
+                });
+                if (quoteId != null) {
+                  _loadQuoteData(quoteId!);
+                }
+              },
+            ),
+            const SizedBox(height: 20),
+            
+            // Монтажники и водитель
+            InstallersWidget(
+              driverName: _driverName,
+              installers: _installers,
+              onChanged: (driverName, installers) {
+                setState(() {
+                  _driverName = driverName;
+                  _installers = installers;
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            
             TextFormField(
               controller: _budgetController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),

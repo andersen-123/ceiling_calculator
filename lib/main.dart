@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'screens/home_screen.dart';
+import 'screens/main_screen.dart';
 import 'database/database_helper.dart';
 
 void main() async {
@@ -23,7 +23,7 @@ class CeilingCalculatorApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.blue,
+          backgroundColor: Color(0xFF007AFF),
           foregroundColor: Colors.white,
           elevation: 2,
         ),
@@ -51,7 +51,7 @@ class CeilingCalculatorApp extends StatelessWidget {
         Locale('ru', 'RU'),
       ],
       locale: const Locale('ru', 'RU'),
-      home: const HomeScreen(),
+      home: const MainScreen(),
     );
   }
 }

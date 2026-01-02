@@ -37,6 +37,9 @@ class Project {
   final double actualExpenses;
   final double totalSalary;
   final double profit;
+  final int? quoteId; // Связь с предложением
+  final String? driverName; // Кто на машине
+  final List<String> installers; // Список монтажников
   final String? notes;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -54,6 +57,9 @@ class Project {
     this.actualExpenses = 0.0,
     this.totalSalary = 0.0,
     this.profit = 0.0,
+    this.quoteId,
+    this.driverName,
+    this.installers = const [],
     this.notes,
     required this.createdAt,
     required this.updatedAt,
@@ -72,6 +78,9 @@ class Project {
     double? actualExpenses,
     double? totalSalary,
     double? profit,
+    int? quoteId,
+    String? driverName,
+    List<String>? installers,
     String? notes,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -89,6 +98,9 @@ class Project {
       actualExpenses: actualExpenses ?? this.actualExpenses,
       totalSalary: totalSalary ?? this.totalSalary,
       profit: profit ?? this.profit,
+      quoteId: quoteId ?? this.quoteId,
+      driverName: driverName ?? this.driverName,
+      installers: installers ?? this.installers,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -109,6 +121,9 @@ class Project {
       'actual_expenses': actualExpenses,
       'total_salary': totalSalary,
       'profit': profit,
+      'quote_id': quoteId,
+      'driver_name': driverName,
+      'installers': installers.join(','), // Сохраняем как строку через запятую
       'notes': notes,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
@@ -132,10 +147,43 @@ class Project {
       actualExpenses: map['actual_expenses']?.toDouble() ?? 0.0,
       totalSalary: map['total_salary']?.toDouble() ?? 0.0,
       profit: map['profit']?.toDouble() ?? 0.0,
+      quoteId: map['quote_id'],
+      driverName: map['driver_name'],
+      installers: map['installers'] != null && map['installers'].toString().isNotEmpty 
+          ? map['installers'].toString().split(',') 
+          : [],
       notes: map['notes'],
       createdAt: DateTime.parse(map['created_at']),
       updatedAt: DateTime.parse(map['updated_at']),
     );
+  }
+
+  // Метод расчета зарплаты по новой формуле
+  Map<String, double> calculateSalaryDistribution() {
+    if (plannedBudget <= 0 || installers.isEmpty) {
+      return {
+        'driver': 0.0,
+        'installer': 0.0,
+        'total': 0.0,
+      };
+    }
+
+    // 100% - затраты на материалы, бензин и прочее
+    final expensesAmount = plannedBudget * 0.5; // 50% на материалы и прочее
+    final remainingAmount = plannedBudget - expensesAmount; // Остаток 50%
+
+    // От остатка 5% начисляется тому кто на машине
+    final driverAmount = remainingAmount * 0.05;
+    final finalRemaining = remainingAmount - driverAmount;
+
+    // Остальное делится на количество монтажников
+    final installerAmount = installers.isNotEmpty ? finalRemaining / installers.length : 0.0;
+
+    return {
+      'driver': driverAmount,
+      'installer': installerAmount,
+      'total': driverAmount + (installerAmount * installers.length),
+    };
   }
 }
 

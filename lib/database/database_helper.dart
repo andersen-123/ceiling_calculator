@@ -98,7 +98,9 @@ class DatabaseHelper {
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
         deleted_at TEXT NULL,
-        FOREIGN KEY (company_id) REFERENCES companies (company_id)
+        project_id INTEGER NULL, -- Связь с проектом
+        FOREIGN KEY (company_id) REFERENCES companies (company_id),
+        FOREIGN KEY (project_id) REFERENCES projects (project_id)
       )
     ''');
 
@@ -273,10 +275,14 @@ class DatabaseHelper {
         actual_expenses REAL NOT NULL DEFAULT 0,
         total_salary REAL NOT NULL DEFAULT 0,
         profit REAL NOT NULL DEFAULT 0,
+        quote_id INTEGER NULL,
+        driver_name TEXT NULL,
+        installers TEXT NULL,
         notes TEXT NULL,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
-        deleted_at TEXT NULL
+        deleted_at TEXT NULL,
+        FOREIGN KEY (quote_id) REFERENCES quotes (quote_id)
       )
     ''');
   }
