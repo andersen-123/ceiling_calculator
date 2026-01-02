@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'quote_list_screen.dart';
 import 'quote_edit_screen.dart';
+import 'project_list_screen.dart';
 import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const QuoteListScreen(),
     const QuoteEditScreen(),
+    const ProjectListScreen(),
     const SettingsScreen(),
   ];
 
@@ -42,6 +44,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.add_circle),
             label: 'Создать',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.business),
+            label: 'Проекты',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
