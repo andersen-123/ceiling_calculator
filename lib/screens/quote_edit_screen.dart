@@ -216,6 +216,57 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     }
   }
 
+  Quote _getCurrentQuote() {
+    return Quote(
+      id: widget.quote?.id,
+      companyId: 1,
+      customerName: _customerNameController.text.trim(),
+      customerPhone: _customerPhoneController.text.trim(),
+      customerEmail: _customerEmailController.text.trim(),
+      objectName: _objectNameController.text.trim(),
+      address: _addressController.text.trim(),
+      areaS: double.tryParse(_areaSController.text) ?? 0,
+      perimeterP: double.tryParse(_perimeterPController.text) ?? 0,
+      heightH: double.tryParse(_heightHController.text) ?? 0,
+      ceilingSystem: _selectedCeilingSystem,
+      status: _selectedStatus,
+      paymentTerms: _paymentTermsController.text.trim().isEmpty 
+          ? null 
+          : _paymentTermsController.text.trim(),
+      installationTerms: _installationTermsController.text.trim().isEmpty 
+          ? null 
+          : _installationTermsController.text.trim(),
+      notes: _notesController.text.trim().isEmpty 
+          ? null 
+          : _notesController.text.trim(),
+      currencyCode: 'RUB',
+      subtotalWork: 0, // TODO: Calculate from line items
+      subtotalEquipment: 0, // TODO: Calculate from line items
+      totalAmount: 0, // TODO: Calculate from line items
+      createdAt: widget.quote?.createdAt ?? DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  Future<Company> _getCompany() async {
+    final companies = await DatabaseHelper.instance.query('companies');
+    if (companies.isNotEmpty) {
+      return Company.fromMap(companies.first);
+    }
+    return Company(
+      id: 1,
+      name: 'Название компании',
+      phone: '+7 (999) 999-99-99',
+      email: 'info@company.com',
+      website: 'www.company.com',
+      address: 'Адрес компании',
+      logoPath: null,
+      footerNote: 'Примечание компании',
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+
   Future<void> _exportToExcel() async {
     if (_lineItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -228,7 +279,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
 
     try {
       final quote = _getCurrentQuote();
-      final filePath = await _excelService.exportToExcel(quote, _lineItems);
+      final filePath = await _excelService.generateQuoteExcel(quote, _lineItems, await _getCompany());
       
       // Открываем файл напрямую в Excel
       final result = await OpenFile.open(filePath);
@@ -276,7 +327,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     try {
       final quote = _getCurrentQuote();
       final company = await _getCompany();
-      final filePath = await _pdfService.generatePdf(quote, _lineItems, company);
+      final filePath = await _pdfService.generateQuotePdf(quote, _lineItems, await _getCompany());
       
       // Открываем файл напрямую в PDF просмотрщике
       final result = await OpenFile.open(filePath);
