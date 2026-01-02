@@ -181,7 +181,14 @@ class _InstallersWidgetState extends State<InstallersWidget> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '• 50% - материалы, бензин и прочее',
+                  '• Затраты на материалы - по факту',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                Text(
+                  '• Бензин (10% от остатка) - водителю',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[700],
@@ -195,7 +202,7 @@ class _InstallersWidgetState extends State<InstallersWidget> {
                   ),
                 ),
                 Text(
-                  '• Остаток делится на монтажников',
+                  '• Остаток (95%) делится на монтажников',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[700],

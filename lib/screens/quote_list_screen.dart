@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/quote.dart';
 import '../database/database_helper.dart';
-import '../widgets/quote_card.dart';
 import 'quote_edit_screen.dart';
 
 class QuoteListScreen extends StatefulWidget {
@@ -130,21 +130,9 @@ class _QuoteListScreenState extends State<QuoteListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Коммерческие предложения'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        titleTextStyle: const TextStyle(
-          color: Color(0xFF1D1D1F),
-          fontWeight: FontWeight.w600,
-          fontSize: 18,
-        ),
-        iconTheme: const IconThemeData(color: Color(0xFF007AFF)),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Color(0xFF86868B)),
-            onPressed: _loadQuotes,
-          ),
-        ],
+        title: const Text('Предложения'),
+        backgroundColor: const Color(0xFF007AFF),
+        foregroundColor: Colors.white,
       ),
       body: Column(
         children: [

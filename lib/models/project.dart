@@ -168,21 +168,26 @@ class Project {
       };
     }
 
-    // 100% - затраты на материалы, бензин и прочее
-    final expensesAmount = plannedBudget * 0.5; // 50% на материалы и прочее
-    final remainingAmount = plannedBudget - expensesAmount; // Остаток 50%
-
-    // От остатка 5% начисляется тому кто на машине
-    final driverAmount = remainingAmount * 0.05;
-    final finalRemaining = remainingAmount - driverAmount;
-
-    // Остальное делится на количество монтажников
-    final installerAmount = installers.isNotEmpty ? finalRemaining / installers.length : 0.0;
+    // Затраты на материалы - по факту (из actualExpenses)
+    final materialsExpenses = actualExpenses;
+    
+    // Остаток после материалов
+    final remainingAmount = plannedBudget - materialsExpenses;
+    
+    // Бензин возмещается водителю (10% от остатка)
+    final fuelAmount = remainingAmount * 0.1;
+    final finalRemaining = remainingAmount - fuelAmount;
+    
+    // Зарплата водителя = 5% от остатка + бензин
+    final driverSalary = (finalRemaining * 0.05) + fuelAmount;
+    
+    // Остаток делится на количество монтажников
+    final installerSalary = installers.isNotEmpty ? finalRemaining * 0.95 / installers.length : 0.0;
 
     return {
-      'driver': driverAmount,
-      'installer': installerAmount,
-      'total': driverAmount + (installerAmount * installers.length),
+      'driver': driverSalary,
+      'installer': installerSalary,
+      'total': driverSalary + (installerSalary * installers.length),
     };
   }
 }

@@ -301,6 +301,13 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
         ? ((project.profit / project.plannedBudget) * 100).toStringAsFixed(1)
         : '0.0';
     
+    final currencyFormat = NumberFormat.currency(
+      locale: 'ru_RU',
+      symbol: '₽',
+      decimalDigits: 0,
+    );
+    
+    // Связанное предложение
     final relatedQuote = project.quoteId != null 
         ? _quotes.firstWhere((q) => q.id == project.quoteId, orElse: () => Quote.fromMap({}))
         : null;

@@ -84,7 +84,11 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
         _salaryPayments = salaryData.map((map) => SalaryPayment.fromMap(map)).toList();
       });
     } catch (e) {
-      // Обработка ошибки
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка загрузки данных: $e')),
+        );
+      }
     }
   }
 
@@ -99,62 +103,25 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
       if (data.isNotEmpty) {
         final quote = Quote.fromMap(data.first);
         
-        // Загрузка позиций предложения
-        final lineItemsData = await DatabaseHelper.instance.query(
-          'line_items',
-          where: 'quote_id = ?',
-          whereArgs: [quoteId],
-        );
-        
         setState(() {
           // Автоматически заполняем поля из предложения
           _customerNameController.text = quote.customerName;
           _customerPhoneController.text = quote.customerPhone ?? '';
           _addressController.text = quote.address ?? '';
           _budgetController.text = quote.totalAmount.toString();
-          
-          // Создаем расходы на основе позиций предложения
-          _expenses.clear();
-          _expenses.add(Expense(
-            projectId: widget.project?.id ?? 0,
-            type: ExpenseType.materials,
-            description: 'Материалы по смете',
-            amount: quote.totalAmount * 0.5, // 50% на материалы
-            date: DateTime.now(),
-            createdAt: DateTime.now(),
-          ));
+          // НЕ создаем автоматически расходы на материалы - они вводятся по факту
         });
       }
     } catch (e) {
-      // Обработка ошибки
-    }
-  }
-        where: 'project_id = ?',
-        whereArgs: [widget.project!.id],
-        orderBy: 'date DESC',
-      );
-      _expenses = expensesData.map((map) => Expense.fromMap(map)).toList();
-
-      // Загрузка зарплат
-      final salaryData = await DatabaseHelper.instance.query(
-        'salary_payments',
-        where: 'project_id = ?',
-        whereArgs: [widget.project!.id],
-        orderBy: 'date DESC',
-      );
-      _salaryPayments = salaryData.map((map) => SalaryPayment.fromMap(map)).toList();
-
-      setState(() {});
-    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка загрузки данных: $e')),
+          SnackBar(content: Text('Ошибка загрузки предложения: $e')),
         );
       }
     }
   }
 
-  Map<String, double> _calculateSalaryDistribution(double plannedBudget, List<String> installers) {
+  Map<String, double> _calculateSalaryDistribution(double plannedBudget, List<String> installers, double actualExpenses) {
     if (plannedBudget <= 0 || installers.isEmpty) {
       return {
         'driver': 0.0,
@@ -163,21 +130,26 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
       };
     }
 
-    // 50% - затраты на материалы, бензин и прочее
-    final expensesAmount = plannedBudget * 0.5;
-    final remainingAmount = plannedBudget - expensesAmount;
-
-    // От остатка 5% начисляется тому кто на машине
-    final driverAmount = remainingAmount * 0.05;
-    final finalRemaining = remainingAmount - driverAmount;
-
-    // Остальное делится на количество монтажников
-    final installerAmount = finalRemaining / installers.length;
+    // Затраты на материалы - по факту
+    final materialsExpenses = actualExpenses;
+    
+    // Остаток после материалов
+    final remainingAmount = plannedBudget - materialsExpenses;
+    
+    // Бензин возмещается водителю (10% от остатка)
+    final fuelAmount = remainingAmount * 0.1;
+    final finalRemaining = remainingAmount - fuelAmount;
+    
+    // Зарплата водителя = 5% от остатка + бензин
+    final driverSalary = (finalRemaining * 0.05) + fuelAmount;
+    
+    // Остаток делится на количество монтажников
+    final installerSalary = installers.isNotEmpty ? finalRemaining * 0.95 / installers.length : 0.0;
 
     return {
-      'driver': driverAmount,
-      'installer': installerAmount,
-      'total': driverAmount + (installerAmount * installers.length),
+      'driver': driverSalary,
+      'installer': installerSalary,
+      'total': driverSalary + (installerSalary * installers.length),
     };
   }
 
@@ -189,7 +161,8 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
     try {
       // Расчитываем зарплату по новой формуле
       final plannedBudget = double.tryParse(_budgetController.text) ?? 0.0;
-      final salaryDistribution = _calculateSalaryDistribution(plannedBudget, _installers);
+      final actualExpenses = _expenses.fold(0.0, (sum, expense) => sum + expense.amount);
+      final salaryDistribution = _calculateSalaryDistribution(plannedBudget, _installers, actualExpenses);
       
       final project = Project(
         id: widget.project?.id,
