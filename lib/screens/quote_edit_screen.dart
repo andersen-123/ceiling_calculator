@@ -467,37 +467,22 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
             : _installationTermsController.text.trim(),
         notes: _notesController.text.trim().isEmpty 
             ? null 
-            : _notesController.text.trim(),
       );
 
-      // Расчёт сумм
-      final workItems = _lineItems.where((item) => item.section == LineItemSection.work);
-      final equipmentItems = _lineItems.where((item) => item.section == LineItemSection.equipment);
-      
-      final subtotalWork = workItems.fold(0.0, (sum, item) => sum + item.amount);
-      final subtotalEquipment = equipmentItems.fold(0.0, (sum, item) => sum + item.amount);
-      final totalAmount = subtotalWork + subtotalEquipment;
-
-      final quoteWithTotals = quote.copyWith(
-        subtotalWork: subtotalWork,
-        subtotalEquipment: subtotalEquipment,
-        totalAmount: totalAmount,
-      );
-
-      // Сохранение предложения
-      int? savedQuoteId;
-      if (widget.quote?.id != null) {
+      int savedQuoteId;
+      if (widget.quote == null) {
+        // Новое предложение
+        savedQuoteId = await DatabaseHelper.instance.insert('quotes', quote.toMap());
+        quoteId = savedQuoteId;
+      } else {
+        // Обновление существующего
         await DatabaseHelper.instance.update(
           'quotes',
-          quoteWithTotals.toMap(),
+          quote.toMap(),
           where: 'quote_id = ?',
-          whereArgs: [widget.quote!.id],
+          whereArgs: [quote.id],
         );
-        savedQuoteId = widget.quote!.id;
-      } else {
-        final newId = await DatabaseHelper.instance.insert('quotes', quoteWithTotals.toMap());
-        savedQuoteId = newId;
-        quoteId = newId;
+        savedQuoteId = quote.id!;
       }
 
       // Сохранение позиций
@@ -524,11 +509,9 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         await DatabaseHelper.instance.insert('quote_attachments', attachmentWithQuoteId.toMap());
       }
 
-      if (mounted) {
-        // Сохраняем результат и принудительно перезагружаем предыдущий экран
-        Navigator.of(context).pop('saved');
-        return;
-      }
+      // Синхронный переход без проверок
+      Navigator.of(context).pop('saved');
+      
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -536,7 +519,6 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         );
       }
     }
-    // setState убираем совсем, чтобы избежать конфликтов
   }
 
   @override

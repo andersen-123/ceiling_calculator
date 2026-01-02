@@ -162,35 +162,25 @@ class _QuoteListScreenState extends State<QuoteListScreen> {
                           return QuoteCard(
                             quote: quote,
                             onTap: () async {
-                              final result = await Navigator.push(
+                              await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => QuoteEditScreen(quote: quote),
                                 ),
                               );
-                              // Принудительно перезагружаем список при любом возврате
                               if (mounted) {
-                                Future.delayed(const Duration(milliseconds: 200), () {
-                                  if (mounted) {
-                                    _loadQuotes();
-                                  }
-                                });
+                                _loadQuotes();
                               }
                             },
                             onEdit: () async {
-                              final result = await Navigator.push(
+                              await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => QuoteEditScreen(quote: quote),
                                 ),
                               );
-                              // Принудительно перезагружаем список при любом возврате
                               if (mounted) {
-                                Future.delayed(const Duration(milliseconds: 200), () {
-                                  if (mounted) {
-                                    _loadQuotes();
-                                  }
-                                });
+                                _loadQuotes();
                               }
                             },
                             onDelete: () => _deleteQuote(quote),
