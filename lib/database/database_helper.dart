@@ -131,7 +131,38 @@ class DatabaseHelper {
         
         if (oldVersion < 2) {
           if (kDebugMode) {
-            print('Adding missing tables for version 2...');
+            print('Adding missing tables for version 2 with data preservation...');
+          }
+          
+          // Создаем резервную копию существующих данных
+          Map<String, List<Map<String, dynamic>>> backupData = {};
+          
+          try {
+            List<String> existingTables = ['companies', 'quotes'];
+            
+            for (String table in existingTables) {
+              try {
+                List<Map> result = await db.rawQuery(
+                  "SELECT name FROM sqlite_master WHERE type='table' AND name='$table'"
+                );
+                
+                if (result.isNotEmpty) {
+                  List<Map> tableData = await db.rawQuery('SELECT * FROM $table');
+                  backupData[table] = tableData;
+                  if (kDebugMode) {
+                    print('Backed up ${tableData.length} records from $table');
+                  }
+                }
+              } catch (e) {
+                if (kDebugMode) {
+                  print('Failed to backup table $table: $e');
+                }
+              }
+            }
+          } catch (backupError) {
+            if (kDebugMode) {
+              print('Failed to create backup during upgrade: $backupError');
+            }
           }
           
           try {
@@ -191,6 +222,29 @@ class DatabaseHelper {
               )
             ''');
             
+            // Восстанавливаем данные если они были
+            if (backupData.isNotEmpty) {
+              Batch batch = db.batch();
+              
+              if (backupData['companies'] != null) {
+                for (Map record in backupData['companies']!) {
+                  batch.insert('companies', record);
+                }
+              }
+              
+              if (backupData['quotes'] != null) {
+                for (Map record in backupData['quotes']!) {
+                  batch.insert('quotes', record);
+                }
+              }
+              
+              await batch.commit(noResult: true);
+              
+              if (kDebugMode) {
+                print('Successfully restored data during upgrade');
+              }
+            }
+            
             if (kDebugMode) {
               print('Database upgrade to version 2 completed successfully');
             }
@@ -216,27 +270,38 @@ class DatabaseHelper {
       print('Stack trace: $stackTrace');
     }
     
-    // Если критическая ошибка, пытаемся пересоздать базу данных с резервным копированием
+    // Если критическая ошибка, делаем полное резервное копирование и восстановление
     try {
       if (kDebugMode) {
-        print('Attempting to recreate database with backup...');
+        print('Attempting full database backup and recreate...');
       }
       String path = join(await getDatabasesPath(), _databaseName);
       
-      // Создаем резервную копию если возможно
+      // Создаем полное резервное копирование всех данных
+      Map<String, List<Map<String, dynamic>>> backupData = {};
+      
       try {
-        String backupPath = path.replaceFirst('.db', '_backup_${DateTime.now().millisecondsSinceEpoch}.db');
         Database existingDb = await openDatabase(path);
-        List<Map> allData = [];
         
-        // Копируем основные данные
-        List<String> tables = ['companies', 'quotes'];
+        // Получаем все таблицы
+        List<String> tables = [
+          'companies', 'quotes', 'projects', 'expenses', 
+          'salary_payments', 'quote_line_items'
+        ];
+        
         for (String table in tables) {
           try {
-            List<Map> tableData = await existingDb.rawQuery('SELECT * FROM $table');
-            allData.addAll(tableData.map((row) => {'table': table, 'data': row}));
-            if (kDebugMode) {
-              print('Backed up ${tableData.length} records from $table');
+            // Проверяем существование таблицы
+            List<Map> result = await existingDb.rawQuery(
+              "SELECT name FROM sqlite_master WHERE type='table' AND name='$table'"
+            );
+            
+            if (result.isNotEmpty) {
+              List<Map> tableData = await existingDb.rawQuery('SELECT * FROM $table');
+              backupData[table] = tableData;
+              if (kDebugMode) {
+                print('Backed up ${tableData.length} records from $table');
+              }
             }
           } catch (e) {
             if (kDebugMode) {
@@ -248,7 +313,8 @@ class DatabaseHelper {
         await existingDb.close();
         
         if (kDebugMode) {
-          print('Created backup with ${allData.length} total records');
+          int totalRecords = backupData.values.fold(0, (sum, records) => sum + records.length);
+          print('Created complete backup with $totalRecords total records');
         }
       } catch (backupError) {
         if (kDebugMode) {
@@ -267,20 +333,67 @@ class DatabaseHelper {
         onUpgrade: _onUpgrade,
       );
       
-      // Восстанавливаем данные из резервной копии если возможно
-      try {
-        // Здесь можно добавить восстановление данных из backup
-        if (kDebugMode) {
-          print('Database recreated successfully (backup restoration not implemented)');
-        }
-      } catch (restoreError) {
-        if (kDebugMode) {
-          print('Failed to restore backup: $restoreError');
+      // Восстанавливаем все данные из резервной копии
+      if (backupData.isNotEmpty) {
+        try {
+          Batch batch = _database!.batch();
+          
+          // Восстанавливаем компании
+          if (backupData['companies'] != null) {
+            for (Map record in backupData['companies']!) {
+              batch.insert('companies', record);
+            }
+          }
+          
+          // Восстанавливаем предложения
+          if (backupData['quotes'] != null) {
+            for (Map record in backupData['quotes']!) {
+              batch.insert('quotes', record);
+            }
+          }
+          
+          // Восстанавливаем проекты
+          if (backupData['projects'] != null) {
+            for (Map record in backupData['projects']!) {
+              batch.insert('projects', record);
+            }
+          }
+          
+          // Восстанавливаем расходы
+          if (backupData['expenses'] != null) {
+            for (Map record in backupData['expenses']!) {
+              batch.insert('expenses', record);
+            }
+          }
+          
+          // Восстанавливаем выплаты зарплат
+          if (backupData['salary_payments'] != null) {
+            for (Map record in backupData['salary_payments']!) {
+              batch.insert('salary_payments', record);
+            }
+          }
+          
+          // Восстанавливаем позиции предложений
+          if (backupData['quote_line_items'] != null) {
+            for (Map record in backupData['quote_line_items']!) {
+              batch.insert('quote_line_items', record);
+            }
+          }
+          
+          await batch.commit(noResult: true);
+          
+          if (kDebugMode) {
+            print('Successfully restored all data from backup');
+          }
+        } catch (restoreError) {
+          if (kDebugMode) {
+            print('Failed to restore backup: $restoreError');
+          }
         }
       }
       
       if (kDebugMode) {
-        print('Database recreated successfully');
+        print('Database recreated and data restored successfully');
       }
       return _database!;
     } catch (recreateError) {
