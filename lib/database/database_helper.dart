@@ -37,88 +37,14 @@ class DatabaseHelper {
           print('Creating database tables...');
         }
         
-        // Создаем только основные таблицы
-        await db.execute('''
-          CREATE TABLE companies (
-            company_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            address TEXT,
-            phone TEXT,
-            email TEXT,
-            created_at INTEGER NOT NULL
-          )
-        ''');
-        
-        await db.execute('''
-          CREATE TABLE quotes (
-            quote_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            company_id INTEGER,
-            client_name TEXT NOT NULL,
-            client_phone TEXT,
-            client_address TEXT,
-            created_at INTEGER NOT NULL,
-            updated_at INTEGER NOT NULL,
-            status TEXT NOT NULL DEFAULT 'draft',
-            project_id INTEGER,
-            FOREIGN KEY (company_id) REFERENCES companies (company_id)
-          )
-        ''');
-        
-        // Добавляем таблицы для проектов
-        await db.execute('''
-          CREATE TABLE projects (
-            project_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            quote_id INTEGER,
-            client_name TEXT NOT NULL,
-            client_phone TEXT,
-            client_address TEXT,
-            budget REAL NOT NULL DEFAULT 0,
-            status TEXT NOT NULL DEFAULT 'active',
-            created_at INTEGER NOT NULL,
-            updated_at INTEGER NOT NULL,
-            driver_name TEXT,
-            installers TEXT,
-            FOREIGN KEY (quote_id) REFERENCES quotes (quote_id)
-          )
-        ''');
-        
-        await db.execute('''
-          CREATE TABLE expenses (
-            expense_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            project_id INTEGER NOT NULL,
-            description TEXT NOT NULL,
-            amount REAL NOT NULL,
-            created_at INTEGER NOT NULL,
-            FOREIGN KEY (project_id) REFERENCES projects (project_id)
-          )
-        ''');
-        
-        await db.execute('''
-          CREATE TABLE salary_payments (
-            payment_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            project_id INTEGER NOT NULL,
-            worker_name TEXT NOT NULL,
-            amount REAL NOT NULL,
-            description TEXT,
-            created_at INTEGER NOT NULL,
-            FOREIGN KEY (project_id) REFERENCES projects (project_id)
-          )
-        ''');
-        
-        await db.execute('''
-          CREATE TABLE quote_line_items (
-            item_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            quote_id INTEGER NOT NULL,
-            description TEXT NOT NULL,
-            unit TEXT NOT NULL,
-            quantity REAL NOT NULL,
-            unit_price REAL NOT NULL,
-            total_price REAL NOT NULL,
-            item_type TEXT NOT NULL DEFAULT 'work',
-            created_at INTEGER NOT NULL,
-            FOREIGN KEY (quote_id) REFERENCES quotes (quote_id)
-          )
-        ''');
+        // Создаем все таблицы с IF NOT EXISTS для безопасности
+        await _createCompaniesTable(db);
+        await _createQuotesTable(db);
+        await _createProjectsTable(db);
+        await _createExpensesTable(db);
+        await _createSalaryPaymentsTable(db);
+        await _createQuoteLineItemsTable(db);
+        await _createAdvancesTable(db);
         
         if (kDebugMode) {
           print('All tables created successfully');
@@ -589,24 +515,21 @@ class DatabaseHelper {
 
   Future<void> _createCompaniesTable(Database db) async {
     await db.execute('''
-      CREATE TABLE companies (
+      CREATE TABLE IF NOT EXISTS companies (
         company_id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         logo_path TEXT NULL,
-        phone TEXT NULL,
-        email TEXT NULL,
-        website TEXT NULL,
-        address TEXT NULL,
-        footer_note TEXT NULL,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL
+        address TEXT,
+        phone TEXT,
+        email TEXT,
+        created_at INTEGER NOT NULL
       )
     ''');
   }
 
   Future<void> _createSettingsTable(Database db) async {
     await db.execute('''
-      CREATE TABLE settings (
+      CREATE TABLE IF NOT EXISTS settings (
         setting_key TEXT PRIMARY KEY,
         setting_value TEXT NOT NULL
       )
@@ -615,39 +538,27 @@ class DatabaseHelper {
 
   Future<void> _createQuotesTable(Database db) async {
     await db.execute('''
-      CREATE TABLE quotes (
+      CREATE TABLE IF NOT EXISTS quotes (
         quote_id INTEGER PRIMARY KEY AUTOINCREMENT,
         company_id INTEGER NOT NULL,
         customer_name TEXT NOT NULL,
-        customer_phone TEXT NULL,
-        customer_email TEXT NULL,
-        object_name TEXT NULL,
-        address TEXT NULL,
-        area_s REAL NULL,
-        perimeter_p REAL NULL,
-        height_h REAL NULL,
-        ceiling_system TEXT NULL,
-        status TEXT NOT NULL DEFAULT 'draft',
-        payment_terms TEXT NULL,
-        installation_terms TEXT NULL,
-        notes TEXT NULL,
-        currency_code TEXT NOT NULL DEFAULT 'RUB',
-        subtotal_work REAL NOT NULL DEFAULT 0,
+        customer_phone TEXT,
+        customer_address TEXT,
         subtotal_equipment REAL NOT NULL DEFAULT 0,
         total_amount REAL NOT NULL DEFAULT 0,
+        status TEXT NOT NULL DEFAULT 'draft',
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
         deleted_at TEXT NULL,
-        project_id INTEGER NULL, -- Связь с проектом
+        project_id INTEGER NULL,
         FOREIGN KEY (company_id) REFERENCES companies (company_id),
         FOREIGN KEY (project_id) REFERENCES projects (project_id)
       )
     ''');
 
-    await db.execute('CREATE INDEX idx_quotes_status ON quotes (status)');
-    await db.execute('CREATE INDEX idx_quotes_customer_name ON quotes (customer_name)');
-    await db.execute('CREATE INDEX idx_quotes_address ON quotes (address)');
-    await db.execute('CREATE INDEX idx_quotes_created_at ON quotes (created_at)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_quotes_status ON quotes (status)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_quotes_customer_name ON quotes (customer_name)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_quotes_created_at ON quotes (created_at)');
   }
 
   Future<void> _createLineItemsTable(Database db) async {
@@ -830,25 +741,18 @@ class DatabaseHelper {
 
   Future<void> _createProjectsTable(Database db) async {
     await db.execute('''
-      CREATE TABLE projects (
+      CREATE TABLE IF NOT EXISTS projects (
         project_id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         address TEXT,
-        customer_name TEXT,
-        customer_phone TEXT,
-        status TEXT NOT NULL DEFAULT 'planning',
-        start_date TEXT,
-        end_date TEXT,
-        planned_budget REAL NOT NULL DEFAULT 0.0,
-        actual_expenses REAL NOT NULL DEFAULT 0.0,
-        total_salary REAL NOT NULL DEFAULT 0.0,
-        profit REAL NOT NULL DEFAULT 0.0,
-        quote_id INTEGER,
-        driver_name TEXT,
-        installers TEXT DEFAULT '',
-        notes TEXT,
+        phone TEXT,
+        budget REAL NOT NULL DEFAULT 0,
+        status TEXT NOT NULL DEFAULT 'active',
         created_at TEXT NOT NULL,
-        updated_at TEXT,
+        updated_at TEXT NOT NULL,
+        driver_name TEXT,
+        installers TEXT,
+        quote_id INTEGER,
         FOREIGN KEY (quote_id) REFERENCES quotes (quote_id)
       )
     ''');
@@ -856,14 +760,12 @@ class DatabaseHelper {
 
   Future<void> _createExpensesTable(Database db) async {
     await db.execute('''
-      CREATE TABLE expenses (
+      CREATE TABLE IF NOT EXISTS expenses (
         expense_id INTEGER PRIMARY KEY AUTOINCREMENT,
         project_id INTEGER NOT NULL,
         type TEXT NOT NULL,
         description TEXT NOT NULL,
         amount REAL NOT NULL,
-        date TEXT NOT NULL,
-        notes TEXT NULL,
         created_at TEXT NOT NULL,
         FOREIGN KEY (project_id) REFERENCES projects (project_id)
       )
@@ -872,13 +774,12 @@ class DatabaseHelper {
 
   Future<void> _createSalaryPaymentsTable(Database db) async {
     await db.execute('''
-      CREATE TABLE salary_payments (
+      CREATE TABLE IF NOT EXISTS salary_payments (
         payment_id INTEGER PRIMARY KEY AUTOINCREMENT,
         project_id INTEGER NOT NULL,
         employee_name TEXT NOT NULL,
-        amount REAL NOT NULL DEFAULT 0.0,
+        amount REAL NOT NULL,
         description TEXT,
-        date TEXT NOT NULL,
         created_at TEXT NOT NULL,
         FOREIGN KEY (project_id) REFERENCES projects (project_id)
       )
@@ -887,7 +788,7 @@ class DatabaseHelper {
 
   Future<void> _createAdvancesTable(Database db) async {
     await db.execute('''
-      CREATE TABLE advances (
+      CREATE TABLE IF NOT EXISTS advances (
         advance_id INTEGER PRIMARY KEY AUTOINCREMENT,
         project_id INTEGER NOT NULL,
         type TEXT NOT NULL,
