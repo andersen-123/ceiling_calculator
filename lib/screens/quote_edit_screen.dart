@@ -282,7 +282,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       final filePath = await _excelService.generateQuoteExcel(quote, _lineItems, await _getCompany());
       
       // Открываем файл напрямую в Excel
-      final result = await OpenFile.open(filePath);
+      final result = await OpenFile.open(filePath.path);
       
       if (result.type == ResultType.done) {
         if (mounted) {
@@ -330,7 +330,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       final filePath = await _pdfService.generateQuotePdf(quote, _lineItems, await _getCompany());
       
       // Открываем файл напрямую в PDF просмотрщике
-      final result = await OpenFile.open(filePath);
+      final result = await OpenFile.open(filePath.path);
       
       if (result.type == ResultType.done) {
         if (mounted) {
