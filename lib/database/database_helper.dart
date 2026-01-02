@@ -19,9 +19,69 @@ class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
   Future<Database> get database async {
-    _database ??= await _initDatabase();
+  if (_database != null) return _database!;
+  
+  try {
+    if (kDebugMode) {
+      print('Initializing database...');
+    }
+    
+    // Упрощенная инициализация без сложных операций
+    String path = join(await getDatabasesPath(), _databaseName);
+    
+    _database = await openDatabase(
+      path,
+      version: _databaseVersion,
+      onCreate: (db, version) async {
+        if (kDebugMode) {
+          print('Creating database tables...');
+        }
+        
+        // Создаем только основные таблицы
+        await db.execute('''
+          CREATE TABLE companies (
+            company_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            address TEXT,
+            phone TEXT,
+            email TEXT,
+            created_at INTEGER NOT NULL
+          )
+        ''');
+        
+        await db.execute('''
+          CREATE TABLE quotes (
+            quote_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            company_id INTEGER,
+            client_name TEXT NOT NULL,
+            client_phone TEXT,
+            client_address TEXT,
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL,
+            status TEXT NOT NULL DEFAULT 'draft',
+            project_id INTEGER,
+            FOREIGN KEY (company_id) REFERENCES companies (company_id)
+          )
+        ''');
+        
+        if (kDebugMode) {
+          print('Basic tables created successfully');
+        }
+      },
+    );
+    
+    if (kDebugMode) {
+      print('Database initialized successfully');
+    }
     return _database!;
+  } catch (e, stackTrace) {
+    if (kDebugMode) {
+      print('Error initializing database: $e');
+      print('Stack trace: $stackTrace');
+    }
+    rethrow;
   }
+}
 
   Future<Database> _initDatabase() async {
     try {

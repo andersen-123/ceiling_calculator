@@ -2,29 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'screens/main_screen.dart';
-import 'main_test.dart';
+import 'database/database_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Временно отключаем базу данных для тестирования
   try {
     if (kDebugMode) {
-      print('Starting app without database for testing...');
+      print('Starting app with simplified database...');
     }
-    // await DatabaseHelper.instance.database; // Закомментировано
+    
+    // Упрощенная инициализация базы данных
+    await DatabaseHelper.instance.database;
+    
     if (kDebugMode) {
-      print('App started successfully (database disabled)');
+      print('App started successfully');
     }
   } catch (e, stackTrace) {
     if (kDebugMode) {
       print('App startup failed: $e');
       print('Stack trace: $stackTrace');
     }
+    
+    // Запускаем приложение даже если база данных не работает
+    runApp(const CeilingCalculatorApp());
+    return;
   }
   
-  // Используем тестовый экран вместо основного
-  runApp(const TestApp());
+  runApp(const CeilingCalculatorApp());
 }
 
 class TestApp extends StatelessWidget {
