@@ -124,6 +124,77 @@ class DatabaseHelper {
           print('All tables created successfully');
         }
       },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (kDebugMode) {
+          print('Upgrading database from version $oldVersion to $newVersion');
+        }
+        
+        if (oldVersion < 2) {
+          if (kDebugMode) {
+            print('Adding missing tables for version 2...');
+          }
+          
+          // Добавляем таблицы для проектов
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS projects (
+              project_id INTEGER PRIMARY KEY AUTOINCREMENT,
+              quote_id INTEGER,
+              client_name TEXT NOT NULL,
+              client_phone TEXT,
+              client_address TEXT,
+              budget REAL NOT NULL DEFAULT 0,
+              status TEXT NOT NULL DEFAULT 'active',
+              created_at INTEGER NOT NULL,
+              updated_at INTEGER NOT NULL,
+              driver_name TEXT,
+              installers TEXT,
+              FOREIGN KEY (quote_id) REFERENCES quotes (quote_id)
+            )
+          ''');
+          
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS expenses (
+              expense_id INTEGER PRIMARY KEY AUTOINCREMENT,
+              project_id INTEGER NOT NULL,
+              description TEXT NOT NULL,
+              amount REAL NOT NULL,
+              created_at INTEGER NOT NULL,
+              FOREIGN KEY (project_id) REFERENCES projects (project_id)
+            )
+          ''');
+          
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS salary_payments (
+              payment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+              project_id INTEGER NOT NULL,
+              worker_name TEXT NOT NULL,
+              amount REAL NOT NULL,
+              description TEXT,
+              created_at INTEGER NOT NULL,
+              FOREIGN KEY (project_id) REFERENCES projects (project_id)
+            )
+          ''');
+          
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS quote_line_items (
+              item_id INTEGER PRIMARY KEY AUTOINCREMENT,
+              quote_id INTEGER NOT NULL,
+              description TEXT NOT NULL,
+              unit TEXT NOT NULL,
+              quantity REAL NOT NULL,
+              unit_price REAL NOT NULL,
+              total_price REAL NOT NULL,
+              item_type TEXT NOT NULL DEFAULT 'work',
+              created_at INTEGER NOT NULL,
+              FOREIGN KEY (quote_id) REFERENCES quotes (quote_id)
+            )
+          ''');
+          
+          if (kDebugMode) {
+            print('Database upgrade to version 2 completed');
+          }
+        }
+      },
     );
     
     if (kDebugMode) {
