@@ -11,7 +11,7 @@ import '../models/app_settings.dart';
 
 class DatabaseHelper {
   static const String _databaseName = 'ceiling_calculator.db';
-  static const int _databaseVersion = 1;
+  static const int _databaseVersion = 2;
 
   static Database? _database;
 
@@ -64,8 +64,64 @@ class DatabaseHelper {
           )
         ''');
         
+        // Добавляем таблицы для проектов
+        await db.execute('''
+          CREATE TABLE projects (
+            project_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            quote_id INTEGER,
+            client_name TEXT NOT NULL,
+            client_phone TEXT,
+            client_address TEXT,
+            budget REAL NOT NULL DEFAULT 0,
+            status TEXT NOT NULL DEFAULT 'active',
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL,
+            driver_name TEXT,
+            installers TEXT,
+            FOREIGN KEY (quote_id) REFERENCES quotes (quote_id)
+          )
+        ''');
+        
+        await db.execute('''
+          CREATE TABLE expenses (
+            expense_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id INTEGER NOT NULL,
+            description TEXT NOT NULL,
+            amount REAL NOT NULL,
+            created_at INTEGER NOT NULL,
+            FOREIGN KEY (project_id) REFERENCES projects (project_id)
+          )
+        ''');
+        
+        await db.execute('''
+          CREATE TABLE salary_payments (
+            payment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id INTEGER NOT NULL,
+            worker_name TEXT NOT NULL,
+            amount REAL NOT NULL,
+            description TEXT,
+            created_at INTEGER NOT NULL,
+            FOREIGN KEY (project_id) REFERENCES projects (project_id)
+          )
+        ''');
+        
+        await db.execute('''
+          CREATE TABLE quote_line_items (
+            item_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            quote_id INTEGER NOT NULL,
+            description TEXT NOT NULL,
+            unit TEXT NOT NULL,
+            quantity REAL NOT NULL,
+            unit_price REAL NOT NULL,
+            total_price REAL NOT NULL,
+            item_type TEXT NOT NULL DEFAULT 'work',
+            created_at INTEGER NOT NULL,
+            FOREIGN KEY (quote_id) REFERENCES quotes (quote_id)
+          )
+        ''');
+        
         if (kDebugMode) {
-          print('Basic tables created successfully');
+          print('All tables created successfully');
         }
       },
     );
