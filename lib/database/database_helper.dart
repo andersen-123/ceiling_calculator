@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:flutter/foundation.dart';
 import '../models/quote.dart';
 import '../models/project.dart';
 import '../models/expense.dart';
@@ -23,16 +24,41 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), _databaseName);
-    return await openDatabase(
-      path,
-      version: _databaseVersion,
-      onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
-    );
+    try {
+      if (kDebugMode) {
+        print('Getting database path...');
+      }
+      String path = join(await getDatabasesPath(), _databaseName);
+      if (kDebugMode) {
+        print('Database path: $path');
+        print('Opening database...');
+      }
+      
+      Database db = await openDatabase(
+        path,
+        version: _databaseVersion,
+        onCreate: _onCreate,
+      );
+      
+      if (kDebugMode) {
+        print('Database opened successfully');
+      }
+      return db;
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        print('Error initializing database: $e');
+        print('Stack trace: $stackTrace');
+      }
+      rethrow;
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {
+  try {
+    if (kDebugMode) {
+      print('Creating database tables...');
+    }
+    
     await _createCompaniesTable(db);
     await _createSettingsTable(db);
     await _createQuotesTable(db);
@@ -43,8 +69,18 @@ class DatabaseHelper {
     await _createExpensesTable(db);
     await _createSalaryPaymentsTable(db);
     await _createAdvancesTable(db);
-    await _insertDefaultData(db);
+    
+    if (kDebugMode) {
+      print('All database tables created successfully');
+    }
+  } catch (e, stackTrace) {
+    if (kDebugMode) {
+      print('Error creating database tables: $e');
+      print('Stack trace: $stackTrace');
+    }
+    rethrow;
   }
+}
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     // Миграции базы данных для будущих версий

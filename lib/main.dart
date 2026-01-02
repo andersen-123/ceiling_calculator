@@ -1,12 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter/foundation.dart';
 import 'screens/main_screen.dart';
 import 'database/database_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  await DatabaseHelper.instance.database;
+  try {
+    if (kDebugMode) {
+      print('Initializing database...');
+    }
+    await DatabaseHelper.instance.database;
+    if (kDebugMode) {
+      print('Database initialized successfully');
+    }
+  } catch (e, stackTrace) {
+    if (kDebugMode) {
+      print('Database initialization failed: $e');
+      print('Stack trace: $stackTrace');
+    }
+  }
   
   runApp(const CeilingCalculatorApp());
 }
