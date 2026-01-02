@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
+import 'dart:io';
 import '../models/quote.dart';
 import '../models/line_item.dart';
 import '../models/company.dart';
@@ -433,93 +434,11 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   }
 
   Future<void> _saveQuote() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isLoading = true);
-
-    try {
-      final quote = Quote(
-        id: widget.quote?.id,
-        companyId: _company?.id ?? 1,
-        customerName: _customerNameController.text.trim(),
-        customerPhone: _customerPhoneController.text.trim().isEmpty 
-            ? null 
-            : _customerPhoneController.text.trim(),
-        customerEmail: _customerEmailController.text.trim().isEmpty 
-            ? null 
-            : _customerEmailController.text.trim(),
-        objectName: _objectNameController.text.trim().isEmpty 
-            ? null 
-            : _objectNameController.text.trim(),
-        address: _addressController.text.trim().isEmpty 
-            ? null 
-            : _addressController.text.trim(),
-        areaS: double.tryParse(_areaSController.text),
-        perimeterP: double.tryParse(_perimeterPController.text),
-        heightH: double.tryParse(_heightHController.text),
-        ceilingSystem: _selectedCeilingSystem,
-        status: _selectedStatus,
-        paymentTerms: _paymentTermsController.text.trim().isEmpty 
-            ? null 
-            : _paymentTermsController.text.trim(),
-        installationTerms: _installationTermsController.text.trim().isEmpty 
-            ? null 
-            : _installationTermsController.text.trim(),
-        notes: _notesController.text.trim().isEmpty 
-            ? null 
-      );
-
-      int savedQuoteId;
-      if (widget.quote == null) {
-        // Новое предложение
-        savedQuoteId = await DatabaseHelper.instance.insert('quotes', quote.toMap());
-        quoteId = savedQuoteId;
-      } else {
-        // Обновление существующего
-        await DatabaseHelper.instance.update(
-          'quotes',
-          quote.toMap(),
-          where: 'quote_id = ?',
-          whereArgs: [quote.id],
-        );
-        savedQuoteId = quote.id!;
-      }
-
-      // Сохранение позиций
-      await DatabaseHelper.instance.delete(
-        'line_items',
-        where: 'quote_id = ?',
-        whereArgs: [savedQuoteId],
-      );
-
-      for (final item in _lineItems) {
-        final itemWithQuoteId = item.copyWith(quoteId: savedQuoteId);
-        await DatabaseHelper.instance.insert('line_items', itemWithQuoteId.toMap());
-      }
-
-      // Сохранение вложений
-      await DatabaseHelper.instance.delete(
-        'quote_attachments',
-        where: 'quote_id = ?',
-        whereArgs: [savedQuoteId],
-      );
-
-      for (final attachment in _attachments) {
-        final attachmentWithQuoteId = attachment.copyWith(quoteId: savedQuoteId);
-        await DatabaseHelper.instance.insert('quote_attachments', attachmentWithQuoteId.toMap());
-      }
-
-      // Синхронный переход без проверок
-      Navigator.of(context).pop('saved');
-      
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка сохранения: $e')),
-        );
-      }
-    }
-  }
+  if (!_formKey.currentState!.validate()) return;
+  
+  // Временно убираем сохранение для теста навигации
+  Navigator.of(context).pop('saved');
+}
 
   @override
   Widget build(BuildContext context) {
