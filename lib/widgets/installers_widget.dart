@@ -4,12 +4,14 @@ class InstallersWidget extends StatefulWidget {
   final String? driverName;
   final List<String> installers;
   final Function(String? driverName, List<String> installers) onChanged;
+  final Map<String, double>? salaryDistribution; // Добавляем параметр для зарплаты
 
   const InstallersWidget({
     super.key,
     this.driverName,
     required this.installers,
     required this.onChanged,
+    this.salaryDistribution, // Опциональный параметр
   });
 
   @override
@@ -88,6 +90,36 @@ class _InstallersWidgetState extends State<InstallersWidget> {
           ),
           onChanged: (value) => _notifyChanged(),
         ),
+        
+        // Зарплата водителя
+        if (widget.salaryDistribution != null && 
+            widget.salaryDistribution!['driver'] != null && 
+            widget.salaryDistribution!['driver']! > 0 &&
+            _driverController.text.trim().isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.blue.withOpacity(0.3)),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.account_balance_wallet, size: 16, color: Colors.blue[700]),
+                const SizedBox(width: 8),
+                Text(
+                  'Зарплата водителя: ${widget.salaryDistribution!['driver']!.toStringAsFixed(0)} ₽',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.blue[700],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
         const SizedBox(height: 20),
 
         // Монтажники
@@ -137,25 +169,71 @@ class _InstallersWidgetState extends State<InstallersWidget> {
 
         // Список монтажников
         if (_installers.isNotEmpty) ...[
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFE5E5E7)),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: _installers.asMap().entries.map((entry) {
-                final index = entry.key;
-                final name = entry.value;
-                return ListTile(
-                  title: Text(name),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.remove_circle, color: Colors.red),
-                    onPressed: () => _removeInstaller(index),
+          const SizedBox(height: 12),
+          ..._installers.asMap().entries.map((entry) {
+            final index = entry.key;
+            final installer = entry.value;
+            final salary = widget.salaryDistribution != null 
+                ? widget.salaryDistribution!['installer'] ?? 0.0
+                : 0.0;
+            
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Icon(Icons.person, size: 20, color: Colors.grey[600]),
+                        const SizedBox(width: 8),
+                        Text(
+                          installer,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                );
-              }).toList(),
-            ),
-          ),
+                  if (widget.salaryDistribution != null && salary > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: Colors.green.withOpacity(0.3)),
+                      ),
+                      child: Text(
+                        '${salary.toStringAsFixed(0)} ₽',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.green[700],
+                        ),
+                      ),
+                    ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _installers.removeAt(index);
+                        widget.onChanged(_driverController.text.trim().isEmpty ? null : _driverController.text.trim(), _installers);
+                      });
+                    },
+                    icon: Icon(Icons.remove_circle_outline, color: Colors.red[400]),
+                    iconSize: 20,
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
         ],
 
         // Информация о расчете
@@ -188,7 +266,7 @@ class _InstallersWidgetState extends State<InstallersWidget> {
                   ),
                 ),
                 Text(
-                  '• Бензин (10% от остатка) - водителю',
+                  '• Бензин - по факту (в расходах)',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[700],

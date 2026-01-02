@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../models/project.dart';
 import '../models/quote.dart';
+import '../models/expense.dart';
+import '../models/advance.dart';
 import '../database/database_helper.dart';
-import '../widgets/installers_widget.dart';
 import '../widgets/quote_selector_widget.dart';
+import '../widgets/installers_widget.dart';
+import '../widgets/advances_widget.dart';
 
 class ProjectEditScreen extends StatefulWidget {
   final Project? project;
@@ -23,6 +27,14 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
   final _customerPhoneController = TextEditingController();
   final _budgetController = TextEditingController();
   final _notesController = TextEditingController();
+  
+  // Focus nodes для управления клавиатурой
+  final _nameFocusNode = FocusNode();
+  final _addressFocusNode = FocusNode();
+  final _customerNameFocusNode = FocusNode();
+  final _customerPhoneFocusNode = FocusNode();
+  final _budgetFocusNode = FocusNode();
+  final _notesFocusNode = FocusNode();
 
   ProjectStatus _selectedStatus = ProjectStatus.planning;
   DateTime? _startDate;
@@ -30,6 +42,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
   int? _selectedQuoteId;
   String? _driverName;
   List<String> _installers = [];
+  List<Advance> _advances = [];
 
   List<Expense> _expenses = [];
   List<SalaryPayment> _salaryPayments = [];
@@ -37,11 +50,35 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
   bool _isLoading = false;
 
   @override
+  void dispose() {
+    // Очищаем controllers и focus nodes
+    _nameController.dispose();
+    _addressController.dispose();
+    _customerNameController.dispose();
+    _customerPhoneController.dispose();
+    _budgetController.dispose();
+    _notesController.dispose();
+    
+    _nameFocusNode.dispose();
+    _addressFocusNode.dispose();
+    _customerNameFocusNode.dispose();
+    _customerPhoneFocusNode.dispose();
+    _budgetFocusNode.dispose();
+    _notesFocusNode.dispose();
+    
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
+    
     if (widget.project != null) {
       _loadProjectData();
     }
+    
+    // Добавляем listener для автоматического пересчета зарплаты
+    _budgetController.addListener(_recalculateSalary);
   }
 
   void _loadProjectData() {
@@ -58,6 +95,8 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
     _selectedQuoteId = project.quoteId;
     _driverName = project.driverName;
     _installers = List.from(project.installers);
+    _projectAdvance = project.projectAdvance;
+    _installerAdvances = Map.from(project.installerAdvances);
     _loadExpensesAndSalary();
   }
 
@@ -121,6 +160,12 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
     }
   }
 
+  void _recalculateSalary() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   Map<String, double> _calculateSalaryDistribution(double plannedBudget, List<String> installers, double actualExpenses) {
     if (plannedBudget <= 0 || installers.isEmpty) {
       return {
@@ -136,15 +181,11 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
     // Остаток после материалов
     final remainingAmount = plannedBudget - materialsExpenses;
     
-    // Бензин возмещается водителю (10% от остатка)
-    final fuelAmount = remainingAmount * 0.1;
-    final finalRemaining = remainingAmount - fuelAmount;
-    
-    // Зарплата водителя = 5% от остатка + бензин
-    final driverSalary = (finalRemaining * 0.05) + fuelAmount;
+    // Зарплата водителя = 5% от остатка
+    final driverSalary = remainingAmount * 0.05;
     
     // Остаток делится на количество монтажников
-    final installerSalary = installers.isNotEmpty ? finalRemaining * 0.95 / installers.length : 0.0;
+    final installerSalary = installers.isNotEmpty ? (remainingAmount - driverSalary) / installers.length : 0.0;
 
     return {
       'driver': driverSalary,
@@ -175,14 +216,16 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
         endDate: _endDate,
         plannedBudget: plannedBudget,
         actualExpenses: _expenses.fold(0.0, (sum, expense) => sum + expense.amount),
-        totalSalary: salaryDistribution['total'] ?? 0.0,
-        profit: 0.0, // Будет рассчитано ниже
+        totalSalary: _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount),
+        profit: plannedBudget - _expenses.fold(0.0, (sum, expense) => sum + expense.amount) - _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount),
         quoteId: _selectedQuoteId,
         driverName: _driverName?.trim().isEmpty ?? true ? null : _driverName?.trim(),
         installers: _installers,
         notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
         createdAt: widget.project?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
+        projectAdvance: _projectAdvance,
+        installerAdvances: _installerAdvances,
       );
 
       // Рассчитываем прибыль
@@ -253,6 +296,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
         onAdd: (expense) {
           setState(() {
             _expenses.add(expense);
+            _recalculateSalary(); // Автоматический пересчет
           });
         },
       ),
@@ -346,10 +390,11 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
             const SizedBox(height: 20),
             TextFormField(
               controller: _nameController,
+              focusNode: _nameFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Название проекта *',
                 border: OutlineInputBorder(),
-                floatingLabelStyle: TextStyle(color: Color(0xFF007AFF)),
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
@@ -361,6 +406,8 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _addressController,
+              focusNode: _addressFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Адрес',
                 border: OutlineInputBorder(),
@@ -370,6 +417,8 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _customerNameController,
+              focusNode: _customerNameFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Имя клиента',
                 border: OutlineInputBorder(),
@@ -379,6 +428,8 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _customerPhoneController,
+              focusNode: _customerPhoneFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Телефон клиента',
                 border: OutlineInputBorder(),
@@ -502,10 +553,33 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
             InstallersWidget(
               driverName: _driverName,
               installers: _installers,
+              salaryDistribution: _calculateSalaryDistribution(
+                double.tryParse(_budgetController.text) ?? 0.0,
+                _installers,
+                _expenses.fold(0.0, (sum, expense) => sum + expense.amount),
+              ),
               onChanged: (driverName, installers) {
                 setState(() {
                   _driverName = driverName;
                   _installers = installers;
+                  _recalculateSalary(); // Автоматический пересчет
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            
+            // Авансы
+            AdvancesWidget(
+              advances: _advances,
+              installers: _installers,
+              onAddAdvance: (advance) {
+                setState(() {
+                  _advances.add(advance.copyWith(projectId: widget.project?.id ?? 0));
+                });
+              },
+              onDeleteAdvance: (advanceId) {
+                setState(() {
+                  _advances.removeWhere((a) => a.id == advanceId);
                 });
               },
             ),
@@ -513,18 +587,19 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
             
             TextFormField(
               controller: _budgetController,
+              focusNode: _budgetFocusNode,
+              autofocus: false,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
                 labelText: 'Планируемый бюджет *',
                 border: OutlineInputBorder(),
-                floatingLabelStyle: TextStyle(color: Color(0xFF007AFF)),
                 prefixText: '₽ ',
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return 'Введите бюджет';
                 }
-                if (double.tryParse(value) == null) {
+                if (double.tryParse(value) == null || double.tryParse(value)! <= 0) {
                   return 'Введите корректную сумму';
                 }
                 return null;
@@ -533,10 +608,11 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _notesController,
+              focusNode: _notesFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Примечания',
                 border: OutlineInputBorder(),
-                floatingLabelStyle: TextStyle(color: Color(0xFF007AFF)),
               ),
               maxLines: 3,
             ),
@@ -741,6 +817,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
             onPressed: () {
               setState(() {
                 _expenses.removeAt(index);
+                _recalculateSalary(); // Автоматический пересчет
               });
             },
             icon: const Icon(Icons.delete_outline, color: Color(0xFFFF3B30)),

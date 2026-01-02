@@ -42,7 +42,9 @@ class Project {
   final List<String> installers; // Список монтажников
   final String? notes;
   final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
+  final double projectAdvance; // Общий аванс по объекту
+  final Map<String, double> installerAdvances; // Авансы монтажникам
 
   Project({
     this.id,
@@ -62,7 +64,9 @@ class Project {
     this.installers = const [],
     this.notes,
     required this.createdAt,
-    required this.updatedAt,
+    this.updatedAt,
+    this.projectAdvance = 0.0,
+    this.installerAdvances = const {},
   });
 
   Project copyWith({
@@ -84,6 +88,8 @@ class Project {
     String? notes,
     DateTime? createdAt,
     DateTime? updatedAt,
+    double? projectAdvance,
+    Map<String, double>? installerAdvances,
   }) {
     return Project(
       id: id ?? this.id,
@@ -104,6 +110,8 @@ class Project {
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      projectAdvance: projectAdvance ?? this.projectAdvance,
+      installerAdvances: installerAdvances ?? this.installerAdvances,
     );
   }
 
@@ -114,7 +122,7 @@ class Project {
       'address': address,
       'customer_name': customerName,
       'customer_phone': customerPhone,
-      'status': status.name,
+      'status': status.toString().split('.').last,
       'start_date': startDate?.toIso8601String(),
       'end_date': endDate?.toIso8601String(),
       'planned_budget': plannedBudget,
@@ -123,38 +131,54 @@ class Project {
       'profit': profit,
       'quote_id': quoteId,
       'driver_name': driverName,
-      'installers': installers.join(','), // Сохраняем как строку через запятую
+      'installers': installers.join(','),
       'notes': notes,
       'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+      'updated_at': updatedAt?.toIso8601String(),
+      'project_advance': projectAdvance,
+      'installer_advances': installerAdvances.entries.map((e) => '${e.key}:${e.value}').join(','),
     };
   }
 
   factory Project.fromMap(Map<String, dynamic> map) {
+    // Parse installer advances from string "name1:amount1,name2:amount2"
+    final advancesString = map['installer_advances'] as String? ?? '';
+    final Map<String, double> advances = {};
+    if (advancesString.isNotEmpty) {
+      for (final entry in advancesString.split(',')) {
+        final parts = entry.split(':');
+        if (parts.length == 2) {
+          final name = parts[0];
+          final amount = double.tryParse(parts[1]) ?? 0.0;
+          advances[name] = amount;
+        }
+      }
+    }
+
     return Project(
-      id: map['project_id'],
-      name: map['name'],
-      address: map['address'],
-      customerName: map['customer_name'],
-      customerPhone: map['customer_phone'],
+      id: map['project_id'] as int?,
+      name: map['name'] as String,
+      address: map['address'] as String?,
+      customerName: map['customer_name'] as String?,
+      customerPhone: map['customer_phone'] as String?,
       status: ProjectStatus.values.firstWhere(
-        (e) => e.name == map['status'],
+        (e) => e.toString() == 'ProjectStatus.${map['status']}',
         orElse: () => ProjectStatus.planning,
       ),
       startDate: map['start_date'] != null ? DateTime.parse(map['start_date']) : null,
       endDate: map['end_date'] != null ? DateTime.parse(map['end_date']) : null,
-      plannedBudget: map['planned_budget']?.toDouble() ?? 0.0,
-      actualExpenses: map['actual_expenses']?.toDouble() ?? 0.0,
-      totalSalary: map['total_salary']?.toDouble() ?? 0.0,
-      profit: map['profit']?.toDouble() ?? 0.0,
-      quoteId: map['quote_id'],
-      driverName: map['driver_name'],
-      installers: map['installers'] != null && map['installers'].toString().isNotEmpty 
-          ? map['installers'].toString().split(',') 
-          : [],
-      notes: map['notes'],
+      plannedBudget: map['planned_budget'] as double? ?? 0.0,
+      actualExpenses: map['actual_expenses'] as double? ?? 0.0,
+      totalSalary: map['total_salary'] as double? ?? 0.0,
+      profit: map['profit'] as double? ?? 0.0,
+      quoteId: map['quote_id'] as int?,
+      driverName: map['driver_name'] as String?,
+      installers: (map['installers'] as String? ?? '').isEmpty ? [] : (map['installers'] as String).split(','),
+      notes: map['notes'] as String?,
       createdAt: DateTime.parse(map['created_at']),
-      updatedAt: DateTime.parse(map['updated_at']),
+      updatedAt: map['updated_at'] != null ? DateTime.parse(map['updated_at']) : null,
+      projectAdvance: map['project_advance'] as double? ?? 0.0,
+      installerAdvances: advances,
     );
   }
 
@@ -174,15 +198,11 @@ class Project {
     // Остаток после материалов
     final remainingAmount = plannedBudget - materialsExpenses;
     
-    // Бензин возмещается водителю (10% от остатка)
-    final fuelAmount = remainingAmount * 0.1;
-    final finalRemaining = remainingAmount - fuelAmount;
-    
-    // Зарплата водителя = 5% от остатка + бензин
-    final driverSalary = (finalRemaining * 0.05) + fuelAmount;
+    // Зарплата водителя = 5% от остатка
+    final driverSalary = remainingAmount * 0.05;
     
     // Остаток делится на количество монтажников
-    final installerSalary = installers.isNotEmpty ? finalRemaining * 0.95 / installers.length : 0.0;
+    final installerSalary = installers.isNotEmpty ? (remainingAmount - driverSalary) / installers.length : 0.0;
 
     return {
       'driver': driverSalary,

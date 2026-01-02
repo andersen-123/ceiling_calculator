@@ -1,10 +1,10 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../models/company.dart';
 import '../models/quote.dart';
-import '../models/line_item.dart';
-import '../models/settings.dart';
 import '../models/project.dart';
+import '../models/expense.dart';
+import '../models/salary_payment.dart';
+import '../models/advance.dart';
 
 class DatabaseHelper {
   static const String _databaseName = 'ceiling_calculator.db';
@@ -40,6 +40,7 @@ class DatabaseHelper {
     await _createProjectsTable(db);
     await _createExpensesTable(db);
     await _createSalaryPaymentsTable(db);
+    await _createAdvancesTable(db);
     await _insertDefaultData(db);
   }
 
@@ -265,23 +266,24 @@ class DatabaseHelper {
       CREATE TABLE projects (
         project_id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        address TEXT NULL,
-        customer_name TEXT NULL,
-        customer_phone TEXT NULL,
+        address TEXT,
+        customer_name TEXT,
+        customer_phone TEXT,
         status TEXT NOT NULL DEFAULT 'planning',
-        start_date TEXT NULL,
-        end_date TEXT NULL,
-        planned_budget REAL NOT NULL DEFAULT 0,
-        actual_expenses REAL NOT NULL DEFAULT 0,
-        total_salary REAL NOT NULL DEFAULT 0,
-        profit REAL NOT NULL DEFAULT 0,
-        quote_id INTEGER NULL,
-        driver_name TEXT NULL,
-        installers TEXT NULL,
-        notes TEXT NULL,
+        start_date TEXT,
+        end_date TEXT,
+        planned_budget REAL NOT NULL DEFAULT 0.0,
+        actual_expenses REAL NOT NULL DEFAULT 0.0,
+        total_salary REAL NOT NULL DEFAULT 0.0,
+        profit REAL NOT NULL DEFAULT 0.0,
+        quote_id INTEGER,
+        driver_name TEXT,
+        installers TEXT DEFAULT '',
+        notes TEXT,
         created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        deleted_at TEXT NULL,
+        updated_at TEXT,
+        project_advance REAL NOT NULL DEFAULT 0.0,
+        installer_advances TEXT DEFAULT '',
         FOREIGN KEY (quote_id) REFERENCES quotes (quote_id)
       )
     ''');
@@ -306,12 +308,28 @@ class DatabaseHelper {
   Future<void> _createSalaryPaymentsTable(Database db) async {
     await db.execute('''
       CREATE TABLE salary_payments (
-        salary_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        payment_id INTEGER PRIMARY KEY AUTOINCREMENT,
         project_id INTEGER NOT NULL,
         employee_name TEXT NOT NULL,
-        amount REAL NOT NULL,
+        amount REAL NOT NULL DEFAULT 0.0,
+        description TEXT,
         date TEXT NOT NULL,
-        work_description TEXT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (project_id) REFERENCES projects (project_id)
+      )
+    ''');
+  }
+
+  Future<void> _createAdvancesTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE advances (
+        advance_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER NOT NULL,
+        type TEXT NOT NULL,
+        installer_name TEXT,
+        amount REAL NOT NULL DEFAULT 0.0,
+        description TEXT,
+        date TEXT NOT NULL,
         created_at TEXT NOT NULL,
         FOREIGN KEY (project_id) REFERENCES projects (project_id)
       )
