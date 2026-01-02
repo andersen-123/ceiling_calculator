@@ -297,25 +297,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         SnackBar(content: Text('Excel файл сохранен: ${filePath.path}')),
       );
       
-      /* if (result.type == ResultType.done) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Excel файл открыт'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-      }* else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Ошибка открытия Excel: ${result.message}*'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }*
-      
+      // Закомментированный код для открытия файла
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -350,25 +332,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         SnackBar(content: Text('PDF файл сохранен: ${filePath.path}')),
       );
       
-      /* if (result.type == ResultType.done) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('PDF файл открыт'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Ошибка открытия PDF: ${result.message}'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }*
+      // Закомментированный код для открытия PDF
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
