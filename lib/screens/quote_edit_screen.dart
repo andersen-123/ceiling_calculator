@@ -436,13 +436,84 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
 
   Future<void> _saveQuote() async {
   if (!_formKey.currentState!.validate()) return;
-  
-  // Пробуем навигацию через pushReplacement с HomeScreen
-  Navigator.of(context).pushReplacement(
-    MaterialPageRoute(
-      builder: (context) => const HomeScreen(),
-    ),
-  );
+
+  try {
+    final quote = Quote(
+      id: widget.quote?.id,
+      customerId: 1,
+      customerName: _customerNameController.text.trim(),
+      customerPhone: _customerPhoneController.text.trim(),
+      customerEmail: _customerEmailController.text.trim(),
+      objectName: _objectNameController.text.trim(),
+      address: _addressController.text.trim(),
+      areaS: double.tryParse(_areaSController.text) ?? 0,
+      perimeterP: double.tryParse(_perimeterPController.text) ?? 0,
+      heightH: double.tryParse(_heightHController.text) ?? 0,
+      ceilingSystem: _selectedCeilingSystem,
+      status: _selectedStatus,
+      paymentTerms: _paymentTermsController.text.trim().isEmpty 
+          ? null 
+          : _paymentTermsController.text.trim(),
+      installationTerms: _installationTermsController.text.trim().isEmpty 
+          ? null 
+          : _installationTermsController.text.trim(),
+      notes: _notesController.text.trim().isEmpty 
+          ? null 
+          : _notesController.text.trim(),
+      createdAt: widget.quote?.createdAt ?? DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    int savedQuoteId;
+    if (widget.quote == null) {
+      savedQuoteId = await DatabaseHelper.instance.insert('quotes', quote.toMap());
+      quoteId = savedQuoteId;
+    } else {
+      await DatabaseHelper.instance.update(
+        'quotes',
+        quote.toMap(),
+        where: 'quote_id = ?',
+        whereArgs: [quote.id],
+      );
+      savedQuoteId = quote.id!;
+    }
+
+    await DatabaseHelper.instance.delete(
+      'line_items',
+      where: 'quote_id = ?',
+      whereArgs: [savedQuoteId],
+    );
+
+    for (final item in _lineItems) {
+      final itemWithQuoteId = item.copyWith(quoteId: savedQuoteId);
+      await DatabaseHelper.instance.insert('line_items', itemWithQuoteId.toMap());
+    }
+
+    await DatabaseHelper.instance.delete(
+      'quote_attachments',
+      where: 'quote_id = ?',
+      whereArgs: [savedQuoteId],
+    );
+
+    for (final attachment in _attachments) {
+      final attachmentWithQuoteId = attachment.copyWith(quoteId: savedQuoteId);
+      await DatabaseHelper.instance.insert('quote_attachments', attachmentWithQuoteId.toMap());
+    }
+
+    // Используем pushReplacement для избежания черного экрана
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => const HomeScreen(),
+      ),
+    );
+    
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка сохранения: $e')),
+      );
+    }
+  }
 }
 
   @override
