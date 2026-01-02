@@ -337,58 +337,177 @@ class DatabaseHelper {
       if (backupData.isNotEmpty) {
         try {
           Batch batch = _database!.batch();
+          int totalRestored = 0;
           
-          // Восстанавливаем компании
+          // Валидация и восстановление компаний
           if (backupData['companies'] != null) {
+            List<Map<String, Object?>> validCompanies = [];
             for (Map record in backupData['companies']!) {
-              batch.insert('companies', Map<String, Object?>.from(record));
+              // Проверяем обязательные поля
+              if (record.containsKey('name') && record['name'] != null && record['name'].toString().isNotEmpty) {
+                validCompanies.add(Map<String, Object?>.from(record));
+              } else {
+                if (kDebugMode) {
+                  print('Skipping invalid company record: $record');
+                }
+              }
+            }
+            
+            for (Map record in validCompanies) {
+              batch.insert('companies', record);
+              totalRestored++;
+            }
+            
+            if (kDebugMode) {
+              print('Restored ${validCompanies.length} valid companies out of ${backupData['companies']!.length}');
             }
           }
           
-          // Восстанавливаем предложения
+          // Валидация и восстановление предложений
           if (backupData['quotes'] != null) {
+            List<Map<String, Object?>> validQuotes = [];
             for (Map record in backupData['quotes']!) {
-              batch.insert('quotes', Map<String, Object?>.from(record));
+              // Проверяем обязательные поля
+              if (record.containsKey('client_name') && record['client_name'] != null && 
+                  record['client_name'].toString().isNotEmpty) {
+                validQuotes.add(Map<String, Object?>.from(record));
+              } else {
+                if (kDebugMode) {
+                  print('Skipping invalid quote record: $record');
+                }
+              }
+            }
+            
+            for (Map record in validQuotes) {
+              batch.insert('quotes', record);
+              totalRestored++;
+            }
+            
+            if (kDebugMode) {
+              print('Restored ${validQuotes.length} valid quotes out of ${backupData['quotes']!.length}');
             }
           }
           
-          // Восстанавливаем проекты
+          // Валидация и восстановление проектов
           if (backupData['projects'] != null) {
+            List<Map<String, Object?>> validProjects = [];
             for (Map record in backupData['projects']!) {
-              batch.insert('projects', Map<String, Object?>.from(record));
+              // Проверяем обязательные поля
+              if (record.containsKey('client_name') && record['client_name'] != null && 
+                  record['client_name'].toString().isNotEmpty) {
+                validProjects.add(Map<String, Object?>.from(record));
+              } else {
+                if (kDebugMode) {
+                  print('Skipping invalid project record: $record');
+                }
+              }
+            }
+            
+            for (Map record in validProjects) {
+              batch.insert('projects', record);
+              totalRestored++;
+            }
+            
+            if (kDebugMode) {
+              print('Restored ${validProjects.length} valid projects out of ${backupData['projects']!.length}');
             }
           }
           
-          // Восстанавливаем расходы
+          // Валидация и восстановление расходов
           if (backupData['expenses'] != null) {
+            List<Map<String, Object?>> validExpenses = [];
             for (Map record in backupData['expenses']!) {
-              batch.insert('expenses', Map<String, Object?>.from(record));
+              // Проверяем обязательные поля
+              if (record.containsKey('description') && record['description'] != null && 
+                  record['description'].toString().isNotEmpty &&
+                  record.containsKey('amount') && record['amount'] != null) {
+                validExpenses.add(Map<String, Object?>.from(record));
+              } else {
+                if (kDebugMode) {
+                  print('Skipping invalid expense record: $record');
+                }
+              }
+            }
+            
+            for (Map record in validExpenses) {
+              batch.insert('expenses', record);
+              totalRestored++;
+            }
+            
+            if (kDebugMode) {
+              print('Restored ${validExpenses.length} valid expenses out of ${backupData['expenses']!.length}');
             }
           }
           
-          // Восстанавливаем выплаты зарплат
+          // Валидация и восстановление выплат зарплат
           if (backupData['salary_payments'] != null) {
+            List<Map<String, Object?>> validPayments = [];
             for (Map record in backupData['salary_payments']!) {
-              batch.insert('salary_payments', Map<String, Object?>.from(record));
+              // Проверяем обязательные поля
+              if (record.containsKey('worker_name') && record['worker_name'] != null && 
+                  record['worker_name'].toString().isNotEmpty &&
+                  record.containsKey('amount') && record['amount'] != null) {
+                validPayments.add(Map<String, Object?>.from(record));
+              } else {
+                if (kDebugMode) {
+                  print('Skipping invalid salary payment record: $record');
+                }
+              }
+            }
+            
+            for (Map record in validPayments) {
+              batch.insert('salary_payments', record);
+              totalRestored++;
+            }
+            
+            if (kDebugMode) {
+              print('Restored ${validPayments.length} valid salary payments out of ${backupData['salary_payments']!.length}');
             }
           }
           
-          // Восстанавливаем позиции предложений
+          // Валидация и восстановление позиций предложений
           if (backupData['quote_line_items'] != null) {
+            List<Map<String, Object?>> validItems = [];
             for (Map record in backupData['quote_line_items']!) {
-              batch.insert('quote_line_items', Map<String, Object?>.from(record));
+              // Проверяем обязательные поля
+              if (record.containsKey('description') && record['description'] != null && 
+                  record['description'].toString().isNotEmpty &&
+                  record.containsKey('unit_price') && record['unit_price'] != null &&
+                  record.containsKey('quantity') && record['quantity'] != null) {
+                validItems.add(Map<String, Object?>.from(record));
+              } else {
+                if (kDebugMode) {
+                  print('Skipping invalid quote line item record: $record');
+                }
+              }
+            }
+            
+            for (Map record in validItems) {
+              batch.insert('quote_line_items', record);
+              totalRestored++;
+            }
+            
+            if (kDebugMode) {
+              print('Restored ${validItems.length} valid quote line items out of ${backupData['quote_line_items']!.length}');
             }
           }
           
-          await batch.commit(noResult: true);
+          // Выполняем batch с проверкой результатов
+          List<dynamic> results = await batch.commit();
           
           if (kDebugMode) {
-            print('Successfully restored all data from backup');
+            print('Successfully restored $totalRestored valid records from backup');
+            print('Batch execution completed with ${results.length} operations');
           }
+          
+          // Проверяем целостность восстановленных данных
+          await _validateRestoredData();
+          
         } catch (restoreError) {
           if (kDebugMode) {
             print('Failed to restore backup: $restoreError');
           }
+          // Не прерываем работу приложения при ошибке восстановления
         }
       }
       
@@ -752,5 +871,64 @@ class DatabaseHelper {
         FOREIGN KEY (project_id) REFERENCES projects (project_id)
       )
     ''');
+  }
+  
+  // Метод для проверки целостности восстановленных данных
+  Future<void> _validateRestoredData() async {
+    try {
+      if (kDebugMode) {
+        print('Validating restored data integrity...');
+      }
+      
+      // Проверяем количество записей в каждой таблице
+      List<String> tables = ['companies', 'quotes', 'projects', 'expenses', 'salary_payments', 'quote_line_items'];
+      
+      for (String table in tables) {
+        try {
+          List<Map> result = await _database!.rawQuery('SELECT COUNT(*) as count FROM $table');
+          int count = result.first['count'] as int;
+          
+          if (kDebugMode) {
+            print('Table $table: $count records');
+          }
+          
+          // Дополнительная проверка целостности для важных таблиц
+          if (table == 'companies') {
+            List<Map> companies = await _database!.rawQuery('SELECT * FROM companies LIMIT 5');
+            for (Map company in companies) {
+              if (!company.containsKey('name') || company['name'] == null) {
+                if (kDebugMode) {
+                  print('Warning: Found company without name: $company');
+                }
+              }
+            }
+          } else if (table == 'quotes') {
+            List<Map> quotes = await _database!.rawQuery('SELECT * FROM quotes LIMIT 5');
+            for (Map quote in quotes) {
+              if (!quote.containsKey('client_name') || quote['client_name'] == null) {
+                if (kDebugMode) {
+                  print('Warning: Found quote without client_name: $quote');
+                }
+              }
+            }
+          }
+          
+        } catch (e) {
+          if (kDebugMode) {
+            print('Failed to validate table $table: $e');
+          }
+        }
+      }
+      
+      if (kDebugMode) {
+        print('Data validation completed');
+      }
+      
+    } catch (e) {
+      if (kDebugMode) {
+        print('Data validation failed: $e');
+      }
+      // Не прерываем работу приложения при ошибке валидации
+    }
   }
 }
