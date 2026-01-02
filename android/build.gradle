@@ -12,6 +12,11 @@ buildscript {
         maven { url 'https://maven.aliyun.com/repository/central/' }
         maven { url 'https://repo1.maven.org/maven2/' }
         maven { url 'https://jcenter.bintray.com/' }
+        maven { url 'https://oss.sonatype.org/content/repositories/central/' }
+        maven { url 'https://dl.google.com/dl/android/maven2/' }
+        maven { url 'https://plugins.gradle.org/m2/' }
+        maven { url 'https://maven.fabric.io/public' }
+        maven { url 'https://s3.amazonaws.com/repo.commons.apache.org/content/repositories/releases/' }
     }
 
     dependencies {
@@ -29,6 +34,11 @@ allprojects {
         maven { url 'https://maven.aliyun.com/repository/central/' }
         maven { url 'https://repo1.maven.org/maven2/' }
         maven { url 'https://jcenter.bintray.com/' }
+        maven { url 'https://oss.sonatype.org/content/repositories/central/' }
+        maven { url 'https://dl.google.com/dl/android/maven2/' }
+        maven { url 'https://plugins.gradle.org/m2/' }
+        maven { url 'https://maven.fabric.io/public' }
+        maven { url 'https://s3.amazonaws.com/repo.commons.apache.org/content/repositories/releases/' }
     }
 }
 
