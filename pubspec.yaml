@@ -55,23 +55,17 @@ dependency_overrides:
 flutter:
   uses-material-design: true
   generate: true
-  
-  # Правильная конфигурация платформ для file_picker
-  platforms:
-    android:
-      default_package: file_picker
-    ios:
-      default_package: file_picker
-    macos:
-      default_package: file_picker
-    web:
-      default_package: file_picker
-    # Убираем проблемные платформы
-    # linux:
-    #   default_package: file_picker
-    # windows:
-    #   default_package: file_picker
-
   assets:
     - assets/images/
     - assets/templates/
+
+# Правильная конфигурация платформ для file_picker (временно закомментирована)
+# platforms:
+#   android:
+#     default_package: file_picker
+#   ios:
+#     default_package: file_picker
+#   macos:
+#     default_package: file_picker
+#   web:
+#     default_package: file_picker
