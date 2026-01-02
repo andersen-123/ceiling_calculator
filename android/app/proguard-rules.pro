@@ -36,3 +36,13 @@
 # Keep PDF and Excel libraries
 -keep class com.itextpdf.** { *; }
 -keep class org.apache.poi.** { *; }
+
+# Keep Google Play Core classes
+-keep class com.google.android.play.core.** { *; }
+-keep class com.google.android.play.core.splitcompat.** { *; }
+-keep class com.google.android.play.core.splitinstall.** { *; }
+-keep class com.google.android.play.core.tasks.** { *; }
+
+# Keep Flutter PlayStore split application
+-keep class io.flutter.app.FlutterPlayStoreSplitApplication { *; }
+-keep class io.flutter.embedding.engine.deferredcomponents.** { *; }
