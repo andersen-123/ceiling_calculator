@@ -525,12 +525,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       }
 
       if (mounted) {
-        // Принудительный переход с задержкой для MIUI
-        Future.delayed(const Duration(milliseconds: 100), () {
-          if (mounted) {
-            Navigator.of(context).pop(true);
-          }
-        });
+        // Сохраняем результат и принудительно перезагружаем предыдущий экран
+        Navigator.of(context).pop('saved');
         return;
       }
     } catch (e) {

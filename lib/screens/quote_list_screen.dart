@@ -168,9 +168,13 @@ class _QuoteListScreenState extends State<QuoteListScreen> {
                                   builder: (context) => QuoteEditScreen(quote: quote),
                                 ),
                               );
-                              // Обновляем список только если вернулись с сохранением
-                              if (result == true && mounted) {
-                                _loadQuotes();
+                              // Принудительно перезагружаем список при любом возврате
+                              if (mounted) {
+                                Future.delayed(const Duration(milliseconds: 200), () {
+                                  if (mounted) {
+                                    _loadQuotes();
+                                  }
+                                });
                               }
                             },
                             onEdit: () async {
@@ -180,9 +184,13 @@ class _QuoteListScreenState extends State<QuoteListScreen> {
                                   builder: (context) => QuoteEditScreen(quote: quote),
                                 ),
                               );
-                              // Обновляем список только если вернулись с сохранением
-                              if (result == true && mounted) {
-                                _loadQuotes();
+                              // Принудительно перезагружаем список при любом возврате
+                              if (mounted) {
+                                Future.delayed(const Duration(milliseconds: 200), () {
+                                  if (mounted) {
+                                    _loadQuotes();
+                                  }
+                                });
                               }
                             },
                             onDelete: () => _deleteQuote(quote),
