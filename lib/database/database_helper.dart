@@ -747,6 +747,16 @@ class DatabaseHelper {
 
   Future<int> insert(String table, Map<String, dynamic> values) async {
     final db = await database;
+    
+    // Проверяем целостность базы данных перед сохранением
+    if (!await _validateDatabaseIntegrity()) {
+      if (kDebugMode) {
+        print('Database integrity check failed, but attempting save anyway');
+      }
+      // Продолжаем сохранение даже если проверка не прошла
+      // чтобы не блокировать работу приложения
+    }
+    
     return await db.insert(table, values);
   }
 
@@ -781,6 +791,15 @@ class DatabaseHelper {
     List<dynamic>? whereArgs,
   }) async {
     final db = await database;
+    
+    // Проверяем целостность базы данных перед обновлением
+    if (!await _validateDatabaseIntegrity()) {
+      if (kDebugMode) {
+        print('Database integrity check failed, but attempting update anyway');
+      }
+      // Продолжаем обновление даже если проверка не прошла
+    }
+    
     return await db.update(table, values, where: where, whereArgs: whereArgs);
   }
 
@@ -789,6 +808,15 @@ class DatabaseHelper {
     List<dynamic>? whereArgs,
   }) async {
     final db = await database;
+    
+    // Проверяем целостность базы данных перед удалением
+    if (!await _validateDatabaseIntegrity()) {
+      if (kDebugMode) {
+        print('Database integrity check failed, but attempting delete anyway');
+      }
+      // Продолжаем удаление даже если проверка не прошла
+    }
+    
     return await db.delete(table, where: where, whereArgs: whereArgs);
   }
 
@@ -871,6 +899,153 @@ class DatabaseHelper {
         FOREIGN KEY (project_id) REFERENCES projects (project_id)
       )
     ''');
+  }
+  
+  Future<void> _createQuoteLineItemsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS quote_line_items (
+        item_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        quote_id INTEGER NOT NULL,
+        description TEXT NOT NULL,
+        unit TEXT NOT NULL,
+        quantity REAL NOT NULL,
+        unit_price REAL NOT NULL,
+        total_price REAL NOT NULL,
+        item_type TEXT NOT NULL DEFAULT 'work',
+        created_at INTEGER NOT NULL,
+        FOREIGN KEY (quote_id) REFERENCES quotes (quote_id)
+      )
+    ''');
+  }
+  
+  // Метод для проверки целостности базы данных перед сохранением
+  Future<bool> _validateDatabaseIntegrity() async {
+    try {
+      if (kDebugMode) {
+        print('Validating database integrity before save...');
+      }
+      
+      // Проверяем существование всех необходимых таблиц
+      List<String> requiredTables = ['companies', 'quotes', 'projects', 'expenses', 'salary_payments', 'quote_line_items'];
+      
+      for (String table in requiredTables) {
+        try {
+          List<Map> result = await _database!.rawQuery(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='$table'"
+          );
+          
+          if (result.isEmpty) {
+            if (kDebugMode) {
+              print('Critical: Missing table $table - attempting to create...');
+            }
+            
+            // Пробуем создать недостающую таблицу
+            await _createMissingTable(table);
+            
+            // Проверяем снова
+            result = await _database!.rawQuery(
+              "SELECT name FROM sqlite_master WHERE type='table' AND name='$table'"
+            );
+            
+            if (result.isEmpty) {
+              if (kDebugMode) {
+                print('Error: Failed to create table $table');
+              }
+              return false;
+            }
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error checking table $table: $e');
+          }
+          return false;
+        }
+      }
+      
+      // Проверяем структуру важных таблиц
+      if (!await _validateTableStructure('companies', ['company_id', 'name'])) {
+        return false;
+      }
+      
+      if (!await _validateTableStructure('quotes', ['quote_id', 'client_name'])) {
+        return false;
+      }
+      
+      if (!await _validateTableStructure('projects', ['project_id', 'client_name'])) {
+        return false;
+      }
+      
+      if (kDebugMode) {
+        print('Database integrity validation passed');
+      }
+      
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Database integrity validation failed: $e');
+      }
+      return false;
+    }
+  }
+  
+  // Метод для создания недостающей таблицы
+  Future<void> _createMissingTable(String tableName) async {
+    try {
+      switch (tableName) {
+        case 'companies':
+          await _createCompaniesTable(_database!);
+          break;
+        case 'quotes':
+          await _createQuotesTable(_database!);
+          break;
+        case 'projects':
+          await _createProjectsTable(_database!);
+          break;
+        case 'expenses':
+          await _createExpensesTable(_database!);
+          break;
+        case 'salary_payments':
+          await _createSalaryPaymentsTable(_database!);
+          break;
+        case 'quote_line_items':
+          await _createQuoteLineItemsTable(_database!);
+          break;
+      }
+      
+      if (kDebugMode) {
+        print('Successfully created missing table: $tableName');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Failed to create missing table $tableName: $e');
+      }
+      rethrow;
+    }
+  }
+  
+  // Метод для проверки структуры таблицы
+  Future<bool> _validateTableStructure(String tableName, List<String> requiredColumns) async {
+    try {
+      List<Map> result = await _database!.rawQuery("PRAGMA table_info($tableName)");
+      
+      Set<String> existingColumns = result.map((row) => row['name'] as String).toSet();
+      
+      for (String column in requiredColumns) {
+        if (!existingColumns.contains(column)) {
+          if (kDebugMode) {
+            print('Critical: Missing column $column in table $tableName');
+          }
+          return false;
+        }
+      }
+      
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error validating table structure for $tableName: $e');
+      }
+      return false;
+    }
   }
   
   // Метод для проверки целостности восстановленных данных
