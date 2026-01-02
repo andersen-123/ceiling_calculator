@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../models/project.dart';
 import '../models/quote.dart';
-import '../models/expense.dart';
+import '../models/expense.dart' as expense_model;
 import '../models/advance.dart';
 import '../database/database_helper.dart';
 import '../widgets/quote_selector_widget.dart';
@@ -44,7 +44,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
   List<String> _installers = [];
   List<Advance> _advances = [];
 
-  List<Expense> _expenses = [];
+  List<expense_model.Expense> _expenses = [];
   List<SalaryPayment> _salaryPayments = [];
 
   bool _isLoading = false;
@@ -117,7 +117,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
       );
       
       setState(() {
-        _expenses = expensesData.map((map) => Expense.fromMap(map)).toList();
+        _expenses = expensesData.map((map) => expense_model.Expense.fromMap(map)).toList();
         _salaryPayments = salaryData.map((map) => SalaryPayment.fromMap(map)).toList();
       });
     } catch (e) {
@@ -213,9 +213,9 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
         startDate: _startDate,
         endDate: _endDate,
         plannedBudget: plannedBudget,
-        actualExpenses: _expenses.fold(0.0, (sum, expense) => sum + expense.amount),
+        actualExpenses: _expenses.fold(0.0, (sum, expense) => sum + (expense as expense_model.Expense).amount),
         totalSalary: _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount),
-        profit: plannedBudget - _expenses.fold(0.0, (sum, expense) => sum + expense.amount) - _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount),
+        profit: plannedBudget - _expenses.fold(0.0, (sum, expense) => sum + (expense as expense_model.Expense).amount) - _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount),
         quoteId: _selectedQuoteId,
         driverName: _driverName?.trim().isEmpty ?? true ? null : _driverName?.trim(),
         installers: _installers,
@@ -314,7 +314,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final totalExpenses = _expenses.fold(0.0, (sum, expense) => sum + expense.amount);
+    final totalExpenses = _expenses.fold(0.0, (sum, expense) => sum + (expense as expense_model.Expense).amount);
     final totalSalary = _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount);
     final plannedBudget = double.tryParse(_budgetController.text) ?? 0.0;
     final profit = plannedBudget - totalExpenses - totalSalary;
@@ -552,7 +552,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
               salaryDistribution: _calculateSalaryDistribution(
                 double.tryParse(_budgetController.text) ?? 0.0,
                 _installers,
-                _expenses.fold(0.0, (sum, expense) => sum + expense.amount),
+                _expenses.fold(0.0, (sum, expense) => sum + (expense as expense_model.Expense).amount),
               ),
               onChanged: (driverName, installers) {
                 setState(() {
@@ -1177,7 +1177,7 @@ class _AddExpenseDialogState extends State<_AddExpenseDialog> {
       return;
     }
 
-    final expense = Expense(
+    final expense = expense_model.Expense(
       projectId: 0, // Будет установлен позже
       type: _selectedType,
       description: description,

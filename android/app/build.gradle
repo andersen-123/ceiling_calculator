@@ -57,7 +57,7 @@ android {
 
     defaultConfig {
         applicationId "com.ceilingcalc.ceiling_calculator"
-        minSdkVersion 21
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
