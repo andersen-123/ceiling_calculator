@@ -95,8 +95,6 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
     _selectedQuoteId = project.quoteId;
     _driverName = project.driverName;
     _installers = List.from(project.installers);
-    _projectAdvance = project.projectAdvance;
-    _installerAdvances = Map.from(project.installerAdvances);
     _loadExpensesAndSalary();
   }
 
@@ -224,8 +222,6 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
         notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
         createdAt: widget.project?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
-        projectAdvance: _projectAdvance,
-        installerAdvances: _installerAdvances,
       );
 
       // Рассчитываем прибыль

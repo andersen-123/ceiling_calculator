@@ -37,14 +37,12 @@ class Project {
   final double actualExpenses;
   final double totalSalary;
   final double profit;
-  final int? quoteId; // Связь с предложением
-  final String? driverName; // Кто на машине
-  final List<String> installers; // Список монтажников
+  final int? quoteId;
+  final String? driverName;
+  final List<String> installers;
   final String? notes;
   final DateTime createdAt;
   final DateTime? updatedAt;
-  final double projectAdvance; // Общий аванс по объекту
-  final Map<String, double> installerAdvances; // Авансы монтажникам
 
   Project({
     this.id,
@@ -65,8 +63,6 @@ class Project {
     this.notes,
     required this.createdAt,
     this.updatedAt,
-    this.projectAdvance = 0.0,
-    this.installerAdvances = const {},
   });
 
   Project copyWith({
@@ -88,8 +84,6 @@ class Project {
     String? notes,
     DateTime? createdAt,
     DateTime? updatedAt,
-    double? projectAdvance,
-    Map<String, double>? installerAdvances,
   }) {
     return Project(
       id: id ?? this.id,
@@ -110,8 +104,6 @@ class Project {
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      projectAdvance: projectAdvance ?? this.projectAdvance,
-      installerAdvances: installerAdvances ?? this.installerAdvances,
     );
   }
 
@@ -135,26 +127,10 @@ class Project {
       'notes': notes,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
-      'project_advance': projectAdvance,
-      'installer_advances': installerAdvances.entries.map((e) => '${e.key}:${e.value}').join(','),
     };
   }
 
   factory Project.fromMap(Map<String, dynamic> map) {
-    // Parse installer advances from string "name1:amount1,name2:amount2"
-    final advancesString = map['installer_advances'] as String? ?? '';
-    final Map<String, double> advances = {};
-    if (advancesString.isNotEmpty) {
-      for (final entry in advancesString.split(',')) {
-        final parts = entry.split(':');
-        if (parts.length == 2) {
-          final name = parts[0];
-          final amount = double.tryParse(parts[1]) ?? 0.0;
-          advances[name] = amount;
-        }
-      }
-    }
-
     return Project(
       id: map['project_id'] as int?,
       name: map['name'] as String,
@@ -177,8 +153,6 @@ class Project {
       notes: map['notes'] as String?,
       createdAt: DateTime.parse(map['created_at']),
       updatedAt: map['updated_at'] != null ? DateTime.parse(map['updated_at']) : null,
-      projectAdvance: map['project_advance'] as double? ?? 0.0,
-      installerAdvances: advances,
     );
   }
 

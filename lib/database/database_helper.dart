@@ -5,6 +5,8 @@ import '../models/project.dart';
 import '../models/expense.dart';
 import '../models/salary_payment.dart';
 import '../models/advance.dart';
+import '../models/unit.dart';
+import '../models/app_settings.dart';
 
 class DatabaseHelper {
   static const String _databaseName = 'ceiling_calculator.db';
@@ -282,8 +284,6 @@ class DatabaseHelper {
         notes TEXT,
         created_at TEXT NOT NULL,
         updated_at TEXT,
-        project_advance REAL NOT NULL DEFAULT 0.0,
-        installer_advances TEXT DEFAULT '',
         FOREIGN KEY (quote_id) REFERENCES quotes (quote_id)
       )
     ''');
