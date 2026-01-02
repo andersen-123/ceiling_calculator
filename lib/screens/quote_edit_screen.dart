@@ -13,6 +13,7 @@ import '../widgets/quick_add_item_dialog.dart';
 import '../widgets/quote_attachments_widget.dart';
 import '../services/excel_service.dart';
 import '../services/pdf_service.dart';
+import 'home_screen.dart';
 
 class QuoteEditScreen extends StatefulWidget {
   final Quote? quote;
@@ -436,8 +437,12 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   Future<void> _saveQuote() async {
   if (!_formKey.currentState!.validate()) return;
   
-  // Временно убираем сохранение для теста навигации
-  Navigator.of(context).pop('saved');
+  // Пробуем навигацию через pushReplacement с HomeScreen
+  Navigator.of(context).pushReplacement(
+    MaterialPageRoute(
+      builder: (context) => const HomeScreen(),
+    ),
+  );
 }
 
   @override
