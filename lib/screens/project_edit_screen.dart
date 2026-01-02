@@ -755,7 +755,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
     );
   }
 
-  Widget _buildExpenseItem(Expense expense, int index) {
+  Widget _buildExpenseItem(expense_model.Expense expense, int index) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -1179,7 +1179,6 @@ class _AddExpenseDialogState extends State<_AddExpenseDialog> {
 
     final expense = expense_model.Expense(
       projectId: 0, // Будет установлен позже
-      type: _selectedType,
       description: description,
       amount: amount,
       date: _selectedDate,
