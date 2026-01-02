@@ -924,9 +924,9 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
                     color: Color(0xFF1D1D1F),
                   ),
                 ),
-                if (payment.workDescription != null)
+                if (payment.description != null)
                   Text(
-                    payment.workDescription!,
+                    payment.description!,
                     style: const TextStyle(
                       fontSize: 12,
                       color: Color(0xFF86868B),
@@ -1313,7 +1313,7 @@ class _AddSalaryDialogState extends State<_AddSalaryDialog> {
       employeeName: employeeName,
       amount: amount,
       date: _selectedDate,
-      workDescription: _workDescriptionController.text.trim().isEmpty ? null : _workDescriptionController.text.trim(),
+      description: _workDescriptionController.text.trim().isEmpty ? null : _workDescriptionController.text.trim(),
       createdAt: DateTime.now(),
     );
 
