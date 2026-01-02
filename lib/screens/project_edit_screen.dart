@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../models/project.dart';
 import '../models/expense.dart';
+import '../models/salary_payment.dart';
 import '../models/quote.dart';
 
 import '../models/advance.dart';
