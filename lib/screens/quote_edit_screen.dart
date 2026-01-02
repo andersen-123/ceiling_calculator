@@ -217,6 +217,14 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   }
 
   Quote _getCurrentQuote() {
+    final subtotalWork = _lineItems
+        .where((item) => item.section == LineItemSection.work)
+        .fold(0.0, (sum, item) => sum + item.amount);
+    final subtotalEquipment = _lineItems
+        .where((item) => item.section == LineItemSection.equipment)
+        .fold(0.0, (sum, item) => sum + item.amount);
+    final totalAmount = subtotalWork + subtotalEquipment;
+
     return Quote(
       id: widget.quote?.id,
       companyId: 1,
@@ -240,9 +248,9 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
           ? null 
           : _notesController.text.trim(),
       currencyCode: 'RUB',
-      subtotalWork: 0, // TODO: Calculate from line items
-      subtotalEquipment: 0, // TODO: Calculate from line items
-      totalAmount: 0, // TODO: Calculate from line items
+      subtotalWork: subtotalWork,
+      subtotalEquipment: subtotalEquipment,
+      totalAmount: totalAmount,
       createdAt: widget.quote?.createdAt ?? DateTime.now(),
       updatedAt: DateTime.now(),
     );
@@ -519,6 +527,15 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   if (!_formKey.currentState!.validate()) return;
 
   try {
+    // Расчитываем суммы из позиций
+    final subtotalWork = _lineItems
+        .where((item) => item.section == LineItemSection.work)
+        .fold(0.0, (sum, item) => sum + item.amount);
+    final subtotalEquipment = _lineItems
+        .where((item) => item.section == LineItemSection.equipment)
+        .fold(0.0, (sum, item) => sum + item.amount);
+    final totalAmount = subtotalWork + subtotalEquipment;
+
     final quote = Quote(
       id: widget.quote?.id,
       companyId: 1,
@@ -542,9 +559,9 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
           ? null 
           : _notesController.text.trim(),
       currencyCode: 'RUB',
-      subtotalWork: 0, // TODO: Calculate from line items
-      subtotalEquipment: 0, // TODO: Calculate from line items
-      totalAmount: 0, // TODO: Calculate from line items
+      subtotalWork: subtotalWork,
+      subtotalEquipment: subtotalEquipment,
+      totalAmount: totalAmount,
       createdAt: widget.quote?.createdAt ?? DateTime.now(),
       updatedAt: DateTime.now(),
     );
