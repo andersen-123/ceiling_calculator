@@ -454,4 +454,34 @@ class _QuoteListScreenState extends State<QuoteListScreen> {
       ),
     );
   }
+  
+  Color _getStatusColor(QuoteStatus status) {
+    switch (status) {
+      case QuoteStatus.draft:
+        return Colors.grey;
+      case QuoteStatus.sent:
+        return Colors.blue;
+      case QuoteStatus.accepted:
+        return Colors.green;
+      case QuoteStatus.rejected:
+        return Colors.red;
+      case QuoteStatus.completed:
+        return Colors.purple;
+    }
+  }
+
+  String _getStatusText(QuoteStatus status) {
+    switch (status) {
+      case QuoteStatus.draft:
+        return 'Черновик';
+      case QuoteStatus.sent:
+        return 'Отправлено';
+      case QuoteStatus.accepted:
+        return 'Принято';
+      case QuoteStatus.rejected:
+        return 'Отклонено';
+      case QuoteStatus.completed:
+        return 'Завершено';
+    }
+  }
 }
