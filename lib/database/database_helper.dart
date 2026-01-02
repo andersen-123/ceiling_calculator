@@ -148,7 +148,7 @@ class DatabaseHelper {
                 
                 if (result.isNotEmpty) {
                   List<Map> tableData = await db.rawQuery('SELECT * FROM $table');
-                  backupData[table] = tableData.cast<String, Object?>();
+                  backupData[table] = tableData.map((row) => Map<String, Object?>.from(row)).toList();
                   if (kDebugMode) {
                     print('Backed up ${tableData.length} records from $table');
                   }
@@ -298,7 +298,7 @@ class DatabaseHelper {
             
             if (result.isNotEmpty) {
               List<Map> tableData = await existingDb.rawQuery('SELECT * FROM $table');
-              backupData[table] = tableData.cast<String, Object?>();
+              backupData[table] = tableData.map((row) => Map<String, Object?>.from(row)).toList();
               if (kDebugMode) {
                 print('Backed up ${tableData.length} records from $table');
               }
