@@ -33,7 +33,7 @@ dependencies:
   file_picker: ^6.1.1
   permission_handler: ^11.0.1
   url_launcher: ^6.1.14
-  open_file: ^3.3.2
+  open_file: ^3.2.2
   printing: ^5.12.0
 
   # Файловая система и шаринг
