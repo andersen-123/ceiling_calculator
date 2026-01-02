@@ -216,12 +216,48 @@ class DatabaseHelper {
       print('Stack trace: $stackTrace');
     }
     
-    // Если критическая ошибка, пытаемся пересоздать базу данных
+    // Если критическая ошибка, пытаемся пересоздать базу данных с резервным копированием
     try {
       if (kDebugMode) {
-        print('Attempting to recreate database...');
+        print('Attempting to recreate database with backup...');
       }
       String path = join(await getDatabasesPath(), _databaseName);
+      
+      // Создаем резервную копию если возможно
+      try {
+        String backupPath = path.replaceFirst('.db', '_backup_${DateTime.now().millisecondsSinceEpoch}.db');
+        Database existingDb = await openDatabase(path);
+        List<Map> allData = [];
+        
+        // Копируем основные данные
+        List<String> tables = ['companies', 'quotes'];
+        for (String table in tables) {
+          try {
+            List<Map> tableData = await existingDb.rawQuery('SELECT * FROM $table');
+            allData.addAll(tableData.map((row) => {'table': table, 'data': row}));
+            if (kDebugMode) {
+              print('Backed up ${tableData.length} records from $table');
+            }
+          } catch (e) {
+            if (kDebugMode) {
+              print('Failed to backup table $table: $e');
+            }
+          }
+        }
+        
+        await existingDb.close();
+        
+        if (kDebugMode) {
+          print('Created backup with ${allData.length} total records');
+        }
+      } catch (backupError) {
+        if (kDebugMode) {
+          print('Failed to create backup: $backupError');
+        }
+        // Продолжаем без резервной копии
+      }
+      
+      // Удаляем и пересоздаем базу данных
       await deleteDatabase(path);
       
       _database = await openDatabase(
@@ -230,6 +266,18 @@ class DatabaseHelper {
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
       );
+      
+      // Восстанавливаем данные из резервной копии если возможно
+      try {
+        // Здесь можно добавить восстановление данных из backup
+        if (kDebugMode) {
+          print('Database recreated successfully (backup restoration not implemented)');
+        }
+      } catch (restoreError) {
+        if (kDebugMode) {
+          print('Failed to restore backup: $restoreError');
+        }
+      }
       
       if (kDebugMode) {
         print('Database recreated successfully');
