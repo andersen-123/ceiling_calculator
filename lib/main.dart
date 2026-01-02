@@ -32,37 +32,6 @@ void main() async {
   runApp(const CeilingCalculatorApp());
 }
 
-class TestApp extends StatelessWidget {
-  const TestApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Калькулятор потолков',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF007AFF),
-          foregroundColor: Colors.white,
-          elevation: 2,
-        ),
-      ),
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('ru', 'RU'),
-      ],
-      locale: const Locale('ru', 'RU'),
-      home: const TestScreen(),
-    );
-  }
-}
-
 class CeilingCalculatorApp extends StatelessWidget {
   const CeilingCalculatorApp({super.key});
 
