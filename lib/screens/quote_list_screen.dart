@@ -461,9 +461,9 @@ class _QuoteListScreenState extends State<QuoteListScreen> {
         return Colors.grey;
       case QuoteStatus.sent:
         return Colors.blue;
-      case QuoteStatus.accepted:
+      case QuoteStatus.approved:
         return Colors.green;
-      case QuoteStatus.rejected:
+      case QuoteStatus.cancelled:
         return Colors.red;
       case QuoteStatus.completed:
         return Colors.purple;
@@ -476,10 +476,10 @@ class _QuoteListScreenState extends State<QuoteListScreen> {
         return 'Черновик';
       case QuoteStatus.sent:
         return 'Отправлено';
-      case QuoteStatus.accepted:
+      case QuoteStatus.approved:
         return 'Принято';
-      case QuoteStatus.rejected:
-        return 'Отклонено';
+      case QuoteStatus.cancelled:
+        return 'Отменено';
       case QuoteStatus.completed:
         return 'Завершено';
     }
