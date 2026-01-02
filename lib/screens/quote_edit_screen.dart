@@ -305,7 +305,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
               backgroundColor: Colors.green,
             ),
           );
-        }*
+        } else {
       }* else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
