@@ -354,7 +354,7 @@ class DatabaseHelper {
             }
             
             for (Map record in validCompanies) {
-              batch.insert('companies', record);
+              batch.insert('companies', Map<String, Object?>.from(record));
               totalRestored++;
             }
             
@@ -379,7 +379,7 @@ class DatabaseHelper {
             }
             
             for (Map record in validQuotes) {
-              batch.insert('quotes', record);
+              batch.insert('quotes', Map<String, Object?>.from(record));
               totalRestored++;
             }
             
@@ -404,7 +404,7 @@ class DatabaseHelper {
             }
             
             for (Map record in validProjects) {
-              batch.insert('projects', record);
+              batch.insert('projects', Map<String, Object?>.from(record));
               totalRestored++;
             }
             
@@ -430,7 +430,7 @@ class DatabaseHelper {
             }
             
             for (Map record in validExpenses) {
-              batch.insert('expenses', record);
+              batch.insert('expenses', Map<String, Object?>.from(record));
               totalRestored++;
             }
             
@@ -456,7 +456,7 @@ class DatabaseHelper {
             }
             
             for (Map record in validPayments) {
-              batch.insert('salary_payments', record);
+              batch.insert('salary_payments', Map<String, Object?>.from(record));
               totalRestored++;
             }
             
@@ -483,7 +483,7 @@ class DatabaseHelper {
             }
             
             for (Map record in validItems) {
-              batch.insert('quote_line_items', record);
+              batch.insert('quote_line_items', Map<String, Object?>.from(record));
               totalRestored++;
             }
             
