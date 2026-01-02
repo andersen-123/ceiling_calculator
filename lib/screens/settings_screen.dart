@@ -19,6 +19,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _addressController = TextEditingController();
   final _footerNoteController = TextEditingController();
 
+  // Focus nodes для контроля клавиатуры
+  final FocusNode _companyNameFocusNode = FocusNode();
+  final FocusNode _phoneFocusNode = FocusNode();
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _websiteFocusNode = FocusNode();
+  final FocusNode _addressFocusNode = FocusNode();
+  final FocusNode _footerNoteFocusNode = FocusNode();
+
   String? _logoPath;
   String _selectedCurrency = 'RUB';
   bool _isLoading = false;
@@ -48,6 +56,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _websiteController.dispose();
     _addressController.dispose();
     _footerNoteController.dispose();
+    
+    // Очищаем FocusNode
+    _companyNameFocusNode.dispose();
+    _phoneFocusNode.dispose();
+    _emailFocusNode.dispose();
+    _websiteFocusNode.dispose();
+    _addressFocusNode.dispose();
+    _footerNoteFocusNode.dispose();
+    
     super.dispose();
   }
 
@@ -267,14 +284,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _companyNameController,
+              focusNode: _companyNameFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Название компании *',
                 border: OutlineInputBorder(),
               ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Введите название компании';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _phoneController,
+              focusNode: _phoneFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Телефон',
                 border: OutlineInputBorder(),
@@ -284,6 +311,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _emailController,
+              focusNode: _emailFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
@@ -293,6 +322,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _websiteController,
+              focusNode: _websiteFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Сайт',
                 border: OutlineInputBorder(),
@@ -301,6 +332,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _addressController,
+              focusNode: _addressFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Адрес',
                 border: OutlineInputBorder(),
@@ -310,6 +343,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _footerNoteController,
+              focusNode: _footerNoteFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Примечание для подвала PDF',
                 border: OutlineInputBorder(),

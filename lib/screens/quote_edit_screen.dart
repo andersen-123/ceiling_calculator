@@ -42,6 +42,19 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   final TextEditingController _installationTermsController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
   
+  // Focus nodes для контроля клавиатуры
+  final FocusNode _customerNameFocusNode = FocusNode();
+  final FocusNode _customerPhoneFocusNode = FocusNode();
+  final FocusNode _customerEmailFocusNode = FocusNode();
+  final FocusNode _objectNameFocusNode = FocusNode();
+  final FocusNode _addressFocusNode = FocusNode();
+  final FocusNode _areaSFocusNode = FocusNode();
+  final FocusNode _perimeterPFocusNode = FocusNode();
+  final FocusNode _heightHFocusNode = FocusNode();
+  final FocusNode _paymentTermsFocusNode = FocusNode();
+  final FocusNode _installationTermsFocusNode = FocusNode();
+  final FocusNode _notesFocusNode = FocusNode();
+  
   // State variables
   String? _selectedCeilingSystem;
   QuoteStatus _selectedStatus = QuoteStatus.draft;
@@ -86,6 +99,20 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     _paymentTermsController.dispose();
     _installationTermsController.dispose();
     _notesController.dispose();
+    
+    // Очищаем FocusNode
+    _customerNameFocusNode.dispose();
+    _customerPhoneFocusNode.dispose();
+    _customerEmailFocusNode.dispose();
+    _objectNameFocusNode.dispose();
+    _addressFocusNode.dispose();
+    _areaSFocusNode.dispose();
+    _perimeterPFocusNode.dispose();
+    _heightHFocusNode.dispose();
+    _paymentTermsFocusNode.dispose();
+    _installationTermsFocusNode.dispose();
+    _notesFocusNode.dispose();
+    
     _scrollController.dispose();
     super.dispose();
   }
@@ -794,13 +821,14 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
             const SizedBox(height: 20),
             TextFormField(
               controller: _customerNameController,
+              focusNode: _customerNameFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Имя клиента *',
                 border: OutlineInputBorder(),
-                floatingLabelStyle: TextStyle(color: Color(0xFF007AFF)),
               ),
               validator: (value) {
-                if (value == null || value.trim().isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Введите имя клиента';
                 }
                 return null;
@@ -809,6 +837,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _customerPhoneController,
+              focusNode: _customerPhoneFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Телефон',
                 border: OutlineInputBorder(),
@@ -821,6 +851,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _customerEmailController,
+              focusNode: _customerEmailFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
@@ -845,6 +877,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _objectNameController,
+              focusNode: _objectNameFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Название объекта',
                 border: OutlineInputBorder(),
@@ -854,6 +888,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _addressController,
+              focusNode: _addressFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Адрес',
                 border: OutlineInputBorder(),
@@ -866,6 +902,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                 Expanded(
                   child: TextFormField(
                     controller: _areaSController,
+                    focusNode: _areaSFocusNode,
+                    autofocus: false,
                     decoration: const InputDecoration(
                       labelText: 'Площадь S, м²',
                       border: OutlineInputBorder(),
@@ -878,6 +916,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                 Expanded(
                   child: TextFormField(
                     controller: _perimeterPController,
+                    focusNode: _perimeterPFocusNode,
+                    autofocus: false,
                     decoration: const InputDecoration(
                       labelText: 'Периметр P, м.п.',
                       border: OutlineInputBorder(),
@@ -894,6 +934,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                 Expanded(
                   child: TextFormField(
                     controller: _heightHController,
+                    focusNode: _heightHFocusNode,
+                    autofocus: false,
                     decoration: const InputDecoration(
                       labelText: 'Высота h, м',
                       border: OutlineInputBorder(),
@@ -1169,6 +1211,8 @@ Widget _buildLineItems() {
             const SizedBox(height: 16),
             TextFormField(
               controller: _paymentTermsController,
+              focusNode: _paymentTermsFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Условия оплаты',
                 border: OutlineInputBorder(),
@@ -1179,6 +1223,8 @@ Widget _buildLineItems() {
             const SizedBox(height: 12),
             TextFormField(
               controller: _installationTermsController,
+              focusNode: _installationTermsFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Даты и условия монтажа',
                 border: OutlineInputBorder(),
@@ -1188,6 +1234,8 @@ Widget _buildLineItems() {
             const SizedBox(height: 12),
             TextFormField(
               controller: _notesController,
+              focusNode: _notesFocusNode,
+              autofocus: false,
               decoration: const InputDecoration(
                 labelText: 'Примечания',
                 border: OutlineInputBorder(),
