@@ -33,14 +33,14 @@ dependencies:
   
   # Файлы
   # file_picker: ^6.1.1  # временно отключен для сборки
-  permission_handler: ^11.0.1
-  url_launcher: ^6.1.14
+  permission_handler: ^11.3.0
+  url_launcher: ^6.2.4
   # open_file: ^3.1.0  # временно отключен из-за проблем с namespace
-  printing: ^6.2.1
+  printing: ^5.12.0
 
   # Файловая система и шаринг
-  share_plus: ^9.0.0
-  image_picker: ^1.0.4
+  share_plus: ^7.2.2
+  image_picker: ^1.1.2
   uuid: ^4.2.1
   currency_picker: ^2.0.20
 
