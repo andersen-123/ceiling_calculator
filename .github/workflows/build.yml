@@ -33,6 +33,10 @@ jobs:
         rm -rf .dart_tool
         rm -rf .packages
         rm -rf pubspec.lock
+        rm -rf ~/.pub-cache
+        rm -rf ~/.flutter
+        rm -rf build
+        flutter pub cache repair
         
     - name: Check Flutter version
       run: flutter --version
