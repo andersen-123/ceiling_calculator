@@ -20,6 +20,17 @@ allprojects {
         google()
         mavenCentral()
     }
+    
+    // Force specific build tools version for all subprojects
+    subprojects {
+        afterEvaluate {
+            if (project.hasProperty('android')) {
+                android {
+                    buildToolsVersion "34.0.0"
+                }
+            }
+        }
+    }
 }
 
 rootProject.buildDir = '../build'
