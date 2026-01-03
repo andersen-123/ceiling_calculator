@@ -26,12 +26,6 @@
       "languageVersion": "2.12"
     },
     {
-      "name": "boolean_selector",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/boolean_selector-2.1.2",
-      "packageUri": "lib/",
-      "languageVersion": "3.1"
-    },
-    {
       "name": "characters",
       "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/characters-1.4.0",
       "packageUri": "lib/",
@@ -86,16 +80,22 @@
       "languageVersion": "3.0"
     },
     {
-      "name": "fake_async",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/fake_async-1.3.3",
-      "packageUri": "lib/",
-      "languageVersion": "3.3"
-    },
-    {
       "name": "ffi",
       "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/ffi-2.1.4",
       "packageUri": "lib/",
       "languageVersion": "3.7"
+    },
+    {
+      "name": "file",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/file-7.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "file_picker",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/file_picker-8.3.7",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "file_selector_linux",
@@ -134,12 +134,6 @@
       "languageVersion": "3.8"
     },
     {
-      "name": "flutter_lints",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/flutter_lints-3.0.2",
-      "packageUri": "lib/",
-      "languageVersion": "3.1"
-    },
-    {
       "name": "flutter_localizations",
       "rootUri": "file:///home/ander/flutter/packages/flutter_localizations",
       "packageUri": "lib/",
@@ -156,12 +150,6 @@
       "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/flutter_slidable-3.1.2",
       "packageUri": "lib/",
       "languageVersion": "2.17"
-    },
-    {
-      "name": "flutter_test",
-      "rootUri": "file:///home/ander/flutter/packages/flutter_test",
-      "packageUri": "lib/",
-      "languageVersion": "3.8"
     },
     {
       "name": "flutter_web_plugins",
@@ -237,39 +225,9 @@
     },
     {
       "name": "intl",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/intl-0.18.1",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/intl-0.20.2",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
-    },
-    {
-      "name": "leak_tracker",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/leak_tracker-11.0.2",
-      "packageUri": "lib/",
-      "languageVersion": "3.2"
-    },
-    {
-      "name": "leak_tracker_flutter_testing",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/leak_tracker_flutter_testing-3.0.10",
-      "packageUri": "lib/",
-      "languageVersion": "3.2"
-    },
-    {
-      "name": "leak_tracker_testing",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/leak_tracker_testing-3.0.2",
-      "packageUri": "lib/",
-      "languageVersion": "3.2"
-    },
-    {
-      "name": "lints",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/lints-3.0.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.0"
-    },
-    {
-      "name": "matcher",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/matcher-0.12.17",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.3"
     },
     {
       "name": "material_color_utilities",
@@ -288,6 +246,54 @@
       "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/mime-1.0.6",
       "packageUri": "lib/",
       "languageVersion": "3.2"
+    },
+    {
+      "name": "open_file",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file-3.5.10",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "open_file_android",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_android-1.0.6",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "open_file_ios",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_ios-1.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "open_file_linux",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_linux-0.0.5",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "open_file_mac",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_mac-1.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "open_file_platform_interface",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_platform_interface-1.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "open_file_web",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_web-0.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "open_file_windows",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_windows-0.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
     },
     {
       "name": "path",
@@ -416,6 +422,18 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "share_plus",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/share_plus-12.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "share_plus_platform_interface",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/share_plus_platform_interface-6.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
       "name": "sky_engine",
       "rootUri": "file:///home/ander/flutter/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
@@ -429,9 +447,15 @@
     },
     {
       "name": "sqflite",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/sqflite-2.2.6",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/sqflite-2.4.2",
       "packageUri": "lib/",
-      "languageVersion": "2.18"
+      "languageVersion": "3.7"
+    },
+    {
+      "name": "sqflite_android",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/sqflite_android-2.4.2+2",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
     },
     {
       "name": "sqflite_common",
@@ -440,16 +464,16 @@
       "languageVersion": "3.8"
     },
     {
-      "name": "stack_trace",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/stack_trace-1.12.1",
+      "name": "sqflite_darwin",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/sqflite_darwin-2.4.2",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.7"
     },
     {
-      "name": "stream_channel",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/stream_channel-2.1.4",
+      "name": "sqflite_platform_interface",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/sqflite_platform_interface-2.4.0",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "3.5"
     },
     {
       "name": "string_scanner",
@@ -468,12 +492,6 @@
       "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/term_glyph-1.2.2",
       "packageUri": "lib/",
       "languageVersion": "3.1"
-    },
-    {
-      "name": "test_api",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/test_api-0.7.7",
-      "packageUri": "lib/",
-      "languageVersion": "3.5"
     },
     {
       "name": "typed_data",
@@ -542,16 +560,16 @@
       "languageVersion": "3.1"
     },
     {
-      "name": "vm_service",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/vm_service-15.0.2",
-      "packageUri": "lib/",
-      "languageVersion": "3.5"
-    },
-    {
       "name": "web",
       "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/web-1.1.1",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "win32",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/win32-5.15.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.8"
     },
     {
       "name": "xdg_directories",
@@ -569,7 +587,7 @@
       "name": "ceiling_calculator",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "3.1"
+      "languageVersion": "3.10"
     }
   ],
   "generator": "pub",
