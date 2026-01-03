@@ -25,7 +25,18 @@ jobs:
       with:
         flutter-version: '3.38.5'
         channel: 'stable'
-        cache: 'false'
+        cache: false
+        
+    - name: Verify Flutter installation
+      run: |
+        flutter --version
+        dart --version
+        
+    - name: Force Flutter upgrade
+      run: |
+        flutter channel stable
+        flutter upgrade
+        flutter --version
         
     - name: Clean Flutter cache
       run: |
