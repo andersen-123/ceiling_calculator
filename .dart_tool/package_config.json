@@ -93,9 +93,9 @@
     },
     {
       "name": "file_picker",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/file_picker-8.3.7",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/file_picker-8.0.7",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "2.19"
     },
     {
       "name": "file_selector_linux",
@@ -249,7 +249,7 @@
     },
     {
       "name": "open_file",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file-3.5.10",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file-3.5.4",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     },
@@ -285,7 +285,7 @@
     },
     {
       "name": "open_file_web",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_web-0.0.4",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_web-0.0.2",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     },
@@ -411,7 +411,7 @@
     },
     {
       "name": "printing",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/printing-5.14.2",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/printing-5.13.1",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -423,13 +423,13 @@
     },
     {
       "name": "share_plus",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/share_plus-12.0.1",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/share_plus-9.0.0",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.3"
     },
     {
       "name": "share_plus_platform_interface",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/share_plus_platform_interface-6.1.0",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/share_plus_platform_interface-4.0.0",
       "packageUri": "lib/",
       "languageVersion": "2.18"
     },
@@ -561,9 +561,9 @@
     },
     {
       "name": "web",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/web-1.1.1",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/web-0.5.1",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.3"
     },
     {
       "name": "win32",

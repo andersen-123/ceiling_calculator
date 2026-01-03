@@ -87,25 +87,35 @@ jobs:
       
     - name: Test APK installation and startup
       run: |
-        # Установка эмулятора Android
-        sudo apt-get update
-        sudo apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
-        
-        # Создание AVD
-        echo "no" | flutter doctor --android-licenses
-        flutter doctor
-        
-        # Запуск эмулятора и тестирование
         echo "APK built successfully, checking for installation issues..."
         ls -la build/app/outputs/flutter-apk/
         
         # Проверка APK файла
         file build/app/outputs/flutter-apk/app-release.apk
         
-        # Попытка получить информацию о пакете
-        if command -v aapt &> /dev/null; then
-          aapt dump badging build/app/outputs/flutter-apk/app-release.apk || echo "aapt not available"
-        fi
+        # Установка Android SDK tools для aapt
+        sudo apt-get update
+        sudo apt-get install -y unzip
+        
+        # Скачивание Android SDK build-tools
+        mkdir -p android-sdk
+        cd android-sdk
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+        unzip -q commandlinetools-linux-11076708_latest.zip
+        mkdir -p cmdline-tools/latest
+        mv cmdline-tools/* cmdline-tools/latest/
+        
+        export ANDROID_SDK_ROOT=$PWD
+        export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin
+        
+        # Установка build-tools
+        yes | sdkmanager "build-tools;34.0.0"
+        
+        # Проверка APK с aapt
+        export PATH=$PATH:$ANDROID_SDK_ROOT/build-tools/34.0.0
+        aapt dump badging ../build/app/outputs/flutter-apk/app-release.apk || echo "aapt analysis failed"
+        
+        echo "APK testing completed. For runtime testing, physical device or emulator needed."
       
     - name: Upload APK
       uses: actions/upload-artifact@v4
