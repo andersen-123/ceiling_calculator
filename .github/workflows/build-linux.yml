@@ -35,7 +35,7 @@ jobs:
         rm -rf ~/.pub-cache
         rm -rf ~/.flutter
         flutter pub cache repair
-        flutter pub get --no-overwrite
+        flutter pub get
         
     - name: Check Flutter version
       run: flutter --version
