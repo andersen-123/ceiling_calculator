@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:share_plus/share_plus.dart';
+// import 'package:share_plus/share_plus.dart';
 // import 'package:open_file/open_file.dart';
 import 'dart:io';
 import '../models/quote.dart';
