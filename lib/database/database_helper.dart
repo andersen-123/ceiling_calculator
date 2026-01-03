@@ -1,11 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter/foundation.dart';
-import '../models/quote.dart';
-import '../models/project.dart';
-import '../models/expense.dart';
-import '../models/salary_payment.dart';
-import '../models/advance.dart';
 import '../models/unit.dart';
 import '../models/app_settings.dart';
 
@@ -19,87 +14,91 @@ class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
   Future<Database> get database async {
-  if (_database != null) return _database!;
-  
-  try {
-    if (kDebugMode) {
-      print('Initializing database...');
-    }
-    
-    // Упрощенная инициализация без сложных операций
-    String path = join(await getDatabasesPath(), _databaseName);
-    
-    _database = await openDatabase(
-      path,
-      version: _databaseVersion,
-      onCreate: (db, version) async {
-        if (kDebugMode) {
-          print('Creating database tables...');
-        }
-        
-        // Создаем все таблицы с IF NOT EXISTS для безопасности
-        await _createCompaniesTable(db);
-        await _createQuotesTable(db);
-        await _createProjectsTable(db);
-        await _createExpensesTable(db);
-        await _createSalaryPaymentsTable(db);
-        await _createQuoteLineItemsTable(db);
-        await _createAdvancesTable(db);
-        
-        if (kDebugMode) {
-          print('All tables created successfully');
-        }
-      },
-      onUpgrade: (db, oldVersion, newVersion) async {
-        if (kDebugMode) {
-          print('Upgrading database from version $oldVersion to $newVersion');
-        }
-        
-        if (oldVersion < 2) {
+    if (_database != null) return _database!;
+
+    try {
+      if (kDebugMode) {
+        print('Initializing database...');
+      }
+
+      // Упрощенная инициализация без сложных операций
+      String path = join(await getDatabasesPath(), _databaseName);
+
+      _database = await openDatabase(
+        path,
+        version: _databaseVersion,
+        onCreate: (db, version) async {
           if (kDebugMode) {
-            print('Adding missing tables for version 2 with data preservation...');
+            print('Creating database tables...');
           }
-          
-          // Создаем резервную копию существующих данных
-          Map<String, List<Map<String, Object?>>> backupData = {};
-          
-          try {
-            List<String> existingTables = ['companies', 'quotes'];
-            
-            for (String table in existingTables) {
-              try {
-                List<Map> result = await db.rawQuery(
-                  "SELECT name FROM sqlite_master WHERE type='table' AND name='$table'"
-                );
-                
-                if (result.isNotEmpty) {
-                  List<Map> tableData = await db.rawQuery('SELECT * FROM $table');
-                  backupData[table] = tableData.map((row) => Map<String, Object?>.from(row)).toList();
+
+          // Создаем все таблицы с IF NOT EXISTS для безопасности
+          await _createCompaniesTable(db);
+          await _createQuotesTable(db);
+          await _createProjectsTable(db);
+          await _createExpensesTable(db);
+          await _createSalaryPaymentsTable(db);
+          await _createQuoteLineItemsTable(db);
+          await _createAdvancesTable(db);
+
+          if (kDebugMode) {
+            print('All tables created successfully');
+          }
+        },
+        onUpgrade: (db, oldVersion, newVersion) async {
+          if (kDebugMode) {
+            print('Upgrading database from version $oldVersion to $newVersion');
+          }
+
+          if (oldVersion < 2) {
+            if (kDebugMode) {
+              print(
+                  'Adding missing tables for version 2 with data preservation...');
+            }
+
+            // Создаем резервную копию существующих данных
+            Map<String, List<Map<String, Object?>>> backupData = {};
+
+            try {
+              List<String> existingTables = ['companies', 'quotes'];
+
+              for (String table in existingTables) {
+                try {
+                  List<Map> result = await db.rawQuery(
+                      "SELECT name FROM sqlite_master WHERE type='table' AND name='$table'");
+
+                  if (result.isNotEmpty) {
+                    List<Map> tableData =
+                        await db.rawQuery('SELECT * FROM $table');
+                    backupData[table] = tableData
+                        .map((row) => Map<String, Object?>.from(row))
+                        .toList();
+                    if (kDebugMode) {
+                      print(
+                          'Backed up ${tableData.length} records from $table');
+                    }
+                  }
+                } catch (e) {
                   if (kDebugMode) {
-                    print('Backed up ${tableData.length} records from $table');
+                    print('Failed to backup table $table: $e');
                   }
                 }
-              } catch (e) {
-                if (kDebugMode) {
-                  print('Failed to backup table $table: $e');
-                }
+              }
+            } catch (backupError) {
+              if (kDebugMode) {
+                print('Failed to create backup during upgrade: $backupError');
               }
             }
-          } catch (backupError) {
-            if (kDebugMode) {
-              print('Failed to create backup during upgrade: $backupError');
-            }
-          }
-          
-          try {
-            // Добавляем таблицы для проектов
-            await db.execute('''
+
+            try {
+              // Добавляем таблицы для проектов
+              await db.execute('''
               CREATE TABLE IF NOT EXISTS projects (
                 project_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 quote_id INTEGER,
-                client_name TEXT NOT NULL,
-                client_phone TEXT,
-                client_address TEXT,
+                name TEXT NOT NULL,
+                description TEXT,
+                address TEXT,
                 budget REAL NOT NULL DEFAULT 0,
                 status TEXT NOT NULL DEFAULT 'active',
                 created_at INTEGER NOT NULL,
@@ -109,8 +108,8 @@ class DatabaseHelper {
                 FOREIGN KEY (quote_id) REFERENCES quotes (quote_id)
               )
             ''');
-            
-            await db.execute('''
+
+              await db.execute('''
               CREATE TABLE IF NOT EXISTS expenses (
                 expense_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 project_id INTEGER NOT NULL,
@@ -120,8 +119,8 @@ class DatabaseHelper {
                 FOREIGN KEY (project_id) REFERENCES projects (project_id)
               )
             ''');
-            
-            await db.execute('''
+
+              await db.execute('''
               CREATE TABLE IF NOT EXISTS salary_payments (
                 payment_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 project_id INTEGER NOT NULL,
@@ -132,8 +131,8 @@ class DatabaseHelper {
                 FOREIGN KEY (project_id) REFERENCES projects (project_id)
               )
             ''');
-            
-            await db.execute('''
+
+              await db.execute('''
               CREATE TABLE IF NOT EXISTS quote_line_items (
                 item_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 quote_id INTEGER NOT NULL,
@@ -147,308 +146,336 @@ class DatabaseHelper {
                 FOREIGN KEY (quote_id) REFERENCES quotes (quote_id)
               )
             ''');
-            
-            // Восстанавливаем данные если они были
-            if (backupData.isNotEmpty) {
-              Batch batch = db.batch();
-              
-              if (backupData['companies'] != null) {
-                for (Map record in backupData['companies']!) {
-                  batch.insert('companies', Map<String, Object?>.from(record));
+
+              // Восстанавливаем данные если они были
+              if (backupData.isNotEmpty) {
+                Batch batch = db.batch();
+
+                if (backupData['companies'] != null) {
+                  for (Map record in backupData['companies']!) {
+                    batch.insert(
+                        'companies', Map<String, Object?>.from(record));
+                  }
+                }
+
+                if (backupData['quotes'] != null) {
+                  for (Map record in backupData['quotes']!) {
+                    batch.insert('quotes', Map<String, Object?>.from(record));
+                  }
+                }
+
+                await batch.commit(noResult: true);
+
+                if (kDebugMode) {
+                  print('Successfully restored data during upgrade');
                 }
               }
-              
-              if (backupData['quotes'] != null) {
-                for (Map record in backupData['quotes']!) {
-                  batch.insert('quotes', Map<String, Object?>.from(record));
-                }
-              }
-              
-              await batch.commit(noResult: true);
-              
+
               if (kDebugMode) {
-                print('Successfully restored data during upgrade');
+                print('Database upgrade to version 2 completed successfully');
               }
-            }
-            
-            if (kDebugMode) {
-              print('Database upgrade to version 2 completed successfully');
-            }
-          } catch (e, stackTrace) {
-            if (kDebugMode) {
-              print('Error during database upgrade: $e');
-              print('Stack trace: $stackTrace');
-            }
-            // Не прерываем миграцию, позволяем приложению продолжить работу
-            print('Database upgrade failed, but continuing with existing tables');
-          }
-        }
-      },
-    );
-    
-    if (kDebugMode) {
-      print('Database initialized successfully');
-    }
-    return _database!;
-  } catch (e, stackTrace) {
-    if (kDebugMode) {
-      print('Error initializing database: $e');
-      print('Stack trace: $stackTrace');
-    }
-    
-    // Если критическая ошибка, делаем полное резервное копирование и восстановление
-    try {
-      if (kDebugMode) {
-        print('Attempting full database backup and recreate...');
-      }
-      String path = join(await getDatabasesPath(), _databaseName);
-      
-      // Создаем полное резервное копирование всех данных
-      Map<String, List<Map<String, Object?>>> backupData = {};
-      
-      try {
-        Database existingDb = await openDatabase(path);
-        
-        // Получаем все таблицы
-        List<String> tables = [
-          'companies', 'quotes', 'projects', 'expenses', 
-          'salary_payments', 'quote_line_items'
-        ];
-        
-        for (String table in tables) {
-          try {
-            // Проверяем существование таблицы
-            List<Map> result = await existingDb.rawQuery(
-              "SELECT name FROM sqlite_master WHERE type='table' AND name='$table'"
-            );
-            
-            if (result.isNotEmpty) {
-              List<Map> tableData = await existingDb.rawQuery('SELECT * FROM $table');
-              backupData[table] = tableData.map((row) => Map<String, Object?>.from(row)).toList();
+            } catch (e, stackTrace) {
               if (kDebugMode) {
-                print('Backed up ${tableData.length} records from $table');
+                print('Error during database upgrade: $e');
+                print('Stack trace: $stackTrace');
               }
-            }
-          } catch (e) {
-            if (kDebugMode) {
-              print('Failed to backup table $table: $e');
+              // Не прерываем миграцию, позволяем приложению продолжить работу
+              print(
+                  'Database upgrade failed, but continuing with existing tables');
             }
           }
-        }
-        
-        await existingDb.close();
-        
-        if (kDebugMode) {
-          int totalRecords = backupData.values.fold(0, (sum, records) => sum + records.length);
-          print('Created complete backup with $totalRecords total records');
-        }
-      } catch (backupError) {
-        if (kDebugMode) {
-          print('Failed to create backup: $backupError');
-        }
-        // Продолжаем без резервной копии
-      }
-      
-      // Удаляем и пересоздаем базу данных
-      await deleteDatabase(path);
-      
-      _database = await openDatabase(
-        path,
-        version: _databaseVersion,
-        onCreate: _onCreate,
-        onUpgrade: _onUpgrade,
+        },
       );
-      
-      // Восстанавливаем все данные из резервной копии
-      if (backupData.isNotEmpty) {
-        try {
-          Batch batch = _database!.batch();
-          int totalRestored = 0;
-          
-          // Валидация и восстановление компаний
-          if (backupData['companies'] != null) {
-            List<Map<String, Object?>> validCompanies = [];
-            for (Map record in backupData['companies']!) {
-              // Проверяем обязательные поля
-              if (record.containsKey('name') && record['name'] != null && record['name'].toString().isNotEmpty) {
-                validCompanies.add(Map<String, Object?>.from(record));
-              } else {
-                if (kDebugMode) {
-                  print('Skipping invalid company record: $record');
-                }
-              }
-            }
-            
-            for (Map record in validCompanies) {
-              batch.insert('companies', Map<String, Object?>.from(record));
-              totalRestored++;
-            }
-            
-            if (kDebugMode) {
-              print('Restored ${validCompanies.length} valid companies out of ${backupData['companies']!.length}');
-            }
-          }
-          
-          // Валидация и восстановление предложений
-          if (backupData['quotes'] != null) {
-            List<Map<String, Object?>> validQuotes = [];
-            for (Map record in backupData['quotes']!) {
-              // Проверяем обязательные поля
-              if (record.containsKey('client_name') && record['client_name'] != null && 
-                  record['client_name'].toString().isNotEmpty) {
-                validQuotes.add(Map<String, Object?>.from(record));
-              } else {
-                if (kDebugMode) {
-                  print('Skipping invalid quote record: $record');
-                }
-              }
-            }
-            
-            for (Map record in validQuotes) {
-              batch.insert('quotes', Map<String, Object?>.from(record));
-              totalRestored++;
-            }
-            
-            if (kDebugMode) {
-              print('Restored ${validQuotes.length} valid quotes out of ${backupData['quotes']!.length}');
-            }
-          }
-          
-          // Валидация и восстановление проектов
-          if (backupData['projects'] != null) {
-            List<Map<String, Object?>> validProjects = [];
-            for (Map record in backupData['projects']!) {
-              // Проверяем обязательные поля
-              if (record.containsKey('client_name') && record['client_name'] != null && 
-                  record['client_name'].toString().isNotEmpty) {
-                validProjects.add(Map<String, Object?>.from(record));
-              } else {
-                if (kDebugMode) {
-                  print('Skipping invalid project record: $record');
-                }
-              }
-            }
-            
-            for (Map record in validProjects) {
-              batch.insert('projects', Map<String, Object?>.from(record));
-              totalRestored++;
-            }
-            
-            if (kDebugMode) {
-              print('Restored ${validProjects.length} valid projects out of ${backupData['projects']!.length}');
-            }
-          }
-          
-          // Валидация и восстановление расходов
-          if (backupData['expenses'] != null) {
-            List<Map<String, Object?>> validExpenses = [];
-            for (Map record in backupData['expenses']!) {
-              // Проверяем обязательные поля
-              if (record.containsKey('description') && record['description'] != null && 
-                  record['description'].toString().isNotEmpty &&
-                  record.containsKey('amount') && record['amount'] != null) {
-                validExpenses.add(Map<String, Object?>.from(record));
-              } else {
-                if (kDebugMode) {
-                  print('Skipping invalid expense record: $record');
-                }
-              }
-            }
-            
-            for (Map record in validExpenses) {
-              batch.insert('expenses', Map<String, Object?>.from(record));
-              totalRestored++;
-            }
-            
-            if (kDebugMode) {
-              print('Restored ${validExpenses.length} valid expenses out of ${backupData['expenses']!.length}');
-            }
-          }
-          
-          // Валидация и восстановление выплат зарплат
-          if (backupData['salary_payments'] != null) {
-            List<Map<String, Object?>> validPayments = [];
-            for (Map record in backupData['salary_payments']!) {
-              // Проверяем обязательные поля
-              if (record.containsKey('worker_name') && record['worker_name'] != null && 
-                  record['worker_name'].toString().isNotEmpty &&
-                  record.containsKey('amount') && record['amount'] != null) {
-                validPayments.add(Map<String, Object?>.from(record));
-              } else {
-                if (kDebugMode) {
-                  print('Skipping invalid salary payment record: $record');
-                }
-              }
-            }
-            
-            for (Map record in validPayments) {
-              batch.insert('salary_payments', Map<String, Object?>.from(record));
-              totalRestored++;
-            }
-            
-            if (kDebugMode) {
-              print('Restored ${validPayments.length} valid salary payments out of ${backupData['salary_payments']!.length}');
-            }
-          }
-          
-          // Валидация и восстановление позиций предложений
-          if (backupData['quote_line_items'] != null) {
-            List<Map<String, Object?>> validItems = [];
-            for (Map record in backupData['quote_line_items']!) {
-              // Проверяем обязательные поля
-              if (record.containsKey('description') && record['description'] != null && 
-                  record['description'].toString().isNotEmpty &&
-                  record.containsKey('unit_price') && record['unit_price'] != null &&
-                  record.containsKey('quantity') && record['quantity'] != null) {
-                validItems.add(Map<String, Object?>.from(record));
-              } else {
-                if (kDebugMode) {
-                  print('Skipping invalid quote line item record: $record');
-                }
-              }
-            }
-            
-            for (Map record in validItems) {
-              batch.insert('quote_line_items', Map<String, Object?>.from(record));
-              totalRestored++;
-            }
-            
-            if (kDebugMode) {
-              print('Restored ${validItems.length} valid quote line items out of ${backupData['quote_line_items']!.length}');
-            }
-          }
-          
-          // Выполняем batch с проверкой результатов
-          List<dynamic> results = await batch.commit();
-          
-          if (kDebugMode) {
-            print('Successfully restored $totalRestored valid records from backup');
-            print('Batch execution completed with ${results.length} operations');
-          }
-          
-          // Проверяем целостность восстановленных данных
-          await _validateRestoredData();
-          
-        } catch (restoreError) {
-          if (kDebugMode) {
-            print('Failed to restore backup: $restoreError');
-          }
-          // Не прерываем работу приложения при ошибке восстановления
-        }
-      }
-      
+
       if (kDebugMode) {
-        print('Database recreated and data restored successfully');
+        print('Database initialized successfully');
       }
       return _database!;
-    } catch (recreateError) {
+    } catch (e, stackTrace) {
       if (kDebugMode) {
-        print('Failed to recreate database: $recreateError');
+        print('Error initializing database: $e');
+        print('Stack trace: $stackTrace');
       }
-      rethrow;
+
+      // Если критическая ошибка, делаем полное резервное копирование и восстановление
+      try {
+        if (kDebugMode) {
+          print('Attempting full database backup and recreate...');
+        }
+        String path = join(await getDatabasesPath(), _databaseName);
+
+        // Создаем полное резервное копирование всех данных
+        Map<String, List<Map<String, Object?>>> backupData = {};
+
+        try {
+          Database existingDb = await openDatabase(path);
+
+          // Получаем все таблицы
+          List<String> tables = [
+            'companies',
+            'quotes',
+            'projects',
+            'expenses',
+            'salary_payments',
+            'quote_line_items'
+          ];
+
+          for (String table in tables) {
+            try {
+              // Проверяем существование таблицы
+              List<Map> result = await existingDb.rawQuery(
+                  "SELECT name FROM sqlite_master WHERE type='table' AND name='$table'");
+
+              if (result.isNotEmpty) {
+                List<Map> tableData =
+                    await existingDb.rawQuery('SELECT * FROM $table');
+                backupData[table] = tableData
+                    .map((row) => Map<String, Object?>.from(row))
+                    .toList();
+                if (kDebugMode) {
+                  print('Backed up ${tableData.length} records from $table');
+                }
+              }
+            } catch (e) {
+              if (kDebugMode) {
+                print('Failed to backup table $table: $e');
+              }
+            }
+          }
+
+          await existingDb.close();
+
+          if (kDebugMode) {
+            int totalRecords = backupData.values
+                .fold(0, (sum, records) => sum + records.length);
+            print('Created complete backup with $totalRecords total records');
+          }
+        } catch (backupError) {
+          if (kDebugMode) {
+            print('Failed to create backup: $backupError');
+          }
+          // Продолжаем без резервной копии
+        }
+
+        // Удаляем и пересоздаем базу данных
+        await deleteDatabase(path);
+
+        _database = await openDatabase(
+          path,
+          version: _databaseVersion,
+          onCreate: _onCreate,
+          onUpgrade: _onUpgrade,
+        );
+
+        // Восстанавливаем все данные из резервной копии
+        if (backupData.isNotEmpty) {
+          try {
+            Batch batch = _database!.batch();
+            int totalRestored = 0;
+
+            // Валидация и восстановление компаний
+            if (backupData['companies'] != null) {
+              List<Map<String, Object?>> validCompanies = [];
+              for (Map record in backupData['companies']!) {
+                // Проверяем обязательные поля
+                if (record.containsKey('name') &&
+                    record['name'] != null &&
+                    record['name'].toString().isNotEmpty) {
+                  validCompanies.add(Map<String, Object?>.from(record));
+                } else {
+                  if (kDebugMode) {
+                    print('Skipping invalid company record: $record');
+                  }
+                }
+              }
+
+              for (Map record in validCompanies) {
+                batch.insert('companies', Map<String, Object?>.from(record));
+                totalRestored++;
+              }
+
+              if (kDebugMode) {
+                print(
+                    'Restored ${validCompanies.length} valid companies out of ${backupData['companies']!.length}');
+              }
+            }
+
+            // Валидация и восстановление предложений
+            if (backupData['quotes'] != null) {
+              List<Map<String, Object?>> validQuotes = [];
+              for (Map record in backupData['quotes']!) {
+                // Проверяем обязательные поля
+                if (record.containsKey('customer_name') &&
+                    record['customer_name'] != null &&
+                    record['customer_name'].toString().isNotEmpty) {
+                  validQuotes.add(Map<String, Object?>.from(record));
+                } else {
+                  if (kDebugMode) {
+                    print('Skipping invalid quote record: $record');
+                  }
+                }
+              }
+
+              for (Map record in validQuotes) {
+                batch.insert('quotes', Map<String, Object?>.from(record));
+                totalRestored++;
+              }
+
+              if (kDebugMode) {
+                print(
+                    'Restored ${validQuotes.length} valid quotes out of ${backupData['quotes']!.length}');
+              }
+            }
+
+            // Валидация и восстановление проектов
+            if (backupData['projects'] != null) {
+              List<Map<String, Object?>> validProjects = [];
+              for (Map record in backupData['projects']!) {
+                // Проверяем обязательные поля
+                if (record.containsKey('name') &&
+                    record['name'] != null &&
+                    record['name'].toString().isNotEmpty) {
+                  validProjects.add(Map<String, Object?>.from(record));
+                } else {
+                  if (kDebugMode) {
+                    print('Skipping invalid project record: $record');
+                  }
+                }
+              }
+              for (Map record in validProjects) {
+                batch.insert('projects', Map<String, Object?>.from(record));
+                totalRestored++;
+              }
+
+              if (kDebugMode) {
+                print(
+                    'Restored ${validProjects.length} valid projects out of ${backupData['projects']!.length}');
+              }
+            }
+
+            // Валидация и восстановление расходов
+            if (backupData['expenses'] != null) {
+              List<Map<String, Object?>> validExpenses = [];
+              for (Map record in backupData['expenses']!) {
+                // Проверяем обязательные поля
+                if (record.containsKey('description') &&
+                    record['description'] != null &&
+                    record['description'].toString().isNotEmpty &&
+                    record.containsKey('amount') &&
+                    record['amount'] != null) {
+                  validExpenses.add(Map<String, Object?>.from(record));
+                } else {
+                  if (kDebugMode) {
+                    print('Skipping invalid expense record: $record');
+                  }
+                }
+              }
+
+              for (Map record in validExpenses) {
+                batch.insert('expenses', Map<String, Object?>.from(record));
+                totalRestored++;
+              }
+
+              if (kDebugMode) {
+                print(
+                    'Restored ${validExpenses.length} valid expenses out of ${backupData['expenses']!.length}');
+              }
+            }
+
+            // Валидация и восстановление выплат зарплат
+            if (backupData['salary_payments'] != null) {
+              List<Map<String, Object?>> validPayments = [];
+              for (Map record in backupData['salary_payments']!) {
+                // Проверяем обязательные поля
+                if (record.containsKey('worker_name') &&
+                    record['worker_name'] != null &&
+                    record['worker_name'].toString().isNotEmpty &&
+                    record.containsKey('amount') &&
+                    record['amount'] != null) {
+                  validPayments.add(Map<String, Object?>.from(record));
+                } else {
+                  if (kDebugMode) {
+                    print('Skipping invalid salary payment record: $record');
+                  }
+                }
+              }
+
+              for (Map record in validPayments) {
+                batch.insert(
+                    'salary_payments', Map<String, Object?>.from(record));
+                totalRestored++;
+              }
+
+              if (kDebugMode) {
+                print(
+                    'Restored ${validPayments.length} valid salary payments out of ${backupData['salary_payments']!.length}');
+              }
+            }
+
+            // Валидация и восстановление позиций предложений
+            if (backupData['quote_line_items'] != null) {
+              List<Map<String, Object?>> validItems = [];
+              for (Map record in backupData['quote_line_items']!) {
+                // Проверяем обязательные поля
+                if (record.containsKey('description') &&
+                    record['description'] != null &&
+                    record['description'].toString().isNotEmpty &&
+                    record.containsKey('unit_price') &&
+                    record['unit_price'] != null &&
+                    record.containsKey('quantity') &&
+                    record['quantity'] != null) {
+                  validItems.add(Map<String, Object?>.from(record));
+                } else {
+                  if (kDebugMode) {
+                    print('Skipping invalid quote line item record: $record');
+                  }
+                }
+              }
+
+              for (Map record in validItems) {
+                batch.insert(
+                    'quote_line_items', Map<String, Object?>.from(record));
+                totalRestored++;
+              }
+
+              if (kDebugMode) {
+                print(
+                    'Restored ${validItems.length} valid quote line items out of ${backupData['quote_line_items']!.length}');
+              }
+            }
+
+            // Выполняем batch с проверкой результатов
+            List<dynamic> results = await batch.commit();
+
+            if (kDebugMode) {
+              print(
+                  'Successfully restored $totalRestored valid records from backup');
+              print(
+                  'Batch execution completed with ${results.length} operations');
+            }
+
+            // Проверяем целостность восстановленных данных
+            await _validateRestoredData();
+          } catch (restoreError) {
+            if (kDebugMode) {
+              print('Failed to restore backup: $restoreError');
+            }
+            // Не прерываем работу приложения при ошибке восстановления
+          }
+        }
+
+        if (kDebugMode) {
+          print('Database recreated and data restored successfully');
+        }
+        return _database!;
+      } catch (recreateError) {
+        if (kDebugMode) {
+          print('Failed to recreate database: $recreateError');
+        }
+        rethrow;
+      }
     }
   }
-}
 
   Future<Database> _initDatabase() async {
     try {
@@ -460,13 +487,13 @@ class DatabaseHelper {
         print('Database path: $path');
         print('Opening database...');
       }
-      
+
       Database db = await openDatabase(
         path,
         version: _databaseVersion,
         onCreate: _onCreate,
       );
-      
+
       if (kDebugMode) {
         print('Database opened successfully');
       }
@@ -481,33 +508,33 @@ class DatabaseHelper {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-  try {
-    if (kDebugMode) {
-      print('Creating database tables...');
+    try {
+      if (kDebugMode) {
+        print('Creating database tables...');
+      }
+
+      await _createCompaniesTable(db);
+      await _createSettingsTable(db);
+      await _createQuotesTable(db);
+      await _createLineItemsTable(db);
+      await _createQuoteAttachmentsTable(db);
+      await _createUnitsTable(db);
+      await _createProjectsTable(db);
+      await _createExpensesTable(db);
+      await _createSalaryPaymentsTable(db);
+      await _createAdvancesTable(db);
+
+      if (kDebugMode) {
+        print('All database tables created successfully');
+      }
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        print('Error creating database tables: $e');
+        print('Stack trace: $stackTrace');
+      }
+      rethrow;
     }
-    
-    await _createCompaniesTable(db);
-    await _createSettingsTable(db);
-    await _createQuotesTable(db);
-    await _createLineItemsTable(db);
-    await _createQuoteAttachmentsTable(db);
-    await _createUnitsTable(db);
-    await _createProjectsTable(db);
-    await _createExpensesTable(db);
-    await _createSalaryPaymentsTable(db);
-    await _createAdvancesTable(db);
-    
-    if (kDebugMode) {
-      print('All database tables created successfully');
-    }
-  } catch (e, stackTrace) {
-    if (kDebugMode) {
-      print('Error creating database tables: $e');
-      print('Stack trace: $stackTrace');
-    }
-    rethrow;
   }
-}
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     // Миграции базы данных для будущих версий
@@ -556,9 +583,12 @@ class DatabaseHelper {
       )
     ''');
 
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_quotes_status ON quotes (status)');
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_quotes_customer_name ON quotes (customer_name)');
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_quotes_created_at ON quotes (created_at)');
+    await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_quotes_status ON quotes (status)');
+    await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_quotes_customer_name ON quotes (customer_name)');
+    await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_quotes_created_at ON quotes (created_at)');
   }
 
   Future<void> _createLineItemsTable(Database db) async {
@@ -580,8 +610,10 @@ class DatabaseHelper {
       )
     ''');
 
-    await db.execute('CREATE INDEX idx_line_items_quote_id ON line_items (quote_id)');
-    await db.execute('CREATE INDEX idx_line_items_section ON line_items (section)');
+    await db.execute(
+        'CREATE INDEX idx_line_items_quote_id ON line_items (quote_id)');
+    await db
+        .execute('CREATE INDEX idx_line_items_section ON line_items (section)');
   }
 
   Future<void> _createQuoteAttachmentsTable(Database db) async {
@@ -598,7 +630,8 @@ class DatabaseHelper {
       )
     ''');
 
-    await db.execute('CREATE INDEX idx_quote_attachments_quote_id ON quote_attachments (quote_id)');
+    await db.execute(
+        'CREATE INDEX idx_quote_attachments_quote_id ON quote_attachments (quote_id)');
   }
 
   Future<void> _createUnitsTable(Database db) async {
@@ -658,18 +691,19 @@ class DatabaseHelper {
 
   Future<int> insert(String table, Map<String, dynamic> values) async {
     final db = await database;
-    
+
     // Временно отключаем валидацию для тестирования
     // if (!await _validateDatabaseIntegrity()) {
     //   if (kDebugMode) {
     //     print('Database integrity check failed, but attempting save anyway');
     //   }
     // }
-    
+
     return await db.insert(table, values);
   }
 
-  Future<List<Map<String, dynamic>>> query(String table, {
+  Future<List<Map<String, dynamic>>> query(
+    String table, {
     bool? distinct,
     List<String>? columns,
     String? where,
@@ -695,35 +729,38 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> update(String table, Map<String, dynamic> values, {
+  Future<int> update(
+    String table,
+    Map<String, dynamic> values, {
     String? where,
     List<dynamic>? whereArgs,
   }) async {
     final db = await database;
-    
+
     // Временно отключаем валидацию для тестирования
     // if (!await _validateDatabaseIntegrity()) {
     //   if (kDebugMode) {
     //     print('Database integrity check failed, but attempting update anyway');
     //   }
     // }
-    
+
     return await db.update(table, values, where: where, whereArgs: whereArgs);
   }
 
-  Future<int> delete(String table, {
+  Future<int> delete(
+    String table, {
     String? where,
     List<dynamic>? whereArgs,
   }) async {
     final db = await database;
-    
+
     // Временно отключаем валидацию для тестирования
     // if (!await _validateDatabaseIntegrity()) {
     //   if (kDebugMode) {
     //     print('Database integrity check failed, but attempting delete anyway');
     //   }
     // }
-    
+
     return await db.delete(table, where: where, whereArgs: whereArgs);
   }
 
@@ -797,7 +834,7 @@ class DatabaseHelper {
       )
     ''');
   }
-  
+
   Future<void> _createQuoteLineItemsTable(Database db) async {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS quote_line_items (
@@ -814,36 +851,41 @@ class DatabaseHelper {
       )
     ''');
   }
-  
+
   // Метод для проверки целостности базы данных перед сохранением
   Future<bool> _validateDatabaseIntegrity() async {
     try {
       if (kDebugMode) {
         print('Validating database integrity before save...');
       }
-      
+
       // Проверяем существование всех необходимых таблиц
-      List<String> requiredTables = ['companies', 'quotes', 'projects', 'expenses', 'salary_payments', 'quote_line_items'];
-      
+      List<String> requiredTables = [
+        'companies',
+        'quotes',
+        'projects',
+        'expenses',
+        'salary_payments',
+        'quote_line_items'
+      ];
+
       for (String table in requiredTables) {
         try {
           List<Map> result = await _database!.rawQuery(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='$table'"
-          );
-          
+              "SELECT name FROM sqlite_master WHERE type='table' AND name='$table'");
+
           if (result.isEmpty) {
             if (kDebugMode) {
               print('Critical: Missing table $table - attempting to create...');
             }
-            
+
             // Пробуем создать недостающую таблицу
             await _createMissingTable(table);
-            
+
             // Проверяем снова
             result = await _database!.rawQuery(
-              "SELECT name FROM sqlite_master WHERE type='table' AND name='$table'"
-            );
-            
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='$table'");
+
             if (result.isEmpty) {
               if (kDebugMode) {
                 print('Error: Failed to create table $table');
@@ -858,24 +900,25 @@ class DatabaseHelper {
           return false;
         }
       }
-      
+
       // Проверяем структуру важных таблиц
       if (!await _validateTableStructure('companies', ['company_id', 'name'])) {
         return false;
       }
-      
-      if (!await _validateTableStructure('quotes', ['quote_id', 'customer_name'])) {
+
+      if (!await _validateTableStructure(
+          'quotes', ['quote_id', 'customer_name'])) {
         return false;
       }
-      
+
       if (!await _validateTableStructure('projects', ['project_id', 'name'])) {
         return false;
       }
-      
+
       if (kDebugMode) {
         print('Database integrity validation passed');
       }
-      
+
       return true;
     } catch (e) {
       if (kDebugMode) {
@@ -884,7 +927,7 @@ class DatabaseHelper {
       return false;
     }
   }
-  
+
   // Метод для создания недостающей таблицы
   Future<void> _createMissingTable(String tableName) async {
     try {
@@ -908,7 +951,7 @@ class DatabaseHelper {
           await _createQuoteLineItemsTable(_database!);
           break;
       }
-      
+
       if (kDebugMode) {
         print('Successfully created missing table: $tableName');
       }
@@ -919,14 +962,17 @@ class DatabaseHelper {
       rethrow;
     }
   }
-  
+
   // Метод для проверки структуры таблицы
-  Future<bool> _validateTableStructure(String tableName, List<String> requiredColumns) async {
+  Future<bool> _validateTableStructure(
+      String tableName, List<String> requiredColumns) async {
     try {
-      List<Map> result = await _database!.rawQuery("PRAGMA table_info($tableName)");
-      
-      Set<String> existingColumns = result.map((row) => row['name'] as String).toSet();
-      
+      List<Map> result =
+          await _database!.rawQuery("PRAGMA table_info($tableName)");
+
+      Set<String> existingColumns =
+          result.map((row) => row['name'] as String).toSet();
+
       for (String column in requiredColumns) {
         if (!existingColumns.contains(column)) {
           if (kDebugMode) {
@@ -935,7 +981,7 @@ class DatabaseHelper {
           return false;
         }
       }
-      
+
       return true;
     } catch (e) {
       if (kDebugMode) {
@@ -944,29 +990,38 @@ class DatabaseHelper {
       return false;
     }
   }
-  
+
   // Метод для проверки целостности восстановленных данных
   Future<void> _validateRestoredData() async {
     try {
       if (kDebugMode) {
         print('Validating restored data integrity...');
       }
-      
+
       // Проверяем количество записей в каждой таблице
-      List<String> tables = ['companies', 'quotes', 'projects', 'expenses', 'salary_payments', 'quote_line_items'];
-      
+      List<String> tables = [
+        'companies',
+        'quotes',
+        'projects',
+        'expenses',
+        'salary_payments',
+        'quote_line_items'
+      ];
+
       for (String table in tables) {
         try {
-          List<Map> result = await _database!.rawQuery('SELECT COUNT(*) as count FROM $table');
+          List<Map> result =
+              await _database!.rawQuery('SELECT COUNT(*) as count FROM $table');
           int count = result.first['count'] as int;
-          
+
           if (kDebugMode) {
             print('Table $table: $count records');
           }
-          
+
           // Дополнительная проверка целостности для важных таблиц
           if (table == 'companies') {
-            List<Map> companies = await _database!.rawQuery('SELECT * FROM companies LIMIT 5');
+            List<Map> companies =
+                await _database!.rawQuery('SELECT * FROM companies LIMIT 5');
             for (Map company in companies) {
               if (!company.containsKey('name') || company['name'] == null) {
                 if (kDebugMode) {
@@ -975,27 +1030,27 @@ class DatabaseHelper {
               }
             }
           } else if (table == 'quotes') {
-            List<Map> quotes = await _database!.rawQuery('SELECT * FROM quotes LIMIT 5');
+            List<Map> quotes =
+                await _database!.rawQuery('SELECT * FROM quotes LIMIT 5');
             for (Map quote in quotes) {
-              if (!quote.containsKey('client_name') || quote['client_name'] == null) {
+              if (!quote.containsKey('customer_name') ||
+                  quote['customer_name'] == null) {
                 if (kDebugMode) {
-                  print('Warning: Found quote without client_name: $quote');
+                  print('Warning: Found quote without customer_name: $quote');
                 }
               }
             }
           }
-          
         } catch (e) {
           if (kDebugMode) {
             print('Failed to validate table $table: $e');
           }
         }
       }
-      
+
       if (kDebugMode) {
         print('Data validation completed');
       }
-      
     } catch (e) {
       if (kDebugMode) {
         print('Data validation failed: $e');
