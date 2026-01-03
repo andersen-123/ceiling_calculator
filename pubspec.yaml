@@ -32,7 +32,7 @@ dependencies:
   excel: ^4.0.4
   
   # Файлы
-  file_picker: ^8.0.7
+  file_picker: ^8.0.5
   permission_handler: ^11.3.1
   url_launcher: ^6.3.1
   open_file: ^3.5.3
