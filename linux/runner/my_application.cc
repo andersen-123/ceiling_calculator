@@ -61,6 +61,9 @@ static void my_application_activate(GApplication* application) {
   // fl_view_set_background_color(view, &background_color); // Not available in this Flutter version
   gtk_widget_show(GTK_WIDGET(view));
   gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(view));
+  
+  // Show the window immediately
+  gtk_widget_show(GTK_WIDGET(window));
 
   // Show the window when Flutter renders.
   // Requires the view to be realized so we can start rendering.
