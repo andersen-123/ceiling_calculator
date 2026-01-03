@@ -34,17 +34,17 @@ jobs:
         
     - name: Force reinstall Flutter if needed
       run: |
-        if [[ "$(flutter --version | grep '3.38.5')" == "" ]]; then
-          echo "Flutter 3.38.5 not found, reinstalling..."
+        if [[ "$(flutter --version | grep '3.19.6')" == "" ]]; then
+          echo "Flutter 3.19.6 not found, reinstalling..."
           rm -rf /opt/hostedtoolcache/flutter/*
-          wget -O flutter.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.38.5-stable.tar.xz
+          wget -O flutter.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.6-stable.tar.xz
           tar xf flutter.tar.xz
           echo "export PATH=$PWD/flutter/bin:\$PATH" >> $GITHUB_ENV
           echo "Flutter version after reinstall:"
           $PWD/flutter/bin/flutter --version
           $PWD/flutter/bin/dart --version
         else
-          echo "Flutter 3.38.5 already installed"
+          echo "Flutter 3.19.6 already installed"
         fi
         
     - name: Clean Flutter cache
