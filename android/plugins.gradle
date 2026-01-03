@@ -1,0 +1,13 @@
+// Flutter plugins
+plugins {
+    id "com.android.application"
+    id "com.android.application" version "8.5" apply false
+    id "dev.flutter.flutter-gradle-plugin" version "1.0.0" apply false
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
