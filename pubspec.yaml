@@ -39,7 +39,7 @@ dependencies:
   printing: ^5.12.0
 
   # Файловая система и шаринг
-  share_plus: ^9.0.0
+  share_plus: ^7.2.2
   image_picker: ^1.1.2
   uuid: ^4.5.1
   currency_picker: ^2.0.21
