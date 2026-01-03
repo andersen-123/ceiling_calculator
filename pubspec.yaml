@@ -33,7 +33,7 @@ dependencies:
   
   # Файлы
   # file_picker: ^6.1.1  # временно отключен для сборки
-  permission_handler: ^11.3.0
+  permission_handler: ^11.0.1
   url_launcher: ^6.2.4
   # open_file: ^3.1.0  # временно отключен из-за проблем с namespace
   printing: ^5.10.0
