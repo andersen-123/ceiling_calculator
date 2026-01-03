@@ -51,7 +51,7 @@ dev_dependencies:
 
 dependency_overrides:
   intl: 0.18.1
-  sqflite: ^2.2.8
+  sqflite: ^2.2.6
 
 flutter:
   uses-material-design: true
