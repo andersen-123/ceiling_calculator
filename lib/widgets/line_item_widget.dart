@@ -30,13 +30,16 @@ class _LineItemWidgetState extends State<LineItemWidget> {
   @override
   void initState() {
     super.initState();
-    _descriptionController = TextEditingController(text: widget.item.description);
-    _quantityController = TextEditingController(text: widget.item.quantity.toString());
-    _priceController = TextEditingController(text: widget.item.price.toString());
+    _descriptionController =
+        TextEditingController(text: widget.item.description);
+    _quantityController =
+        TextEditingController(text: widget.item.quantity.toString());
+    _priceController =
+        TextEditingController(text: widget.item.price.toString());
     _noteController = TextEditingController(text: widget.item.note ?? '');
     _selectedUnit = widget.item.unit;
     _descriptionFocusNode = FocusNode();
-    
+
     // Если это новая пустая позиция, фокусируемся на описании
     if (widget.item.description.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -58,16 +61,18 @@ class _LineItemWidgetState extends State<LineItemWidget> {
   void _updateItem() {
     final quantity = double.tryParse(_quantityController.text) ?? 0.0;
     final price = double.tryParse(_priceController.text) ?? 0.0;
-    
+
     final updatedItem = widget.item.copyWith(
       description: _descriptionController.text,
       unit: _selectedUnit,
       quantity: quantity,
       price: price,
       amount: quantity * price,
-      note: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
+      note: _noteController.text.trim().isEmpty
+          ? null
+          : _noteController.text.trim(),
     );
-    
+
     widget.onChanged(updatedItem);
   }
 
@@ -85,8 +90,8 @@ class _LineItemWidgetState extends State<LineItemWidget> {
                   width: 24,
                   height: 24,
                   decoration: BoxDecoration(
-                    color: widget.item.section == LineItemSection.work 
-                        ? Colors.blue[100] 
+                    color: widget.item.section == LineItemSection.work
+                        ? Colors.blue[100]
                         : Colors.green[100],
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -96,8 +101,8 @@ class _LineItemWidgetState extends State<LineItemWidget> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: widget.item.section == LineItemSection.work 
-                            ? Colors.blue[800] 
+                        color: widget.item.section == LineItemSection.work
+                            ? Colors.blue[800]
                             : Colors.green[800],
                       ),
                     ),
@@ -110,8 +115,8 @@ class _LineItemWidgetState extends State<LineItemWidget> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: widget.item.section == LineItemSection.work 
-                          ? Colors.blue[700] 
+                      color: widget.item.section == LineItemSection.work
+                          ? Colors.blue[700]
                           : Colors.green[700],
                     ),
                   ),
@@ -131,7 +136,8 @@ class _LineItemWidgetState extends State<LineItemWidget> {
                 labelText: 'Описание *',
                 border: OutlineInputBorder(),
                 isDense: true,
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
               onChanged: (_) => _updateItem(),
             ),
@@ -141,12 +147,13 @@ class _LineItemWidgetState extends State<LineItemWidget> {
                 Expanded(
                   flex: 2,
                   child: DropdownButtonFormField<String>(
-                    value: _selectedUnit,
+                    initialValue: _selectedUnit,
                     decoration: const InputDecoration(
                       labelText: 'Ед.изм.',
                       border: OutlineInputBorder(),
                       isDense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
                     items: Unit.defaultUnits.map((unit) {
                       return DropdownMenuItem(
@@ -173,10 +180,14 @@ class _LineItemWidgetState extends State<LineItemWidget> {
                       labelText: 'Кол-во',
                       border: OutlineInputBorder(),
                       isDense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))
+                    ],
                     onChanged: (_) => _updateItem(),
                   ),
                 ),
@@ -189,10 +200,14 @@ class _LineItemWidgetState extends State<LineItemWidget> {
                       labelText: 'Цена',
                       border: OutlineInputBorder(),
                       isDense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))
+                    ],
                     onChanged: (_) => _updateItem(),
                   ),
                 ),
@@ -208,14 +223,16 @@ class _LineItemWidgetState extends State<LineItemWidget> {
                       labelText: 'Примечание',
                       border: OutlineInputBorder(),
                       isDense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
                     onChanged: (_) => _updateItem(),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(4),

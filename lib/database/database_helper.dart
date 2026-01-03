@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter/foundation.dart';
@@ -23,6 +24,13 @@ class DatabaseHelper {
 
       // Упрощенная инициализация без сложных операций
       String path = join(await getDatabasesPath(), _databaseName);
+      
+      // Принудительно удаляем старую базу данных
+      final file = File(path);
+      if (await file.exists()) {
+        print('Удаляем старую базу данных: $path');
+        await file.delete();
+      }
 
       _database = await openDatabase(
         path,

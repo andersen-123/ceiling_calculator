@@ -28,20 +28,23 @@ class QuoteEditScreen extends StatefulWidget {
 class _QuoteEditScreenState extends State<QuoteEditScreen> {
   final _formKey = GlobalKey<FormState>();
   final ScrollController _scrollController = ScrollController();
-  
+
   // Controllers
   final TextEditingController _customerNameController = TextEditingController();
-  final TextEditingController _customerPhoneController = TextEditingController();
-  final TextEditingController _customerEmailController = TextEditingController();
+  final TextEditingController _customerPhoneController =
+      TextEditingController();
+  final TextEditingController _customerEmailController =
+      TextEditingController();
   final TextEditingController _objectNameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _areaSController = TextEditingController();
   final TextEditingController _perimeterPController = TextEditingController();
   final TextEditingController _heightHController = TextEditingController();
   final TextEditingController _paymentTermsController = TextEditingController();
-  final TextEditingController _installationTermsController = TextEditingController();
+  final TextEditingController _installationTermsController =
+      TextEditingController();
   final TextEditingController _notesController = TextEditingController();
-  
+
   // Focus nodes для контроля клавиатуры
   final FocusNode _customerNameFocusNode = FocusNode();
   final FocusNode _customerPhoneFocusNode = FocusNode();
@@ -54,7 +57,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   final FocusNode _paymentTermsFocusNode = FocusNode();
   final FocusNode _installationTermsFocusNode = FocusNode();
   final FocusNode _notesFocusNode = FocusNode();
-  
+
   // State variables
   String? _selectedCeilingSystem;
   QuoteStatus _selectedStatus = QuoteStatus.draft;
@@ -66,7 +69,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   bool _isExportingExcel = false;
   bool _isExportingPdf = false;
   bool _isImporting = false;
-  
+
   // Key для принудительного обновления
   final GlobalKey _lineItemsKey = GlobalKey();
   final ExcelService _excelService = ExcelService();
@@ -99,7 +102,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     _paymentTermsController.dispose();
     _installationTermsController.dispose();
     _notesController.dispose();
-    
+
     // Очищаем FocusNode
     _customerNameFocusNode.dispose();
     _customerPhoneFocusNode.dispose();
@@ -112,7 +115,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     _paymentTermsFocusNode.dispose();
     _installationTermsFocusNode.dispose();
     _notesFocusNode.dispose();
-    
+
     _scrollController.dispose();
     super.dispose();
   }
@@ -164,7 +167,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
           whereArgs: [quote.id],
           orderBy: 'created_at DESC',
         );
-        _attachments = attachmentsData.map((map) => QuoteAttachment.fromMap(map)).toList();
+        _attachments =
+            attachmentsData.map((map) => QuoteAttachment.fromMap(map)).toList();
       } else {
         // Новое предложение - добавляем пустые позиции
         _lineItems = [
@@ -192,10 +196,13 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   }
 
   void _addLineItem(LineItemSection section) {
-    final newPosition = _lineItems.isEmpty 
-        ? 1 
-        : _lineItems.map((item) => item.position).reduce((a, b) => a > b ? a : b) + 1;
-    
+    final newPosition = _lineItems.isEmpty
+        ? 1
+        : _lineItems
+                .map((item) => item.position)
+                .reduce((a, b) => a > b ? a : b) +
+            1;
+
     setState(() {
       _lineItems.add(LineItem(
         quoteId: widget.quote?.id ?? 0,
@@ -234,9 +241,11 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     if (result != null) {
       setState(() {
         // Устанавливаем правильную позицию
-        final itemsInSection = _lineItems.where((item) => item.section == result.section).toList();
-        final newPosition = itemsInSection.isEmpty ? 1 : itemsInSection.last.position + 1;
-        
+        final itemsInSection =
+            _lineItems.where((item) => item.section == result.section).toList();
+        final newPosition =
+            itemsInSection.isEmpty ? 1 : itemsInSection.last.position + 1;
+
         final itemWithPosition = result.copyWith(position: newPosition);
         _lineItems.add(itemWithPosition);
       });
@@ -265,14 +274,14 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       heightH: double.tryParse(_heightHController.text) ?? 0,
       ceilingSystem: _selectedCeilingSystem,
       status: _selectedStatus,
-      paymentTerms: _paymentTermsController.text.trim().isEmpty 
-          ? null 
+      paymentTerms: _paymentTermsController.text.trim().isEmpty
+          ? null
           : _paymentTermsController.text.trim(),
-      installationTerms: _installationTermsController.text.trim().isEmpty 
-          ? null 
+      installationTerms: _installationTermsController.text.trim().isEmpty
+          ? null
           : _installationTermsController.text.trim(),
-      notes: _notesController.text.trim().isEmpty 
-          ? null 
+      notes: _notesController.text.trim().isEmpty
+          ? null
           : _notesController.text.trim(),
       currencyCode: 'RUB',
       subtotalWork: subtotalWork,
@@ -314,16 +323,17 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
 
     try {
       final quote = _getCurrentQuote();
-      final filePath = await _excelService.generateQuoteExcel(quote, _lineItems, await _getCompany());
-      
+      final filePath = await _excelService.generateQuoteExcel(
+          quote, _lineItems, await _getCompany());
+
       // Открываем файл напрямую в Excel
       // final result = await OpenFile.open(filePath.path);
-      
+
       // Временно показываем сообщение вместо открытия
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Excel файл сохранен: ${filePath.path}')),
       );
-      
+
       // Закомментированный код для открытия файла
     } catch (e) {
       if (mounted) {
@@ -349,16 +359,17 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     try {
       final quote = _getCurrentQuote();
       final company = await _getCompany();
-      final filePath = await _pdfService.generateQuotePdf(quote, _lineItems, await _getCompany());
-      
+      final filePath = await _pdfService.generateQuotePdf(
+          quote, _lineItems, await _getCompany());
+
       // Открываем файл напрямую в PDF просмотрщике
       // final result = await OpenFile.open(filePath.path);
-      
+
       // Временно показываем сообщение вместо открытия
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('PDF файл сохранен: ${filePath.path}')),
       );
-      
+
       // Закомментированный код для открытия PDF
     } catch (e) {
       if (mounted) {
@@ -373,10 +384,10 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
 
   Future<void> _importFromExcel() async {
     setState(() => _isImporting = true);
-    
+
     try {
       final importData = await _excelService.importFromExcel();
-      
+
       if (importData == null) {
         return; // Пользователь отменил выбор файла
       }
@@ -385,7 +396,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         // Добавляем импортированные позиции к существующим
         _lineItems.addAll(importData.workItems);
         _lineItems.addAll(importData.equipmentItems);
-        
+
         // Обновляем позиции
         _updatePositions();
       });
@@ -406,7 +417,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Импортировано: ${importData.workItems.length} работ, ${importData.equipmentItems.length} оборудования'),
+            content: Text(
+                'Импортировано: ${importData.workItems.length} работ, ${importData.equipmentItems.length} оборудования'),
             backgroundColor: Colors.green,
           ),
         );
@@ -418,7 +430,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         );
       }
     }
-    
+
     setState(() => _isImporting = false);
   }
 
@@ -437,11 +449,11 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-    
+
     setState(() {
       _lineItems.add(newItem);
     });
-    
+
     // Более надежная прокрутка
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) {
@@ -455,7 +467,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     final lastIndex = _lineItems.length - 1;
     if (lastIndex >= 0 && _scrollController.hasClients) {
       // Прокрутим к последнему элементу с небольшим отступом
-      final targetPosition = (lastIndex * 200.0); // Примерная высота одного элемента
+      final targetPosition =
+          (lastIndex * 200.0); // Примерная высота одного элемента
       _scrollController.animateTo(
         targetPosition,
         duration: const Duration(milliseconds: 400),
@@ -476,14 +489,18 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
 
   void _updatePositions() {
     // Обновляем позиции для работ
-    final workItems = _lineItems.where((item) => item.section == LineItemSection.work).toList();
+    final workItems = _lineItems
+        .where((item) => item.section == LineItemSection.work)
+        .toList();
     for (int i = 0; i < workItems.length; i++) {
       final index = _lineItems.indexOf(workItems[i]);
       _lineItems[index] = workItems[i].copyWith(position: i + 1);
     }
-    
+
     // Обновляем позиции для оборудования
-    final equipmentItems = _lineItems.where((item) => item.section == LineItemSection.equipment).toList();
+    final equipmentItems = _lineItems
+        .where((item) => item.section == LineItemSection.equipment)
+        .toList();
     for (int i = 0; i < equipmentItems.length; i++) {
       final index = _lineItems.indexOf(equipmentItems[i]);
       _lineItems[index] = equipmentItems[i].copyWith(position: i + 1);
@@ -503,17 +520,33 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       id: widget.quote?.id ?? 0,
       companyId: _company?.id ?? 1,
       customerName: _customerNameController.text,
-      customerPhone: _customerPhoneController.text.isEmpty ? null : _customerPhoneController.text,
-      customerEmail: _customerEmailController.text.isEmpty ? null : _customerEmailController.text,
-      objectName: _objectNameController.text.isEmpty ? null : _objectNameController.text,
+      customerPhone: _customerPhoneController.text.isEmpty
+          ? null
+          : _customerPhoneController.text,
+      customerEmail: _customerEmailController.text.isEmpty
+          ? null
+          : _customerEmailController.text,
+      objectName: _objectNameController.text.isEmpty
+          ? null
+          : _objectNameController.text,
       address: _addressController.text.isEmpty ? null : _addressController.text,
-      areaS: _areaSController.text.isEmpty ? null : double.tryParse(_areaSController.text),
-      perimeterP: _perimeterPController.text.isEmpty ? null : double.tryParse(_perimeterPController.text),
-      heightH: _heightHController.text.isEmpty ? null : double.tryParse(_heightHController.text),
+      areaS: _areaSController.text.isEmpty
+          ? null
+          : double.tryParse(_areaSController.text),
+      perimeterP: _perimeterPController.text.isEmpty
+          ? null
+          : double.tryParse(_perimeterPController.text),
+      heightH: _heightHController.text.isEmpty
+          ? null
+          : double.tryParse(_heightHController.text),
       ceilingSystem: _selectedCeilingSystem,
       status: _selectedStatus,
-      paymentTerms: _paymentTermsController.text.isEmpty ? null : _paymentTermsController.text,
-      installationTerms: _installationTermsController.text.isEmpty ? null : _installationTermsController.text,
+      paymentTerms: _paymentTermsController.text.isEmpty
+          ? null
+          : _paymentTermsController.text,
+      installationTerms: _installationTermsController.text.isEmpty
+          ? null
+          : _installationTermsController.text,
       notes: _notesController.text.isEmpty ? null : _notesController.text,
       subtotalWork: subtotalWork,
       subtotalEquipment: subtotalEquipment,
@@ -525,105 +558,142 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   }
 
   Future<void> _saveQuote() async {
-  if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) return;
 
-  try {
-    // Расчитываем суммы из позиций
-    final subtotalWork = _lineItems
-        .where((item) => item.section == LineItemSection.work)
-        .fold(0.0, (sum, item) => sum + item.amount);
-    final subtotalEquipment = _lineItems
-        .where((item) => item.section == LineItemSection.equipment)
-        .fold(0.0, (sum, item) => sum + item.amount);
-    final totalAmount = subtotalWork + subtotalEquipment;
+    try {
+      // Расчитываем суммы из позиций
+      final subtotalWork = _lineItems
+          .where((item) => item.section == LineItemSection.work)
+          .fold(0.0, (sum, item) => sum + item.amount);
+      final subtotalEquipment = _lineItems
+          .where((item) => item.section == LineItemSection.equipment)
+          .fold(0.0, (sum, item) => sum + item.amount);
+      final totalAmount = subtotalWork + subtotalEquipment;
 
-    final quote = Quote(
-      id: widget.quote?.id,
-      companyId: 1,
-      customerName: _customerNameController.text.trim(),
-      customerPhone: _customerPhoneController.text.trim(),
-      customerEmail: _customerEmailController.text.trim(),
-      objectName: _objectNameController.text.trim(),
-      address: _addressController.text.trim(),
-      areaS: double.tryParse(_areaSController.text) ?? 0,
-      perimeterP: double.tryParse(_perimeterPController.text) ?? 0,
-      heightH: double.tryParse(_heightHController.text) ?? 0,
-      ceilingSystem: _selectedCeilingSystem,
-      status: _selectedStatus,
-      paymentTerms: _paymentTermsController.text.trim().isEmpty 
-          ? null 
-          : _paymentTermsController.text.trim(),
-      installationTerms: _installationTermsController.text.trim().isEmpty 
-          ? null 
-          : _installationTermsController.text.trim(),
-      notes: _notesController.text.trim().isEmpty 
-          ? null 
-          : _notesController.text.trim(),
-      currencyCode: 'RUB',
-      subtotalWork: subtotalWork,
-      subtotalEquipment: subtotalEquipment,
-      totalAmount: totalAmount,
-      createdAt: widget.quote?.createdAt ?? DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
+      print('=== ДАННЫЕ ДЛЯ СОХРАНЕНИЯ ===');
+      print('customerName: "${_customerNameController.text.trim()}"');
+      print('objectName: "${_objectNameController.text.trim()}"');
+      print('address: "${_addressController.text.trim()}"');
+      print('subtotalWork: $subtotalWork');
+      print('subtotalEquipment: $subtotalEquipment');
+      print('totalAmount: $totalAmount');
 
-    int savedQuoteId;
-    if (widget.quote == null) {
-      savedQuoteId = await DatabaseHelper.instance.insert('quotes', quote.toMap());
-      quoteId = savedQuoteId;
-    } else {
-      await DatabaseHelper.instance.update(
-        'quotes',
-        quote.toMap(),
+      final quote = Quote(
+        id: widget.quote?.id,
+        companyId: 1,
+        customerName: _customerNameController.text.trim(),
+        customerPhone: _customerPhoneController.text.trim(),
+        customerEmail: _customerEmailController.text.trim(),
+        objectName: _objectNameController.text.trim(),
+        address: _addressController.text.trim(),
+        areaS: double.tryParse(_areaSController.text) ?? 0,
+        perimeterP: double.tryParse(_perimeterPController.text) ?? 0,
+        heightH: double.tryParse(_heightHController.text) ?? 0,
+        ceilingSystem: _selectedCeilingSystem,
+        status: _selectedStatus,
+        paymentTerms: _paymentTermsController.text.trim().isEmpty
+            ? null
+            : _paymentTermsController.text.trim(),
+        installationTerms: _installationTermsController.text.trim().isEmpty
+            ? null
+            : _installationTermsController.text.trim(),
+        notes: _notesController.text.trim().isEmpty
+            ? null
+            : _notesController.text.trim(),
+        currencyCode: 'RUB',
+        subtotalWork: subtotalWork,
+        subtotalEquipment: subtotalEquipment,
+        totalAmount: totalAmount,
+        createdAt: widget.quote?.createdAt ?? DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      print('QUOTE TO MAP: ${quote.toMap()}');
+
+      int savedQuoteId;
+      if (widget.quote == null) {
+        savedQuoteId =
+            await DatabaseHelper.instance.insert('quotes', quote.toMap());
+        quoteId = savedQuoteId;
+      } else {
+        await DatabaseHelper.instance.update(
+          'quotes',
+          quote.toMap(),
+          where: 'quote_id = ?',
+          whereArgs: [quote.id],
+        );
+        savedQuoteId = quote.id!;
+      }
+
+      await DatabaseHelper.instance.delete(
+        'line_items',
         where: 'quote_id = ?',
-        whereArgs: [quote.id],
+        whereArgs: [savedQuoteId],
       );
-      savedQuoteId = quote.id!;
-    }
 
-    await DatabaseHelper.instance.delete(
-      'line_items',
-      where: 'quote_id = ?',
-      whereArgs: [savedQuoteId],
-    );
+      for (final item in _lineItems) {
+        final itemWithQuoteId = item.copyWith(quoteId: savedQuoteId);
+        await DatabaseHelper.instance
+            .insert('line_items', itemWithQuoteId.toMap());
+      }
 
-    for (final item in _lineItems) {
-      final itemWithQuoteId = item.copyWith(quoteId: savedQuoteId);
-      await DatabaseHelper.instance.insert('line_items', itemWithQuoteId.toMap());
-    }
-
-    await DatabaseHelper.instance.delete(
-      'quote_attachments',
-      where: 'quote_id = ?',
-      whereArgs: [savedQuoteId],
-    );
-
-    for (final attachment in _attachments) {
-      final attachmentWithQuoteId = attachment.copyWith(quoteId: savedQuoteId);
-      await DatabaseHelper.instance.insert('quote_attachments', attachmentWithQuoteId.toMap());
-    }
-
-    // Используем pushReplacement для избежания черного экрана
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => const HomeScreen(),
-      ),
-    );
-    
-  } catch (e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка сохранения: $e')),
+      await DatabaseHelper.instance.delete(
+        'quote_attachments',
+        where: 'quote_id = ?',
+        whereArgs: [savedQuoteId],
       );
+
+      for (final attachment in _attachments) {
+        final attachmentWithQuoteId =
+            attachment.copyWith(quoteId: savedQuoteId);
+        await DatabaseHelper.instance
+            .insert('quote_attachments', attachmentWithQuoteId.toMap());
+      }
+
+      // Используем pushReplacement для избежания черного экрана
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const HomeScreen(),
+        ),
+      );
+    } catch (e, stackTrace) {
+      if (mounted) {
+        print('=== ОШИБКА СОХРАНЕНИЯ ===');
+        print('Ошибка: $e');
+        print('StackTrace: $stackTrace');
+        
+        String errorMessage = 'Ошибка сохранения: $e';
+        if (e.toString().contains('UNIQUE constraint failed')) {
+          errorMessage = 'Ошибка: Такая запись уже существует';
+        } else if (e.toString().contains('NOT NULL constraint failed')) {
+          errorMessage = 'Ошибка: Заполните все обязательные поля';
+        } else if (e.toString().contains('no such table')) {
+          errorMessage = 'Ошибка: Таблица не найдена в базе данных';
+        }
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            duration: const Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'Подробно',
+              onPressed: () {
+                print('Полная ошибка: $e');
+                print('Stack trace: $stackTrace');
+              },
+            ),
+          ),
+        );
+      }
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.quote == null ? 'Новое предложение' : 'Редактирование'),
+        title:
+            Text(widget.quote == null ? 'Новое предложение' : 'Редактирование'),
         actions: [
           AnimatedIconButton(
             icon: Icons.table_chart,
@@ -677,7 +747,10 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16),
                               gradient: LinearGradient(
-                                colors: [Colors.blue.shade500, Colors.blue.shade700],
+                                colors: [
+                                  Colors.blue.shade500,
+                                  Colors.blue.shade700
+                                ],
                               ),
                               boxShadow: [
                                 BoxShadow(
@@ -693,7 +766,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                                 onTap: _saveQuote,
                                 borderRadius: BorderRadius.circular(16),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
                                   child: Center(
                                     child: Text(
                                       'Сохранить',
@@ -714,7 +788,10 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             gradient: LinearGradient(
-                              colors: [Colors.red.shade500, Colors.red.shade700],
+                              colors: [
+                                Colors.red.shade500,
+                                Colors.red.shade700
+                              ],
                             ),
                             boxShadow: [
                               BoxShadow(
@@ -730,17 +807,21 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                               onTap: _isExportingPdf ? () {} : _exportToPdf,
                               borderRadius: BorderRadius.circular(16),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 16),
                                 child: _isExportingPdf
                                     ? const SizedBox(
                                         height: 20,
                                         width: 20,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.white),
                                         ),
                                       )
-                                    : const Icon(Icons.picture_as_pdf, color: Colors.white, size: 20),
+                                    : const Icon(Icons.picture_as_pdf,
+                                        color: Colors.white, size: 20),
                               ),
                             ),
                           ),
@@ -750,7 +831,10 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             gradient: LinearGradient(
-                              colors: [Colors.green.shade500, Colors.green.shade700],
+                              colors: [
+                                Colors.green.shade500,
+                                Colors.green.shade700
+                              ],
                             ),
                             boxShadow: [
                               BoxShadow(
@@ -766,17 +850,21 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                               onTap: _isExportingExcel ? () {} : _exportToExcel,
                               borderRadius: BorderRadius.circular(16),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 16),
                                 child: _isExportingExcel
                                     ? const SizedBox(
                                         height: 20,
                                         width: 20,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.white),
                                         ),
                                       )
-                                    : const Icon(Icons.table_chart, color: Colors.white, size: 20),
+                                    : const Icon(Icons.table_chart,
+                                        color: Colors.white, size: 20),
                               ),
                             ),
                           ),
@@ -873,7 +961,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Объект', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Объект',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             TextFormField(
               controller: _objectNameController,
@@ -908,8 +997,11 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                       labelText: 'Площадь S, м²',
                       border: OutlineInputBorder(),
                     ),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))
+                    ],
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -922,8 +1014,11 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                       labelText: 'Периметр P, м.п.',
                       border: OutlineInputBorder(),
                     ),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))
+                    ],
                   ),
                 ),
               ],
@@ -940,14 +1035,17 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                       labelText: 'Высота h, м',
                       border: OutlineInputBorder(),
                     ),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))
+                    ],
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: DropdownButtonFormField<String>(
-                    value: _selectedCeilingSystem,
+                    initialValue: _selectedCeilingSystem,
                     decoration: const InputDecoration(
                       labelText: 'Система крепления',
                       border: OutlineInputBorder(),
@@ -974,106 +1072,118 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
   }
 
   Widget _buildActionButtons() {
-  return Container(
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: const Color(0xFFE5E5E7)),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.03),
-          blurRadius: 10,
-          offset: const Offset(0, 2),
-        ),
-      ],
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Действия',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: const Color(0xFF1D1D1F),
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Ряд с основными кнопками
-              Row(
-                children: [
-                  // Кнопка добавления новой позиции
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _addNewLineItem,
-                      icon: const Icon(Icons.add, size: 16),
-                      label: const Text('Добавить позицию', style: TextStyle(fontSize: 12)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Простая кнопка быстрого добавления
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _showQuickAddDialog,
-                      icon: const Icon(Icons.flash_on, size: 16),
-                      label: const Text('Быстрое добавление', style: TextStyle(fontSize: 12)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Простая кнопка импорта Excel
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _isImporting ? null : _importFromExcel,
-                      icon: _isImporting 
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Icon(Icons.file_upload, size: 16),
-                      label: Text(_isImporting ? 'Загрузка...' : 'Импорт Excel', style: const TextStyle(fontSize: 12)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE5E5E7)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-    ),
-  );
-}
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Действия',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF1D1D1F),
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Ряд с основными кнопками
+                Row(
+                  children: [
+                    // Кнопка добавления новой позиции
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _addNewLineItem,
+                        icon: const Icon(Icons.add, size: 16),
+                        label: const Text('Добавить позицию',
+                            style: TextStyle(fontSize: 12)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Простая кнопка быстрого добавления
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _showQuickAddDialog,
+                        icon: const Icon(Icons.flash_on, size: 16),
+                        label: const Text('Быстрое добавление',
+                            style: TextStyle(fontSize: 12)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Простая кнопка импорта Excel
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _isImporting ? null : _importFromExcel,
+                        icon: _isImporting
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Icon(Icons.file_upload, size: 16),
+                        label: Text(
+                            _isImporting ? 'Загрузка...' : 'Импорт Excel',
+                            style: const TextStyle(fontSize: 12)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-Widget _buildLineItems() {
-    final workItems = _lineItems.where((item) => item.section == LineItemSection.work).toList();
-    final equipmentItems = _lineItems.where((item) => item.section == LineItemSection.equipment).toList();
+  Widget _buildLineItems() {
+    final workItems = _lineItems
+        .where((item) => item.section == LineItemSection.work)
+        .toList();
+    final equipmentItems = _lineItems
+        .where((item) => item.section == LineItemSection.equipment)
+        .toList();
 
     return Container(
-      key: ValueKey(_lineItems.length), // Ключ для обновления при изменении количества
+      key: ValueKey(
+          _lineItems.length), // Ключ для обновления при изменении количества
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -1101,10 +1211,10 @@ Widget _buildLineItems() {
               ),
             ),
             const SizedBox(height: 20),
-            
             if (workItems.isNotEmpty) ...[
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFF007AFF).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -1132,10 +1242,10 @@ Widget _buildLineItems() {
               }).toList(),
               const SizedBox(height: 20),
             ],
-            
             if (equipmentItems.isNotEmpty) ...[
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFF9500).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -1162,7 +1272,6 @@ Widget _buildLineItems() {
                 );
               }).toList(),
             ],
-            
             if (_lineItems.isEmpty)
               Container(
                 padding: const EdgeInsets.all(40),
@@ -1207,7 +1316,8 @@ Widget _buildLineItems() {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Условия и примечания', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Условия и примечания',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             TextFormField(
               controller: _paymentTermsController,
@@ -1255,7 +1365,8 @@ Widget _buildLineItems() {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Статус', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Статус',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             Wrap(
               spacing: 8,

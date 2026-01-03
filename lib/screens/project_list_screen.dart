@@ -37,16 +37,16 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
 
   Future<void> _loadProjects() async {
     setState(() => _isLoading = true);
-    
+
     try {
       final data = await DatabaseHelper.instance.query(
         'projects',
         where: 'deleted_at IS NULL',
         orderBy: 'created_at DESC',
       );
-      
+
       final projects = data.map((map) => Project.fromMap(map)).toList();
-      
+
       setState(() {
         _projects = projects;
         _filteredProjects = projects;
@@ -69,9 +69,9 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
         where: 'deleted_at IS NULL',
         orderBy: 'created_at DESC',
       );
-      
+
       final quotes = data.map((map) => Quote.fromMap(map)).toList();
-      
+
       setState(() {
         _quotes = quotes;
       });
@@ -90,12 +90,20 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
   void _applyFilters() {
     setState(() {
       _filteredProjects = _projects.where((project) {
-        final matchesSearch = project.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            (project.customerName?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false) ||
-            (project.address?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false);
-        
-        final matchesStatus = _selectedStatus == null || project.status == _selectedStatus;
-        
+        final matchesSearch =
+            project.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                (project.customerName
+                        ?.toLowerCase()
+                        .contains(_searchQuery.toLowerCase()) ??
+                    false) ||
+                (project.address
+                        ?.toLowerCase()
+                        .contains(_searchQuery.toLowerCase()) ??
+                    false);
+
+        final matchesStatus =
+            _selectedStatus == null || project.status == _selectedStatus;
+
         return matchesSearch && matchesStatus;
       }).toList();
     });
@@ -128,9 +136,9 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
           where: 'project_id = ?',
           whereArgs: [project.id],
         );
-        
+
         await _loadProjects();
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Проект удален')),
@@ -229,7 +237,8 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
             child: Row(
               children: [
                 _buildStatusChip(null, 'Все'),
-                ...ProjectStatus.values.map((status) => _buildStatusChip(status, status.label)),
+                ...ProjectStatus.values
+                    .map((status) => _buildStatusChip(status, status.label)),
               ],
             ),
           ),
@@ -240,7 +249,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
 
   Widget _buildStatusChip(ProjectStatus? status, String label) {
     final isSelected = _selectedStatus == status;
-    
+
     return Container(
       margin: const EdgeInsets.only(right: 8),
       child: FilterChip(
@@ -253,12 +262,17 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
           });
         },
         backgroundColor: Colors.white,
-        selectedColor: status?.color.withOpacity(0.2) ?? Colors.grey.withOpacity(0.2),
+        selectedColor:
+            status?.color.withOpacity(0.2) ?? Colors.grey.withOpacity(0.2),
         labelStyle: TextStyle(
-          color: isSelected ? (status?.color ?? Colors.grey) : const Color(0xFF86868B),
+          color: isSelected
+              ? (status?.color ?? Colors.grey)
+              : const Color(0xFF86868B),
         ),
         side: BorderSide(
-          color: isSelected ? (status?.color ?? Colors.grey) : const Color(0xFFE5E5E7),
+          color: isSelected
+              ? (status?.color ?? Colors.grey)
+              : const Color(0xFFE5E5E7),
         ),
       ),
     );
@@ -297,19 +311,20 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
   }
 
   Widget _buildProjectCard(Project project) {
-    final profitMargin = project.plannedBudget > 0 
+    final profitMargin = project.plannedBudget > 0
         ? ((project.profit / project.plannedBudget) * 100).toStringAsFixed(1)
         : '0.0';
-    
+
     final currencyFormat = NumberFormat.currency(
       locale: 'ru_RU',
       symbol: '₽',
       decimalDigits: 0,
     );
-    
+
     // Связанное предложение
-    final relatedQuote = project.quoteId != null 
-        ? _quotes.firstWhere((q) => q.id == project.quoteId, orElse: () => Quote.fromMap({}))
+    final relatedQuote = project.quoteId != null
+        ? _quotes.firstWhere((q) => q.id == project.quoteId,
+            orElse: () => Quote.fromMap({}))
         : null;
 
     return Container(
@@ -345,7 +360,8 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: project.status.color.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -372,7 +388,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
               ),
               const SizedBox(height: 4),
             ],
-            
+
             // Связанное предложение
             if (relatedQuote != null) ...[
               const SizedBox(height: 8),
@@ -388,10 +404,11 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.description, color: Colors.blue[700], size: 16),
+                        Icon(Icons.description,
+                            color: Colors.blue[700], size: 16),
                         const SizedBox(width: 8),
                         Text(
-                          'Предложение: ${relatedQuote!.objectName ?? 'Без названия'}',
+                          'Предложение: ${relatedQuote.objectName ?? 'Без названия'}',
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.blue[700],
@@ -402,7 +419,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Сумма: ${currencyFormat.format(relatedQuote!.totalAmount)}',
+                      'Сумма: ${currencyFormat.format(relatedQuote.totalAmount)}',
                       style: TextStyle(
                         fontSize: 11,
                         color: Colors.blue[600],
@@ -450,7 +467,9 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                   child: _buildInfoColumn(
                     'Прибыль',
                     '${project.profit.toStringAsFixed(0)} ₽',
-                    project.profit >= 0 ? const Color(0xFF34C759) : const Color(0xFFFF3B30),
+                    project.profit >= 0
+                        ? const Color(0xFF34C759)
+                        : const Color(0xFFFF3B30),
                   ),
                 ),
               ],
@@ -463,7 +482,9 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: double.parse(profitMargin) >= 0 ? const Color(0xFF34C759) : const Color(0xFFFF3B30),
+                    color: double.parse(profitMargin) >= 0
+                        ? const Color(0xFF34C759)
+                        : const Color(0xFFFF3B30),
                   ),
                 ),
                 const Spacer(),
@@ -472,7 +493,8 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                     final result = await Navigator.push<bool>(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ProjectEditScreen(project: project),
+                        builder: (context) =>
+                            ProjectEditScreen(project: project),
                       ),
                     );
                     if (result == true) {

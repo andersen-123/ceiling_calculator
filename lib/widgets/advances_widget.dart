@@ -25,8 +25,10 @@ class AdvancesWidget extends StatelessWidget {
     );
 
     // Разделяем авансы по типам
-    final projectAdvances = advances.where((a) => a.type == AdvanceType.project).toList();
-    final installerAdvances = advances.where((a) => a.type == AdvanceType.installer).toList();
+    final projectAdvances =
+        advances.where((a) => a.type == AdvanceType.project).toList();
+    final installerAdvances =
+        advances.where((a) => a.type == AdvanceType.installer).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,7 +39,8 @@ class AdvancesWidget extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.account_balance_wallet, color: const Color(0xFF007AFF)),
+                Icon(Icons.account_balance_wallet,
+                    color: const Color(0xFF007AFF)),
                 const SizedBox(width: 8),
                 Text(
                   'Авансы',
@@ -76,7 +79,10 @@ class AdvancesWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          ...projectAdvances.map((advance) => _buildAdvanceCard(advance, currencyFormat, onDeleteAdvance)).toList(),
+          ...projectAdvances
+              .map((advance) =>
+                  _buildAdvanceCard(advance, currencyFormat, onDeleteAdvance))
+              .toList(),
           const SizedBox(height: 16),
         ],
 
@@ -91,7 +97,10 @@ class AdvancesWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          ...installerAdvances.map((advance) => _buildAdvanceCard(advance, currencyFormat, onDeleteAdvance)).toList(),
+          ...installerAdvances
+              .map((advance) =>
+                  _buildAdvanceCard(advance, currencyFormat, onDeleteAdvance))
+              .toList(),
           const SizedBox(height: 16),
         ],
 
@@ -102,7 +111,8 @@ class AdvancesWidget extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF007AFF).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFF007AFF).withOpacity(0.3)),
+              border:
+                  Border.all(color: const Color(0xFF007AFF).withOpacity(0.3)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,7 +164,8 @@ class AdvancesWidget extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Icon(Icons.account_balance_wallet_outlined, size: 48, color: Colors.grey[400]),
+                Icon(Icons.account_balance_wallet_outlined,
+                    size: 48, color: Colors.grey[400]),
                 const SizedBox(height: 16),
                 Text(
                   'Авансов еще нет',
@@ -179,7 +190,8 @@ class AdvancesWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildAdvanceCard(Advance advance, NumberFormat currencyFormat, Function(int) onDelete) {
+  Widget _buildAdvanceCard(
+      Advance advance, NumberFormat currencyFormat, Function(int) onDelete) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
@@ -197,13 +209,17 @@ class AdvancesWidget extends StatelessWidget {
                 Row(
                   children: [
                     Icon(
-                      advance.type == AdvanceType.project ? Icons.business : Icons.person,
+                      advance.type == AdvanceType.project
+                          ? Icons.business
+                          : Icons.person,
                       size: 16,
-                      color: advance.type == AdvanceType.project ? Colors.blue : Colors.green,
+                      color: advance.type == AdvanceType.project
+                          ? Colors.blue
+                          : Colors.green,
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      advance.type == AdvanceType.project 
+                      advance.type == AdvanceType.project
                           ? 'Аванс по объекту'
                           : 'Аванс: ${advance.installerName ?? "Неизвестно"}',
                       style: const TextStyle(
@@ -242,7 +258,9 @@ class AdvancesWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: advance.type == AdvanceType.project ? Colors.blue : Colors.green,
+                  color: advance.type == AdvanceType.project
+                      ? Colors.blue
+                      : Colors.green,
                 ),
               ),
               const SizedBox(height: 4),
@@ -302,7 +320,7 @@ class _AddAdvanceDialogState extends State<_AddAdvanceDialog> {
           children: [
             // Тип аванса
             DropdownButtonFormField<AdvanceType>(
-              value: _selectedType,
+              initialValue: _selectedType,
               decoration: const InputDecoration(
                 labelText: 'Тип аванса',
                 border: OutlineInputBorder(),
@@ -310,7 +328,9 @@ class _AddAdvanceDialogState extends State<_AddAdvanceDialog> {
               items: AdvanceType.values.map((type) {
                 return DropdownMenuItem(
                   value: type,
-                  child: Text(type == AdvanceType.project ? 'По объекту' : 'Монтажнику'),
+                  child: Text(type == AdvanceType.project
+                      ? 'По объекту'
+                      : 'Монтажнику'),
                 );
               }).toList(),
               onChanged: (value) {
@@ -328,7 +348,7 @@ class _AddAdvanceDialogState extends State<_AddAdvanceDialog> {
             // Выбор монтажника (если тип - монтажнику)
             if (_selectedType == AdvanceType.installer) ...[
               DropdownButtonFormField<String>(
-                value: _selectedInstaller,
+                initialValue: _selectedInstaller,
                 decoration: const InputDecoration(
                   labelText: 'Монтажник',
                   border: OutlineInputBorder(),
@@ -351,7 +371,8 @@ class _AddAdvanceDialogState extends State<_AddAdvanceDialog> {
             // Сумма
             TextFormField(
               controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
                 labelText: 'Сумма',
                 prefixText: '₽ ',
@@ -361,7 +382,8 @@ class _AddAdvanceDialogState extends State<_AddAdvanceDialog> {
                 if (value == null || value.trim().isEmpty) {
                   return 'Введите сумму';
                 }
-                if (double.tryParse(value) == null || double.tryParse(value)! <= 0) {
+                if (double.tryParse(value) == null ||
+                    double.tryParse(value)! <= 0) {
                   return 'Введите корректную сумму';
                 }
                 return null;
@@ -424,12 +446,14 @@ class _AddAdvanceDialogState extends State<_AddAdvanceDialog> {
 
   void _addAdvance() {
     if (_amountController.text.trim().isEmpty) return;
-    if (_selectedType == AdvanceType.installer && _selectedInstaller == null) return;
+    if (_selectedType == AdvanceType.installer && _selectedInstaller == null)
+      return;
 
     final advance = Advance(
       projectId: 0, // Будет установлено в parent
       type: _selectedType,
-      installerName: _selectedType == AdvanceType.installer ? _selectedInstaller : null,
+      installerName:
+          _selectedType == AdvanceType.installer ? _selectedInstaller : null,
       amount: double.tryParse(_amountController.text) ?? 0.0,
       description: _descriptionController.text.trim(),
       date: _selectedDate,

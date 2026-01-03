@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import '../services/import_service.dart';
@@ -34,7 +33,7 @@ class _ImportScreenState extends State<ImportScreen> {
         });
 
         final importedQuotes = await ImportService.importExcelFile(file);
-        
+
         setState(() {
           _isLoading = false;
           _importedQuotes = importedQuotes;
@@ -43,7 +42,8 @@ class _ImportScreenState extends State<ImportScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Импортировано ${importedQuotes.length} предложений'),
+              content:
+                  Text('Импортировано ${importedQuotes.length} предложений'),
               backgroundColor: Colors.green,
             ),
           );
@@ -73,12 +73,14 @@ class _ImportScreenState extends State<ImportScreen> {
         final lineItems = quoteData['lineItems'] as List<LineItem>;
 
         // Сохраняем предложение
-        final newQuoteId = await DatabaseHelper.instance.insert('quotes', quote.toMap());
+        final newQuoteId =
+            await DatabaseHelper.instance.insert('quotes', quote.toMap());
 
         // Сохраняем позиции
         for (final item in lineItems) {
           final itemWithQuoteId = item.copyWith(quoteId: newQuoteId);
-          await DatabaseHelper.instance.insert('line_items', itemWithQuoteId.toMap());
+          await DatabaseHelper.instance
+              .insert('line_items', itemWithQuoteId.toMap());
         }
       }
 
@@ -158,7 +160,9 @@ class _ImportScreenState extends State<ImportScreen> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          _isLoading ? 'Импортирование...' : 'Выбрать XLSX файл',
+                          _isLoading
+                              ? 'Импортирование...'
+                              : 'Выбрать XLSX файл',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -181,16 +185,16 @@ class _ImportScreenState extends State<ImportScreen> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 30),
-            
+
             // Список импортированных предложений
             Expanded(
               child: _importedQuotes.isEmpty
                   ? _buildEmptyState()
                   : _buildImportedQuotesList(),
             ),
-            
+
             // Кнопка сохранения
             if (_importedQuotes.isNotEmpty) ...[
               const SizedBox(height: 20),
@@ -223,13 +227,15 @@ class _ImportScreenState extends State<ImportScreen> {
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
                                 ),
                               )
                             : const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.save, color: Colors.white, size: 20),
+                                  Icon(Icons.save,
+                                      color: Colors.white, size: 20),
                                   SizedBox(width: 8),
                                   Text(
                                     'Сохранить все предложения',
@@ -331,7 +337,8 @@ class _ImportScreenState extends State<ImportScreen> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: const Color(0xFF007AFF).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),

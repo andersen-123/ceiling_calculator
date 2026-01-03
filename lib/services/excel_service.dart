@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:excel/excel.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:file_picker/file_picker.dart';
+// import 'package:file_picker/file_picker.dart';  // временно отключен
 import '../models/quote.dart';
 import '../models/line_item.dart';
 import '../models/company.dart';
@@ -162,7 +162,8 @@ class ExcelService {
 
   Future<ExcelImportData?> importFromExcel() async {
     try {
-      // Выбор файла
+      // Выбор файла - временно отключен
+      /*
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['xlsx', 'xls'],
@@ -173,6 +174,9 @@ class ExcelService {
       }
 
       final file = File(result.files.first.path!);
+      */
+      return null; // временно отключено
+      /*
       final bytes = await file.readAsBytes();
       final excel = Excel.decodeBytes(bytes);
 
@@ -198,6 +202,7 @@ class ExcelService {
         equipmentItems: equipmentItems,
         summaryData: summaryData,
       );
+      */
     } catch (e) {
       throw Exception('Ошибка импорта из Excel: $e');
     }

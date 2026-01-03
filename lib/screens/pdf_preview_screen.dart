@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
 import '../models/quote.dart';
 import '../models/line_item.dart';
@@ -30,17 +28,17 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
 
   Future<void> _sharePdf() async {
     setState(() => _isGenerating = true);
-    
+
     try {
       final file = await _pdfService.generateQuotePdf(
         widget.quote,
         widget.lineItems,
         widget.company,
       );
-      
+
       // Используем SharePlus вместо Printing.sharePdf
-      await Share.shareXFiles([XFile(file.path)], 
-        text: 'Коммерческое предложение для ${widget.quote.customerName}');
+      await Share.shareXFiles([XFile(file.path)],
+          text: 'Коммерческое предложение для ${widget.quote.customerName}');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -48,7 +46,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
         );
       }
     }
-    
+
     setState(() => _isGenerating = false);
   }
 
@@ -83,7 +81,8 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
         ),
         allowSharing: false,
         allowPrinting: true,
-        pdfFileName: 'Коммерческое предложение_${widget.quote.customerName}.pdf',
+        pdfFileName:
+            'Коммерческое предложение_${widget.quote.customerName}.pdf',
       ),
     );
   }

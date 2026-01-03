@@ -29,7 +29,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
   final _customerPhoneController = TextEditingController();
   final _budgetController = TextEditingController();
   final _notesController = TextEditingController();
-  
+
   // Focus nodes для управления клавиатурой
   final _nameFocusNode = FocusNode();
   final _addressFocusNode = FocusNode();
@@ -60,25 +60,25 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
     _customerPhoneController.dispose();
     _budgetController.dispose();
     _notesController.dispose();
-    
+
     _nameFocusNode.dispose();
     _addressFocusNode.dispose();
     _customerNameFocusNode.dispose();
     _customerPhoneFocusNode.dispose();
     _budgetFocusNode.dispose();
     _notesFocusNode.dispose();
-    
+
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    
+
     if (widget.project != null) {
       _loadProjectData();
     }
-    
+
     // Добавляем listener для автоматического пересчета зарплаты
     _budgetController.addListener(_recalculateSalary);
   }
@@ -110,17 +110,18 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
         where: 'project_id = ?',
         whereArgs: [widget.project!.id],
       );
-      
+
       // Загрузка выплат зарплаты
       final salaryData = await DatabaseHelper.instance.query(
         'salary_payments',
         where: 'project_id = ?',
         whereArgs: [widget.project!.id],
       );
-      
+
       setState(() {
         _expenses = expensesData.map((map) => Expense.fromMap(map)).toList();
-        _salaryPayments = salaryData.map((map) => SalaryPayment.fromMap(map)).toList();
+        _salaryPayments =
+            salaryData.map((map) => SalaryPayment.fromMap(map)).toList();
       });
     } catch (e) {
       if (mounted) {
@@ -138,10 +139,10 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
         where: 'quote_id = ?',
         whereArgs: [quoteId],
       );
-      
+
       if (data.isNotEmpty) {
         final quote = Quote.fromMap(data.first);
-        
+
         setState(() {
           // Автоматически заполняем поля из предложения
           _customerNameController.text = quote.customerName;
@@ -166,7 +167,8 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
     }
   }
 
-  Map<String, double> _calculateSalaryDistribution(double plannedBudget, List<String> installers, double actualExpenses) {
+  Map<String, double> _calculateSalaryDistribution(
+      double plannedBudget, List<String> installers, double actualExpenses) {
     if (plannedBudget <= 0 || installers.isEmpty) {
       return {
         'driver': 0.0,
@@ -177,15 +179,17 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
 
     // Затраты на материалы - по факту
     final materialsExpenses = actualExpenses;
-    
+
     // Остаток после материалов
     final remainingAmount = plannedBudget - materialsExpenses;
-    
+
     // Зарплата водителя = 5% от остатка
     final driverSalary = remainingAmount * 0.05;
-    
+
     // Остаток делится на количество монтажников
-    final installerSalary = installers.isNotEmpty ? (remainingAmount - driverSalary) / installers.length : 0.0;
+    final installerSalary = installers.isNotEmpty
+        ? (remainingAmount - driverSalary) / installers.length
+        : 0.0;
 
     return {
       'driver': driverSalary,
@@ -202,26 +206,41 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
     try {
       // Расчитываем зарплату по новой формуле
       final plannedBudget = double.tryParse(_budgetController.text) ?? 0.0;
-      final actualExpenses = _expenses.fold(0.0, (sum, expense) => sum + expense.amount);
-      final salaryDistribution = _calculateSalaryDistribution(plannedBudget, _installers, actualExpenses);
-      
+      final actualExpenses =
+          _expenses.fold(0.0, (sum, expense) => sum + expense.amount);
+      final salaryDistribution = _calculateSalaryDistribution(
+          plannedBudget, _installers, actualExpenses);
+
       final project = Project(
         id: widget.project?.id,
         name: _nameController.text.trim(),
-        address: _addressController.text.trim().isEmpty ? null : _addressController.text.trim(),
-        customerName: _customerNameController.text.trim().isEmpty ? null : _customerNameController.text.trim(),
-        customerPhone: _customerPhoneController.text.trim().isEmpty ? null : _customerPhoneController.text.trim(),
+        address: _addressController.text.trim().isEmpty
+            ? null
+            : _addressController.text.trim(),
+        customerName: _customerNameController.text.trim().isEmpty
+            ? null
+            : _customerNameController.text.trim(),
+        customerPhone: _customerPhoneController.text.trim().isEmpty
+            ? null
+            : _customerPhoneController.text.trim(),
         status: _selectedStatus,
         startDate: _startDate,
         endDate: _endDate,
         plannedBudget: plannedBudget,
-        actualExpenses: _expenses.fold(0.0, (sum, expense) => sum + (expense as Expense).amount),
-        totalSalary: _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount),
-        profit: plannedBudget - _expenses.fold(0.0, (sum, expense) => sum + (expense as Expense).amount) - _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount),
+        actualExpenses:
+            _expenses.fold(0.0, (sum, expense) => sum + (expense).amount),
+        totalSalary:
+            _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount),
+        profit: plannedBudget -
+            _expenses.fold(0.0, (sum, expense) => sum + (expense).amount) -
+            _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount),
         quoteId: _selectedQuoteId,
-        driverName: _driverName?.trim().isEmpty ?? true ? null : _driverName?.trim(),
+        driverName:
+            _driverName?.trim().isEmpty ?? true ? null : _driverName?.trim(),
         installers: _installers,
-        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+        notes: _notesController.text.trim().isEmpty
+            ? null
+            : _notesController.text.trim(),
         createdAt: widget.project?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -242,7 +261,8 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
         );
         projectId = widget.project!.id;
       } else {
-        projectId = await DatabaseHelper.instance.insert('projects', projectWithProfit.toMap());
+        projectId = await DatabaseHelper.instance
+            .insert('projects', projectWithProfit.toMap());
       }
 
       // Сохранение расходов
@@ -253,7 +273,8 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
       );
       for (final expense in _expenses) {
         final expenseWithProjectId = expense.copyWith(projectId: projectId!);
-        await DatabaseHelper.instance.insert('expenses', expenseWithProjectId.toMap());
+        await DatabaseHelper.instance
+            .insert('expenses', expenseWithProjectId.toMap());
       }
 
       // Сохранение зарплат
@@ -264,7 +285,8 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
       );
       for (final payment in _salaryPayments) {
         final paymentWithProjectId = payment.copyWith(projectId: projectId!);
-        await DatabaseHelper.instance.insert('salary_payments', paymentWithProjectId.toMap());
+        await DatabaseHelper.instance
+            .insert('salary_payments', paymentWithProjectId.toMap());
       }
 
       if (mounted) {
@@ -316,15 +338,18 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final totalExpenses = _expenses.fold(0.0, (sum, expense) => sum + (expense as Expense).amount);
-    final totalSalary = _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount);
+    final totalExpenses =
+        _expenses.fold(0.0, (sum, expense) => sum + (expense).amount);
+    final totalSalary =
+        _salaryPayments.fold(0.0, (sum, payment) => sum + payment.amount);
     final plannedBudget = double.tryParse(_budgetController.text) ?? 0.0;
     final profit = plannedBudget - totalExpenses - totalSalary;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: Text(widget.project == null ? 'Новый проект' : 'Редактировать проект'),
+        title: Text(
+            widget.project == null ? 'Новый проект' : 'Редактировать проект'),
         backgroundColor: Colors.white,
         elevation: 0,
         titleTextStyle: const TextStyle(
@@ -343,7 +368,8 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
             children: [
               _buildBasicInfo(),
               const SizedBox(height: 24),
-              _buildFinancialSummary(plannedBudget, totalExpenses, totalSalary, profit),
+              _buildFinancialSummary(
+                  plannedBudget, totalExpenses, totalSalary, profit),
               const SizedBox(height: 24),
               _buildExpensesSection(),
               const SizedBox(height: 24),
@@ -436,7 +462,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<ProjectStatus>(
-              value: _selectedStatus,
+              initialValue: _selectedStatus,
               decoration: const InputDecoration(
                 labelText: 'Статус',
                 border: OutlineInputBorder(),
@@ -532,7 +558,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Выбор предложения
             QuoteSelectorWidget(
               selectedQuoteId: _selectedQuoteId,
@@ -541,12 +567,12 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
                   _selectedQuoteId = quoteId;
                 });
                 if (quoteId != null) {
-                  _loadQuoteData(quoteId!);
+                  _loadQuoteData(quoteId);
                 }
               },
             ),
             const SizedBox(height: 20),
-            
+
             // Монтажники и водитель
             InstallersWidget(
               driverName: _driverName,
@@ -554,7 +580,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
               salaryDistribution: _calculateSalaryDistribution(
                 double.tryParse(_budgetController.text) ?? 0.0,
                 _installers,
-                _expenses.fold(0.0, (sum, expense) => sum + (expense as Expense).amount),
+                _expenses.fold(0.0, (sum, expense) => sum + (expense).amount),
               ),
               onChanged: (driverName, installers) {
                 setState(() {
@@ -565,14 +591,15 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
               },
             ),
             const SizedBox(height: 20),
-            
+
             // Авансы
             AdvancesWidget(
               advances: _advances,
               installers: _installers,
               onAddAdvance: (advance) {
                 setState(() {
-                  _advances.add(advance.copyWith(projectId: widget.project?.id ?? 0));
+                  _advances.add(
+                      advance.copyWith(projectId: widget.project?.id ?? 0));
                 });
               },
               onDeleteAdvance: (advanceId) {
@@ -582,12 +609,13 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
               },
             ),
             const SizedBox(height: 20),
-            
+
             TextFormField(
               controller: _budgetController,
               focusNode: _budgetFocusNode,
               autofocus: false,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
                 labelText: 'Планируемый бюджет *',
                 border: OutlineInputBorder(),
@@ -597,7 +625,8 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
                 if (value == null || value.trim().isEmpty) {
                   return 'Введите бюджет';
                 }
-                if (double.tryParse(value) == null || double.tryParse(value)! <= 0) {
+                if (double.tryParse(value) == null ||
+                    double.tryParse(value)! <= 0) {
                   return 'Введите корректную сумму';
                 }
                 return null;
@@ -620,7 +649,8 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
     );
   }
 
-  Widget _buildFinancialSummary(double budget, double expenses, double salary, double profit) {
+  Widget _buildFinancialSummary(
+      double budget, double expenses, double salary, double profit) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -652,16 +682,24 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
             Row(
               children: [
                 Expanded(
-                  child: _buildSummaryItem('Бюджет', budget, const Color(0xFF007AFF)),
+                  child: _buildSummaryItem(
+                      'Бюджет', budget, const Color(0xFF007AFF)),
                 ),
                 Expanded(
-                  child: _buildSummaryItem('Расходы', expenses, const Color(0xFFFF9500)),
+                  child: _buildSummaryItem(
+                      'Расходы', expenses, const Color(0xFFFF9500)),
                 ),
                 Expanded(
-                  child: _buildSummaryItem('Зарплата', salary, const Color(0xFF34C759)),
+                  child: _buildSummaryItem(
+                      'Зарплата', salary, const Color(0xFF34C759)),
                 ),
                 Expanded(
-                  child: _buildSummaryItem('Прибыль', profit, profit >= 0 ? const Color(0xFF34C759) : const Color(0xFFFF3B30)),
+                  child: _buildSummaryItem(
+                      'Прибыль',
+                      profit,
+                      profit >= 0
+                          ? const Color(0xFF34C759)
+                          : const Color(0xFFFF3B30)),
                 ),
               ],
             ),
@@ -924,21 +962,20 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
                     color: Color(0xFF1D1D1F),
                   ),
                 ),
-                if (payment.description != null)
-                  Text(
-                    payment.description!,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF86868B),
-                    ),
+                Text(
+                  payment.description!,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF86868B),
                   ),
+                ),
                 Text(
                   '${payment.date.day}.${payment.date.month}.${payment.date.year}',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF86868B),
-                    ),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF86868B),
                   ),
+                ),
               ],
             ),
           ),
@@ -1065,7 +1102,7 @@ class _AddExpenseDialogState extends State<_AddExpenseDialog> {
             ),
             const SizedBox(height: 20),
             DropdownButtonFormField<ExpenseType>(
-              value: _selectedType,
+              initialValue: _selectedType,
               decoration: const InputDecoration(
                 labelText: 'Тип расхода',
                 border: OutlineInputBorder(),
@@ -1106,7 +1143,8 @@ class _AddExpenseDialogState extends State<_AddExpenseDialog> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
                 labelText: 'Сумма',
                 border: OutlineInputBorder(),
@@ -1184,7 +1222,9 @@ class _AddExpenseDialogState extends State<_AddExpenseDialog> {
       description: description,
       amount: amount,
       date: _selectedDate,
-      notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+      notes: _notesController.text.trim().isEmpty
+          ? null
+          : _notesController.text.trim(),
       createdAt: DateTime.now(),
     );
 
@@ -1236,7 +1276,8 @@ class _AddSalaryDialogState extends State<_AddSalaryDialog> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
                 labelText: 'Сумма',
                 border: OutlineInputBorder(),
@@ -1313,7 +1354,9 @@ class _AddSalaryDialogState extends State<_AddSalaryDialog> {
       employeeName: employeeName,
       amount: amount,
       date: _selectedDate,
-      description: _workDescriptionController.text.trim().isEmpty ? 'Без описания' : _workDescriptionController.text.trim(),
+      description: _workDescriptionController.text.trim().isEmpty
+          ? 'Без описания'
+          : _workDescriptionController.text.trim(),
       createdAt: DateTime.now(),
     );
 

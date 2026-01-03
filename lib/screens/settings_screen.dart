@@ -56,7 +56,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _websiteController.dispose();
     _addressController.dispose();
     _footerNoteController.dispose();
-    
+
     // Очищаем FocusNode
     _companyNameFocusNode.dispose();
     _phoneFocusNode.dispose();
@@ -64,7 +64,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _websiteFocusNode.dispose();
     _addressFocusNode.dispose();
     _footerNoteFocusNode.dispose();
-    
+
     super.dispose();
   }
 
@@ -92,17 +92,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final settingsData = await DatabaseHelper.instance.query('settings');
       final settingsMap = <String, String>{};
       for (final row in settingsData) {
-        settingsMap[row['setting_key'] as String] = row['setting_value'] as String;
+        settingsMap[row['setting_key'] as String] =
+            row['setting_value'] as String;
       }
-      
+
       _settings = AppSettings(
         currencyCode: settingsMap[SettingKey.currencyCode] ?? 'RUB',
-        defaultCompanyId: int.tryParse(settingsMap[SettingKey.defaultCompanyId] ?? ''),
+        defaultCompanyId:
+            int.tryParse(settingsMap[SettingKey.defaultCompanyId] ?? ''),
         language: settingsMap[SettingKey.language] ?? 'ru',
         requireAuth: settingsMap[SettingKey.requireAuth] == '1',
         pinCode: settingsMap[SettingKey.pinCode],
       );
-      
+
       _selectedCurrency = _settings!.currencyCode;
     } catch (e) {
       if (mounted) {
@@ -119,7 +121,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final picker = ImagePicker();
       final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-      
+
       if (pickedFile != null) {
         setState(() {
           _logoPath = pickedFile.path;
@@ -142,11 +144,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final company = Company(
         id: _company?.id,
         name: _companyNameController.text.trim(),
-        phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
-        email: _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
-        website: _websiteController.text.trim().isEmpty ? null : _websiteController.text.trim(),
-        address: _addressController.text.trim().isEmpty ? null : _addressController.text.trim(),
-        footerNote: _footerNoteController.text.trim().isEmpty ? null : _footerNoteController.text.trim(),
+        phone: _phoneController.text.trim().isEmpty
+            ? null
+            : _phoneController.text.trim(),
+        email: _emailController.text.trim().isEmpty
+            ? null
+            : _emailController.text.trim(),
+        website: _websiteController.text.trim().isEmpty
+            ? null
+            : _websiteController.text.trim(),
+        address: _addressController.text.trim().isEmpty
+            ? null
+            : _addressController.text.trim(),
+        footerNote: _footerNoteController.text.trim().isEmpty
+            ? null
+            : _footerNoteController.text.trim(),
         logoPath: _logoPath,
       );
 
@@ -196,7 +208,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _createBackup() async {
     // TODO: Реализовать создание резервной копии
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Функция резервного копирования в разработке')),
+      const SnackBar(
+          content: Text('Функция резервного копирования в разработке')),
     );
   }
 
@@ -244,9 +257,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Информация о компании', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Информация о компании',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-            
+
             // Логотип
             Center(
               child: Column(
@@ -265,11 +279,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               _logoPath!,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
-                                return const Icon(Icons.business, size: 50, color: Colors.grey);
+                                return const Icon(Icons.business,
+                                    size: 50, color: Colors.grey);
                               },
                             ),
                           )
-                        : const Icon(Icons.business, size: 50, color: Colors.grey),
+                        : const Icon(Icons.business,
+                            size: 50, color: Colors.grey),
                   ),
                   const SizedBox(height: 8),
                   TextButton.icon(
@@ -280,7 +296,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 16),
             TextFormField(
               controller: _companyNameController,
@@ -365,11 +381,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Настройки приложения', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Настройки приложения',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-            
             DropdownButtonFormField<String>(
-              value: _selectedCurrency,
+              initialValue: _selectedCurrency,
               decoration: const InputDecoration(
                 labelText: 'Валюта по умолчанию',
                 border: OutlineInputBorder(),
@@ -386,7 +402,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 });
               },
             ),
-            
             const SizedBox(height: 12),
             const Text(
               'Язык интерфейса',
@@ -394,7 +409,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 8),
             const Text('Русский'),
-            
             const SizedBox(height: 16),
             SwitchListTile(
               title: const Text('Требовать аутентификацию'),
@@ -419,9 +433,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Резервное копирование', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Резервное копирование',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-            
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -431,7 +445,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
@@ -440,7 +453,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 label: const Text('Восстановить из копии'),
               ),
             ),
-            
             const SizedBox(height: 16),
             const Text(
               'Резервная копия содержит все коммерческие предложения, настройки и данные компании. '

@@ -49,8 +49,7 @@ class Quote {
     required this.updatedAt,
     this.projectId,
     this.deletedAt,
-  })  : assert(createdAt != null),
-        assert(updatedAt != null);
+  }) : assert(updatedAt != null);
 
   Map<String, dynamic> toMap() {
     return {
@@ -106,7 +105,8 @@ class Quote {
       totalAmount: map['total_amount']?.toDouble() ?? 0.0,
       createdAt: DateTime.parse(map['created_at']),
       updatedAt: DateTime.parse(map['updated_at']),
-      deletedAt: map['deleted_at'] != null ? DateTime.parse(map['deleted_at']) : null,
+      deletedAt:
+          map['deleted_at'] != null ? DateTime.parse(map['deleted_at']) : null,
       projectId: map['project_id'], // Связь с проектом
     );
   }

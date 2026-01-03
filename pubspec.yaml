@@ -32,7 +32,7 @@ dependencies:
   excel: ^4.0.1
   
   # Файлы
-  file_picker: ^6.1.1
+  # file_picker: ^6.1.1  # временно отключен для сборки
   permission_handler: ^11.0.1
   url_launcher: ^6.1.14
   # open_file: ^3.1.0  # временно отключен из-за проблем с namespace

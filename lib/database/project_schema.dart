@@ -1,10 +1,9 @@
-import 'package:sqflite/sqflite.dart';
 import '../database/database_helper.dart';
 
 class ProjectSchema {
   static Future<void> createTables(DatabaseHelper dbHelper) async {
     final db = await dbHelper.database;
-    
+
     await db.execute('''
       CREATE TABLE IF NOT EXISTS projects (
         project_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,11 +53,17 @@ class ProjectSchema {
     ''');
 
     // Создание индексов для быстрого поиска
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status)');
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_projects_created_at ON projects(created_at)');
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_expenses_project_id ON expenses(project_id)');
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(date)');
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_salary_project_id ON salary_payments(project_id)');
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_salary_date ON salary_payments(date)');
+    await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status)');
+    await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_projects_created_at ON projects(created_at)');
+    await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_expenses_project_id ON expenses(project_id)');
+    await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(date)');
+    await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_salary_project_id ON salary_payments(project_id)');
+    await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_salary_date ON salary_payments(date)');
   }
 }
