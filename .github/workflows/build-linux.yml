@@ -1,0 +1,40 @@
+name: Build Linux
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.6'
+        channel: 'stable'
+        cache: true
+        
+    - name: Check Flutter version
+      run: flutter --version
+      
+    - name: Check Dart version  
+      run: dart --version
+        
+    - name: Get dependencies
+      run: flutter pub get
+      
+    - name: Build Linux
+      run: flutter build linux --release
+      
+    - name: Upload Linux build
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-release
+        path: build/linux/x64/release/bundle/
