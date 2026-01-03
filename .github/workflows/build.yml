@@ -27,6 +27,13 @@ jobs:
         channel: 'stable'
         cache: 'false'
         
+    - name: Clean Flutter cache
+      run: |
+        flutter clean
+        rm -rf .dart_tool
+        rm -rf .packages
+        rm -rf pubspec.lock
+        
     - name: Check Flutter version
       run: flutter --version
       
