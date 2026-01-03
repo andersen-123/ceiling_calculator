@@ -385,7 +385,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              initialValue: _selectedCurrency,
+              value: _selectedCurrency,
               decoration: const InputDecoration(
                 labelText: 'Валюта по умолчанию',
                 border: OutlineInputBorder(),

@@ -1045,7 +1045,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: DropdownButtonFormField<String>(
-                    initialValue: _selectedCeilingSystem,
+                    value: _selectedCeilingSystem,
                     decoration: const InputDecoration(
                       labelText: 'Система крепления',
                       border: OutlineInputBorder(),

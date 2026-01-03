@@ -462,7 +462,7 @@ class _ProjectEditScreenState extends State<ProjectEditScreen> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<ProjectStatus>(
-              initialValue: _selectedStatus,
+              value: _selectedStatus,
               decoration: const InputDecoration(
                 labelText: 'Статус',
                 border: OutlineInputBorder(),
@@ -1102,7 +1102,7 @@ class _AddExpenseDialogState extends State<_AddExpenseDialog> {
             ),
             const SizedBox(height: 20),
             DropdownButtonFormField<ExpenseType>(
-              initialValue: _selectedType,
+              value: _selectedType,
               decoration: const InputDecoration(
                 labelText: 'Тип расхода',
                 border: OutlineInputBorder(),

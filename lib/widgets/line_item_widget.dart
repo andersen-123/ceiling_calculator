@@ -147,7 +147,7 @@ class _LineItemWidgetState extends State<LineItemWidget> {
                 Expanded(
                   flex: 2,
                   child: DropdownButtonFormField<String>(
-                    initialValue: _selectedUnit,
+                    value: _selectedUnit,
                     decoration: const InputDecoration(
                       labelText: 'Ед.изм.',
                       border: OutlineInputBorder(),

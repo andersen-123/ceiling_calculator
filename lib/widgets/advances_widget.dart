@@ -320,7 +320,7 @@ class _AddAdvanceDialogState extends State<_AddAdvanceDialog> {
           children: [
             // Тип аванса
             DropdownButtonFormField<AdvanceType>(
-              initialValue: _selectedType,
+              value: _selectedType,
               decoration: const InputDecoration(
                 labelText: 'Тип аванса',
                 border: OutlineInputBorder(),
@@ -348,7 +348,7 @@ class _AddAdvanceDialogState extends State<_AddAdvanceDialog> {
             // Выбор монтажника (если тип - монтажнику)
             if (_selectedType == AdvanceType.installer) ...[
               DropdownButtonFormField<String>(
-                initialValue: _selectedInstaller,
+                value: _selectedInstaller,
                 decoration: const InputDecoration(
                   labelText: 'Монтажник',
                   border: OutlineInputBorder(),
