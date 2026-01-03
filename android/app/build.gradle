@@ -34,7 +34,7 @@ android {
     namespace "com.ceilingcalc.ceiling_calculator"
     compileSdkVersion 34
     buildToolsVersion "34.0.0"
-    ndkVersion flutter.ndkVersion
+    ndkVersion "26.1.10909125"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
