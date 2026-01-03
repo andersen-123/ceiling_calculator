@@ -60,6 +60,19 @@ jobs:
         flutter pub cache clean
         flutter pub cache repair
         
+    - name: Verify pubspec.yaml content
+      run: |
+        echo "=== Current pubspec.yaml content ==="
+        grep -n "path:" pubspec.yaml
+        echo "=== Full dependencies section ==="
+        sed -n '/dependencies:/,/flutter:/p' pubspec.yaml | head -20
+        
+    - name: Force update dependencies
+      run: |
+        export PATH="$PWD/flutter/bin:$PATH"
+        flutter pub upgrade --major-versions
+        flutter pub get --verbose
+        
     - name: Check Flutter version
       run: flutter --version
       
