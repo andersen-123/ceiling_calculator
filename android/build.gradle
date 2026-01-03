@@ -15,25 +15,10 @@ buildscript {
     }
 }
 
-plugins {
-    id 'dev.flutter.flutter-gradle-plugin' version '1.0.0' apply false
-}
-
 allprojects {
     repositories {
         google()
         mavenCentral()
-    }
-    
-    // Force specific build tools version for all subprojects
-    subprojects {
-        afterEvaluate {
-            if (project.hasProperty('android')) {
-                android {
-                    buildToolsVersion "34.0.0"
-                }
-            }
-        }
     }
 }
 
