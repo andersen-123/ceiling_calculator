@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
+// import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/quote.dart';
 import '../models/line_item.dart';
@@ -26,8 +26,8 @@ class PdfService {
   ) async {
     final pdf = pw.Document(pageMode: PdfPageMode.outlines);
 
-    final font = await PdfGoogleFonts.nunitoRegular();
-    final boldFont = await PdfGoogleFonts.nunitoBold();
+    final font = pw.Font.courier();
+    final boldFont = pw.Font.courierBold();
 
     pdf.addPage(
       pw.MultiPage(
