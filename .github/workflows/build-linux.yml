@@ -34,6 +34,7 @@ jobs:
         rm -rf pubspec.lock
         rm -rf ~/.pub-cache
         rm -rf ~/.flutter
+        rm -rf /opt/hostedtoolcache/flutter
         flutter pub cache repair
         flutter pub get
         
