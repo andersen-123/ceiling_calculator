@@ -31,7 +31,7 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 android {
     namespace "com.ceilingcalc.ceiling_calculator"
     compileSdkVersion 34
-    buildToolsVersion "33.0.1"
+    buildToolsVersion "34.0.0"
     ndkVersion flutter.ndkVersion
 
     compileOptions {
