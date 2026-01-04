@@ -1,20 +1,12 @@
-def localProperties = new Properties()
-def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader("UTF-8") { reader -> localProperties.load(reader) }
-}
+// Minimal Flutter Gradle configuration without SDK dependencies
 
-def flutterSdkPath = localProperties.getProperty("flutter.sdk")
-if (flutterSdkPath == null) {
-    flutterSdkPath = System.getenv("FLUTTER_ROOT")
-    if (flutterSdkPath == null) {
-        flutterSdkPath = "/opt/hostedtoolcache/flutter/stable-3.16.0-x64"
-    }
+android {
+    compileSdkVersion 34
+    buildToolsVersion "34.0.0"
 }
-
-// Apply Flutter plugin
-apply from: "$flutterSdkPath/packages/flutter_tools/gradle/flutter.gradle"
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10"
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'com.google.android.play:core:1.10.3'
 }
