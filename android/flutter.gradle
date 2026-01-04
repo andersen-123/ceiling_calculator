@@ -1,8 +1,0 @@
-// Simple Flutter Gradle configuration
-// Bypass plugin loader for compatibility
-
-// Add Flutter dependencies to the project
-dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-}
