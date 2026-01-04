@@ -88,4 +88,9 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.multidex:multidex:2.0.1'
+    
+    // Fix Kotlin duplicate classes
+    implementation('org.jetbrains.kotlin:kotlin-stdlib:1.9.10') {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+    }
 }
