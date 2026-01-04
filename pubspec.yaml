@@ -53,7 +53,7 @@ flutter:
     - assets/templates/
 
   # Тестовая точка входа для отладки
-  # main: main_simple.dart
+  main: main_simple.dart
 
 # Правильная конфигурация платформ для file_picker (временно закомментирована)
 # platforms:
