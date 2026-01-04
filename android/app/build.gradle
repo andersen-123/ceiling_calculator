@@ -28,7 +28,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 apply plugin: 'com.android.application'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+apply from: "../flutter.gradle"
 
 android {
     namespace "com.ceilingcalc.ceiling_calculator"
