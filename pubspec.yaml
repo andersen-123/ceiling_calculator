@@ -43,22 +43,23 @@ dependencies:
   uuid: ^4.5.1
   currency_picker: ^2.0.21
 
-# Все плагины обновлены до современных версий
-# Удалены dependency_overrides для чистоты
-
 flutter:
   uses-material-design: true
   generate: true
+
+  # Assets
   assets:
     - assets/images/
     - assets/templates/
+
+  # Тестовая точка входа для отладки
+  # main: main_simple.dart
 
 # Правильная конфигурация платформ для file_picker (временно закомментирована)
 # platforms:
 #   android:
 #     default_package: file_picker
 #   ios:
-#     default_package: file_picker
 #   macos:
 #     default_package: file_picker
 #   web:
