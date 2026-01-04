@@ -120,10 +120,10 @@ jobs:
         # Создание AVD для тестирования
         cd ..
         export ANDROID_SDK_ROOT=$PWD/android-sdk
-        export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
+        export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/emulator
         
         # Установка необходимых компонентов
-        yes | sdkmanager "platforms;android-34" "platform-tools" "system-images;android-34;google_apis;x86_64"
+        yes | sdkmanager "platforms;android-34" "platform-tools" "system-images;android-34;google_apis;x86_64" "emulator"
         
         # Создание AVD
         echo "no" | sdkmanager --licenses
