@@ -127,7 +127,7 @@ jobs:
         
         # Создание AVD
         echo "no" | sdkmanager --licenses
-        avdmanager create avd -n test_emulator -k "system-images;android-34;google_apis;x86_64" --force
+        echo "no" | avdmanager create avd -n test_emulator -k "system-images;android-34;google_apis;x86_64" --force
         
         # Запуск эмулятора в фоновом режиме
         echo "Starting emulator..."
