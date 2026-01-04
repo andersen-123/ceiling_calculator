@@ -18,7 +18,6 @@ if (flutterVersionName == null) {
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply from: "../flutter.gradle"
 
 android {
     namespace "com.ceilingcalc.ceiling_calculator"
@@ -28,18 +27,6 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
-    }
-
-    sourceSets {
-        main {
-            java {
-                exclude '**/io/flutter/**'
-            }
-        }
-    }
-
-    kotlinOptions {
-        jvmTarget = '17'
     }
 
     defaultConfig {
@@ -54,15 +41,11 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.debug
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-        debug {
-            signingConfig signingConfigs.debug
         }
     }
 }
 
 dependencies {
-    // Dependencies are in flutter.gradle
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10"
+    implementation 'androidx.multidex:multidex:2.0.1'
 }
