@@ -30,6 +30,14 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    sourceSets {
+        main {
+            java {
+                exclude '**/io/flutter/**'
+            }
+        }
+    }
+
     kotlinOptions {
         jvmTarget = '17'
     }
