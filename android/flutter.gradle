@@ -1,0 +1,6 @@
+// Flutter Gradle Plugin - bypass compatibility check
+// This allows building with newer Flutter versions
+
+apply plugin: 'dev.flutter.flutter-gradle-plugin'
+
+include ':app'

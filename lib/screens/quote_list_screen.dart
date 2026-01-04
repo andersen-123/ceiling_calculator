@@ -203,7 +203,7 @@ class _QuoteListScreenState extends State<QuoteListScreen> {
                             },
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 ),

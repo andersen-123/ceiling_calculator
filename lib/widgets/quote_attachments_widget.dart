@@ -7,18 +7,18 @@ class QuoteAttachmentsWidget extends StatefulWidget {
   final Function(List<QuoteAttachment>) onChanged;
 
   const QuoteAttachmentsWidget({
-    Key? key,
+    super.key,
     required this.quoteId,
     required this.attachments,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<QuoteAttachmentsWidget> createState() => _QuoteAttachmentsWidgetState();
 }
 
 class _QuoteAttachmentsWidgetState extends State<QuoteAttachmentsWidget> {
-  bool _isAddingFile = false;
+  final bool _isAddingFile = false;
 
   @override
   Widget build(BuildContext context) {

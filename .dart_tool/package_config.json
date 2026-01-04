@@ -248,54 +248,6 @@
       "languageVersion": "3.2"
     },
     {
-      "name": "open_file",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file-3.5.4",
-      "packageUri": "lib/",
-      "languageVersion": "2.17"
-    },
-    {
-      "name": "open_file_android",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_android-1.0.6",
-      "packageUri": "lib/",
-      "languageVersion": "2.17"
-    },
-    {
-      "name": "open_file_ios",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_ios-1.0.3",
-      "packageUri": "lib/",
-      "languageVersion": "2.17"
-    },
-    {
-      "name": "open_file_linux",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_linux-0.0.5",
-      "packageUri": "lib/",
-      "languageVersion": "2.17"
-    },
-    {
-      "name": "open_file_mac",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_mac-1.0.3",
-      "packageUri": "lib/",
-      "languageVersion": "2.17"
-    },
-    {
-      "name": "open_file_platform_interface",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_platform_interface-1.0.3",
-      "packageUri": "lib/",
-      "languageVersion": "2.17"
-    },
-    {
-      "name": "open_file_web",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_web-0.0.2",
-      "packageUri": "lib/",
-      "languageVersion": "2.17"
-    },
-    {
-      "name": "open_file_windows",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/open_file_windows-0.0.3",
-      "packageUri": "lib/",
-      "languageVersion": "2.17"
-    },
-    {
       "name": "path",
       "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/path-1.9.1",
       "packageUri": "lib/",
@@ -423,13 +375,13 @@
     },
     {
       "name": "share_plus",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/share_plus-9.0.0",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/share_plus-7.2.2",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "2.18"
     },
     {
       "name": "share_plus_platform_interface",
-      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/share_plus_platform_interface-4.0.0",
+      "rootUri": "file:///home/ander/.pub-cache/hosted/pub.dev/share_plus_platform_interface-3.4.0",
       "packageUri": "lib/",
       "languageVersion": "2.18"
     },

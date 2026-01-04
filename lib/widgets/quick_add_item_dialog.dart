@@ -89,9 +89,9 @@ class _QuickAddItemDialogState extends State<QuickAddItemDialog> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         'Быстрое добавление',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF1D1D1F),

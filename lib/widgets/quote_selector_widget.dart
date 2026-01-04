@@ -48,12 +48,12 @@ class _QuoteSelectorWidgetState extends State<QuoteSelectorWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Связанное предложение',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF1D1D1F),
+            color: Color(0xFF1D1D1F),
           ),
         ),
         const SizedBox(height: 8),
@@ -101,7 +101,7 @@ class _QuoteSelectorWidgetState extends State<QuoteSelectorWidget> {
                             ],
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                     onChanged: (value) {
                       widget.onChanged(value);

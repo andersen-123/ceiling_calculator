@@ -49,7 +49,7 @@ class Quote {
     required this.updatedAt,
     this.projectId,
     this.deletedAt,
-  }) : assert(updatedAt != null);
+  });
 
   Map<String, dynamic> toMap() {
     return {

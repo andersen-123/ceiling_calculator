@@ -69,12 +69,12 @@ class _InstallersWidgetState extends State<InstallersWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Водитель
-        Text(
+        const Text(
           'Водитель (кто на машине)',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF1D1D1F),
+            color: Color(0xFF1D1D1F),
           ),
         ),
         const SizedBox(height: 8),
@@ -123,12 +123,12 @@ class _InstallersWidgetState extends State<InstallersWidget> {
         const SizedBox(height: 20),
 
         // Монтажники
-        Text(
+        const Text(
           'Монтажники',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF1D1D1F),
+            color: Color(0xFF1D1D1F),
           ),
         ),
         const SizedBox(height: 8),
@@ -233,7 +233,7 @@ class _InstallersWidgetState extends State<InstallersWidget> {
                 ],
               ),
             );
-          }).toList(),
+          }),
         ],
 
         // Информация о расчете
@@ -249,12 +249,12 @@ class _InstallersWidgetState extends State<InstallersWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Расчет зарплаты:',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF007AFF),
+                    color: Color(0xFF007AFF),
                   ),
                 ),
                 const SizedBox(height: 8),
