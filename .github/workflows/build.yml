@@ -123,7 +123,7 @@ jobs:
         export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
         
         # Установка необходимых компонентов
-        yes | sdkmanager "platforms;android-34" "platform-tools"
+        yes | sdkmanager "platforms;android-34" "platform-tools" "system-images;android-34;google_apis;x86_64"
         
         # Создание AVD
         echo "no" | sdkmanager --licenses
