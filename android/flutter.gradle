@@ -1,0 +1,17 @@
+def localProperties = new Properties()
+def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader("UTF-8") { reader -> properties.load(reader) }
+}
+
+def flutterSdkPath = localProperties.getProperty("flutter.sdk")
+if (flutterSdkPath == null) {
+    flutterSdkPath = System.getenv("FLUTTER_ROOT")
+    if (flutterSdkPath == null) {
+        flutterSdkPath = "/opt/hostedtoolcache/flutter/stable-3.16.0-x64"
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10"
+}
