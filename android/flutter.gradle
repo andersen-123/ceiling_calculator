@@ -1,7 +1,7 @@
 def localProperties = new Properties()
 def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
 if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader("UTF-8") { reader -> properties.load(reader) }
+    localPropertiesFile.withReader("UTF-8") { reader -> localProperties.load(reader) }
 }
 
 def flutterSdkPath = localProperties.getProperty("flutter.sdk")
@@ -11,6 +11,9 @@ if (flutterSdkPath == null) {
         flutterSdkPath = "/opt/hostedtoolcache/flutter/stable-3.16.0-x64"
     }
 }
+
+// Apply Flutter plugin
+apply from: "$flutterSdkPath/packages/flutter_tools/gradle/flutter.gradle"
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10"
