@@ -1,45 +1,14 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.INTERNET" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     
-    <!-- Для Android 12 и ниже -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" 
-        android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" 
-        android:maxSdkVersion="32" />
-    
-    <!-- Для Android 13 и выше -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-    
-    <!-- Для доступа к файлам приложения -->
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" 
-        android:minSdkVersion="30"
-        tools:ignore="ScopedStorage" />
-    
-    <uses-permission android:name="android.permission.CAMERA" />
-
     <application
-        android:label="Калькулятор потолков"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:roundIcon="@drawable/ic_launcher_foreground"
+        android:label="Ceiling Calculator"
         android:allowBackup="true"
-        android:fullBackupContent="false"
-        android:supportsRtl="true"
-        android:theme="@style/LaunchTheme"
-        android:requestLegacyExternalStorage="true"
-        android:forceDarkAllowed="false"
-        android:usesCleartextTraffic="true">
+        android:icon="@mipmap/ic_launcher"
+        android:theme="@android:style/Theme.Material.Light">
         
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:theme="@style/LaunchTheme"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize">
+            android:exported="true">
             
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -47,8 +16,5 @@
             </intent-filter>
         </activity>
         
-        <meta-data
-            android:name="flutterEmbedding"
-            android:value="2" />
     </application>
 </manifest>
